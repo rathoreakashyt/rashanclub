@@ -12,6 +12,7 @@ class SyncController extends Controller
     private int $companyId;
     private int $outletId;
     private int $userId;
+    private string $deviceId;
 
     public function __construct(Request $request)
     {
@@ -19,6 +20,9 @@ class SyncController extends Controller
         $this->companyId = (int) ($user->company_id ?? 1);
         $this->outletId = (int) ($request->header('X-Outlet-Id') ?: 1);
         $this->userId = (int) $user->id;
+        // Multi-counter: har machine/counter ka unique device id — mapping isi se
+        // key hoti hai taaki 10 counters ke same local_id clash na karein.
+        $this->deviceId = (string) ($request->header('X-Device-Id') ?: $request->input('device_id', 'unknown'));
     }
 
     /**
@@ -315,15 +319,11 @@ class SyncController extends Controller
         $saleId = (int) ($sr['sale_id'] ?? 0);
 
         try {
-            // Idempotency: this local return was already pushed before
+            // Idempotency: same device + local return already pushed? (multi-counter safe)
             if (! empty($localId)) {
-                $existing = DB::table('sale_returns')
-                    ->where('company_id', $this->companyId)
-                    ->where('outlet_id', $this->outletId)
-                    ->where('local_id', $localId)
-                    ->first();
-                if ($existing) {
-                    return ['local_id' => $localId, 'server_id' => (int) $existing->id];
+                $mapped = $this->findMapping('sale_returns', $localId);
+                if ($mapped && DB::table('sale_returns')->where('id', $mapped->server_id)->exists()) {
+                    return ['local_id' => $localId, 'server_id' => (int) $mapped->server_id];
                 }
             }
 
@@ -456,6 +456,10 @@ class SyncController extends Controller
                 $row['sale_return_id'] = $returnId;
                 $row['sale_id'] = $saleId > 0 ? $saleId : null;
                 DB::table('sale_return_details')->insert($row);
+            }
+
+            if (! empty($localId)) {
+                $this->mapLocal('sale_returns', $localId, '', (int) $returnId);
             }
 
             return ['local_id' => $localId, 'server_id' => $returnId];
@@ -1050,6 +1054,13 @@ class SyncController extends Controller
             return ['local_id' => $sale['local_id'], 'server_id' => null, 'error' => 'No items'];
         }
 
+        // Multi-counter idempotency: ye local sale (device + VchCode) pehle hi push
+        // ho chuki hai? Retry/ack-loss pe duplicate sale na bane.
+        $mappedSale = $this->findMapping('sales', 0, (string) ($sale['local_id'] ?? ''));
+        if ($mappedSale && DB::table('sales')->where('id', $mappedSale->server_id)->where('del_status', 'Live')->exists()) {
+            return ['local_id' => $sale['local_id'], 'server_id' => (int) $mappedSale->server_id, 'created' => false];
+        }
+
         // Map payment method names -> ids (Cash/UPI/Card/Bank Transfer)
         $paymentMethodMap = [];
         foreach (DB::table('payment_methods')->where('del_status', 'Live')->get(['id', 'name']) as $pm) {
@@ -1086,7 +1097,7 @@ class SyncController extends Controller
                 ->where('company_id', $this->companyId)
                 ->where('invoice_no', 'like', $prefix . '%')
                 ->pluck('invoice_no')
-                ->map(fn ($n) => (int) preg_replace('/^SALE-\d+-C\d+-/', '', (string) $n) ?: 0)
+                ->map(fn ($n) => (int) preg_replace('/^SALE-\d+-[^-]+-/', '', (string) $n) ?: 0)
                 ->max();
             $invoiceNo = $prefix . 'C' . $this->outletId . '-' . str_pad(($maxSeq ?? 0) + 1, 6, '0', STR_PAD_LEFT);
         }
@@ -1199,6 +1210,8 @@ class SyncController extends Controller
             ]);
         }
 
+        $this->mapLocal('sales', 0, (string) ($sale['local_id'] ?? ''), (int) $saleId);
+
         return ['local_id' => $sale['local_id'], 'server_id' => (int) $saleId, 'created' => true];
     }
 
@@ -1291,6 +1304,12 @@ class SyncController extends Controller
             return ['local_id' => $localId, 'server_id' => null, 'error' => 'No items'];
         }
 
+        // Multi-counter idempotency — retry/ack-loss pe duplicate purchase na bane
+        $mapped = $this->findMapping('purchases', $localId);
+        if ($mapped && DB::table('purchases')->where('id', $mapped->server_id)->where('del_status', 'Live')->exists()) {
+            return ['local_id' => $localId, 'server_id' => (int) $mapped->server_id, 'created' => false];
+        }
+
         $supplierId = ! empty($purchase['supplier_id']) && is_numeric($purchase['supplier_id']) ? (int) $purchase['supplier_id'] : null;
         if ($supplierId && ! DB::table('suppliers')->where('id', $supplierId)->where('company_id', $this->companyId)->exists()) {
             $supplierId = null;
@@ -1350,6 +1369,8 @@ class SyncController extends Controller
             ]);
         }
 
+        $this->mapLocal('purchases', $localId, '', (int) $purchaseId);
+
         return ['local_id' => $localId, 'server_id' => (int) $purchaseId, 'created' => true];
     }
 
@@ -1360,6 +1381,12 @@ class SyncController extends Controller
         $items = $return['items'] ?? [];
         if (count($items) === 0) {
             return ['local_id' => $localId, 'server_id' => null, 'error' => 'No items'];
+        }
+
+        // Multi-counter idempotency — retry pe duplicate purchase return na bane
+        $mapped = $this->findMapping('purchase_returns', $localId);
+        if ($mapped && DB::table('purchase_returns')->where('id', $mapped->server_id)->where('del_status', 'Live')->exists()) {
+            return ['local_id' => $localId, 'server_id' => (int) $mapped->server_id, 'created' => false];
         }
 
         $supplierId = ! empty($return['supplier_id']) && is_numeric($return['supplier_id']) ? (int) $return['supplier_id'] : null;
@@ -1409,6 +1436,8 @@ class SyncController extends Controller
             ]);
         }
 
+        $this->mapLocal('purchase_returns', $localId, '', (int) $returnId);
+
         return ['local_id' => $localId, 'server_id' => (int) $returnId, 'created' => true];
     }
 
@@ -1416,6 +1445,10 @@ class SyncController extends Controller
     {
         $now = now()->toDateTimeString();
         $localId = $payment['local_id'] ?? null;
+        $mapped = $this->findMapping('supplier_payments', $localId);
+        if ($mapped && DB::table('supplier_payments')->where('id', $mapped->server_id)->exists()) {
+            return ['local_id' => $localId, 'server_id' => (int) $mapped->server_id, 'created' => false];
+        }
         $supplierId = ! empty($payment['supplier_id']) && is_numeric($payment['supplier_id']) ? (int) $payment['supplier_id'] : null;
         if (! $supplierId) {
             return ['local_id' => $localId, 'server_id' => null, 'error' => 'Supplier required'];
@@ -1436,6 +1469,8 @@ class SyncController extends Controller
             'updated_at' => $now,
         ]);
 
+        $this->mapLocal('supplier_payments', $localId, '', (int) $id);
+
         return ['local_id' => $localId, 'server_id' => (int) $id, 'created' => true];
     }
 
@@ -1443,6 +1478,10 @@ class SyncController extends Controller
     {
         $now = now()->toDateTimeString();
         $localId = $expense['local_id'] ?? null;
+        $mapped = $this->findMapping('expenses', $localId);
+        if ($mapped && DB::table('expenses')->where('id', $mapped->server_id)->exists()) {
+            return ['local_id' => $localId, 'server_id' => (int) $mapped->server_id, 'created' => false];
+        }
         $categoryId = ! empty($expense['category_id']) && is_numeric($expense['category_id']) ? (int) $expense['category_id'] : null;
         if (! $categoryId) {
             return ['local_id' => $localId, 'server_id' => null, 'error' => 'Category required'];
@@ -1464,12 +1503,54 @@ class SyncController extends Controller
             'updated_at' => $now,
         ]);
 
+        $this->mapLocal('expenses', $localId, '', (int) $id);
+
         return ['local_id' => $localId, 'server_id' => (int) $id, 'created' => true];
     }
 
 
 
     // ═══════════════════ GENERIC ENTITY PUSH (/api/sync/push-entity) ═══════════════════
+
+    // ═══════════ MULTI-COUNTER MAPPING HELPERS ═══════════
+    // (device_id + local key se mapping — iske bina alag counters ek dusre ki
+    // mapping clobber karke server par duplicate rows bana dete the)
+
+    private function findMapping(string $entityType, $localId = 0, string $localRef = ''): ?object
+    {
+        $q = DB::table('sync_local_mappings')
+            ->where('entity_type', $entityType)
+            ->where('device_id', $this->deviceId)
+            ->where('company_id', $this->companyId)
+            ->where('outlet_id', $this->outletId);
+        if ($localRef !== '') {
+            $q->where('local_ref', $localRef);
+        } else {
+            $q->where('local_id', (int) $localId);
+        }
+
+        return $q->first();
+    }
+
+    private function mapLocal(string $entityType, $localId, string $localRef, int $serverId): void
+    {
+        try {
+            DB::table('sync_local_mappings')->updateOrInsert(
+                [
+                    'entity_type' => $entityType,
+                    'device_id'   => $this->deviceId,
+                    'local_ref'   => $localRef,
+                    'local_id'    => $localRef !== '' ? 0 : (int) $localId,
+                    'company_id'  => $this->companyId,
+                    'outlet_id'   => $this->outletId,
+                ],
+                ['server_id' => $serverId, 'updated_at' => now()->toDateTimeString()]
+            );
+        } catch (\Throwable) {
+            // mapping write fail ho to sirf log — retry pe dobara ho jayega
+            \Illuminate\Support\Facades\Log::warning('mapLocal failed', ['entity' => $entityType, 'ref' => $localRef]);
+        }
+    }
 
     /**
      * Tables the desktop app may push through the generic pending_sync queue.
@@ -1540,12 +1621,7 @@ class SyncController extends Controller
         try {
             $cols = collect(DB::getSchemaBuilder()->getColumnListing($entityType));
 
-            $mapping = DB::table('sync_local_mappings')
-                ->where('entity_type', $entityType)
-                ->where('local_id', $entityId)
-                ->where('company_id', $this->companyId)
-                ->where('outlet_id', $this->outletId)
-                ->first();
+            $mapping = $this->findMapping($entityType, $entityId);
 
             $serverId = $mapping ? (int) $mapping->server_id : null;
 
@@ -1604,15 +1680,7 @@ class SyncController extends Controller
             // duplicate the record on the next retry).
             $newId = DB::transaction(function () use ($entityType, $insert, $entityId) {
                 $id = DB::table($entityType)->insertGetId($insert);
-                DB::table('sync_local_mappings')->updateOrInsert(
-                    [
-                        'entity_type' => $entityType,
-                        'local_id'    => $entityId,
-                        'company_id'  => $this->companyId,
-                        'outlet_id'   => $this->outletId,
-                    ],
-                    ['server_id' => $id, 'updated_at' => now()->toDateTimeString()]
-                );
+                $this->mapLocal($entityType, $entityId, '', (int) $id);
                 return $id;
             });
 

@@ -1583,19 +1583,20 @@ class POSController extends Controller
     private function generateSaleNo(int $companyId): string
     {
         $prefix = 'SALE-' . date('Y') . '-';
-        $lastSale = Sale::where('sale_no', 'like', $prefix . '%')
+
+        // Desktop POS rows ("SALE-2026-C1D3-000001") ko ignore karo — sirf pure
+        // numeric suffix wale (web format) rows ka max lo. Pehle substring parsing
+        // desktop rows par 0 deta tha aur web bar-bar same number bana leta tha
+        // (duplicate sale_no).
+        $pos = strlen($prefix) + 1; // 1-based SUBSTRING position
+        $lastNumber = (int) DB::table('sales')
             ->where('company_id', $companyId)
-            ->orderBy('sale_no', 'desc')
-            ->first();
+            ->where('sale_no', 'like', $prefix . '%')
+            ->where('sale_no', 'regexp', '^' . preg_quote($prefix, '/') . '[0-9]+$')
+            ->selectRaw('MAX(CAST(SUBSTRING(sale_no, ' . $pos . ') AS UNSIGNED)) as mx')
+            ->value('mx');
 
-        if ($lastSale) {
-            $lastNumber = (int) substr($lastSale->sale_no, strlen($prefix));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        return $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
     }
 
     /**
