@@ -1553,6 +1553,30 @@ class SyncController extends Controller
     }
 
     /**
+     * Config entities jinki 'name' natural key hai (brands, categories, units...).
+     * users ko kabhi include nahi karte — 2 employees ka same naam legal hai.
+     */
+    private function naturalKeyColumn(string $entityType, $cols): ?string
+    {
+        if ($entityType === 'units') {
+            return $cols->contains('unit_name') ? 'unit_name' : null;
+        }
+        if ($entityType === 'variations') {
+            return $cols->contains('variation_name') ? 'variation_name' : null;
+        }
+
+        $nameTables = [
+            'brands', 'item_categories', 'income_categories', 'expense_categories',
+            'racks', 'counters', 'printers', 'delivery_partners', 'denominations',
+            'multiple_currencies', 'payment_methods', 'taxs', 'outlets', 'states',
+            'time_zones', 'promotions', 'warranties', 'servicings', 'roles',
+            'business_club_settings',
+        ];
+
+        return in_array($entityType, $nameTables, true) && $cols->contains('name') ? 'name' : null;
+    }
+
+    /**
      * Tables the desktop app may push through the generic pending_sync queue.
      * (Typed entities — items/customers/sales/purchases/... — use the typed push.)
      */
@@ -1637,6 +1661,23 @@ class SyncController extends Controller
                     DB::table('sync_local_mappings')->where('id', $mapping->id)->delete();
                 }
                 return response()->json(['local_id' => $entityId, 'server_id' => $serverId, 'deleted' => true]);
+            }
+
+            // ── Natural-key dedupe: config entities (brands/categories/units...) ka
+            //    naam company me unique hona chahiye. Alag counters same naam wali
+            //    cheez 2 baar na banayein (Parle/Parle double-add bug). ──
+            if ($operation !== 'delete' && ! $serverId) {
+                $keyCol = $this->naturalKeyColumn($entityType, $cols);
+                if ($keyCol && ! empty($data[$keyCol])) {
+                    $q = DB::table($entityType)->where($keyCol, $data[$keyCol]);
+                    if ($cols->contains('company_id')) $q->where('company_id', $this->companyId);
+                    if ($cols->contains('del_status')) $q->where('del_status', 'Live');
+                    $existingByName = $q->first();
+                    if ($existingByName) {
+                        $this->mapLocal($entityType, $entityId, '', (int) $existingByName->id);
+                        return response()->json(['local_id' => $entityId, 'server_id' => (int) $existingByName->id, 'created' => false]);
+                    }
+                }
             }
 
             // ── INSERT / UPDATE: whitelist columns to what the table actually has ──
