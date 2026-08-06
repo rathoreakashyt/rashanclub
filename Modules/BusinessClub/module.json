@@ -1,0 +1,11 @@
+{
+    "name": "BusinessClub",
+    "alias": "businessclub",
+    "description": "Business Club Customer Wallet & Profit Sharing Module",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\BusinessClub\\Providers\\BusinessClubServiceProvider"
+    ],
+    "files": []
+}

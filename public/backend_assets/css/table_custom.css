@@ -1,0 +1,33 @@
+#DataTables_Table_0_wrapper .row{
+    padding-inline-end: 1.25rem !important;
+    padding-inline-start: 1.25rem !important;
+}
+.dataTable thead tr th:last-child,
+.dataTable tbody tr td:last-child {
+    text-align: right;
+}
+.report-table thead tr th:last-child,
+.report-table tbody tr td:last-child {
+    text-align: unset !important;
+}
+.dropdown-menu.dt-button-collection .dt-button span {
+    display: flex;
+    align-items: center;
+}
+
+.dataTable thead tr th:last-child.dt-empty, .dataTable tbody tr td:last-child.dt-empty {
+    text-align: center !important;
+}
+.remove-variation-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+[dir="rtl"] div.dt-container div.dt-search {
+    text-align: left;
+}
+
+.dataTable thead tr th:last-child, .dataTable tbody tr td:last-child {
+    text-align: right !important;
+}

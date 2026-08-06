@@ -1,0 +1,82 @@
+# ============================================================
+# rashankidukan - Docker Compose
+# Port 8080 (rasanclub already uses 80)
+# MySQL port 3307 (rasanclub uses 3306)
+# No Redis needed - SESSION_DRIVER=file, CACHE_STORE=file
+# ============================================================
+version: '3.8'
+
+services:
+
+  # ── Nginx ──────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: rdk-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - rdk-network
+
+  # ── PHP 8.2 FPM ───────────────────────────────────────────
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rdk-php
+    restart: unless-stopped
+    volumes:
+      - .:/var/www
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rdk-network
+    environment:
+      - PHP_OPCACHE_ENABLE=0
+
+  # ── MySQL 8.0 ─────────────────────────────────────────────
+  # Port 3307 on host to avoid conflict with rasanclub's 3306
+  mysql:
+    image: mysql:8.0
+    container_name: rdk-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: off_pos
+      MYSQL_USER: pos_user
+      MYSQL_PASSWORD: pos_pass
+    volumes:
+      - rdk-mysql-data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    networks:
+      - rdk-network
+
+# ── Volumes ────────────────────────────────────────────────
+volumes:
+  rdk-mysql-data:
+    driver: local
+
+# ── Networks ───────────────────────────────────────────────
+networks:
+  rdk-network:
+    driver: bridge
+    # Isolated from rasanclub network - no name conflict

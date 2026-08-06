@@ -1,0 +1,181 @@
+/* Generally this code for A4 invoice, Default A4 Invoice Format */
+body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    color: #333;
+    width: 794px;
+    margin: 0 auto !important;
+    padding: 30px;
+}
+h1, h2, h3, h4 {
+    margin: 0;
+    padding: 0;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.header-table td:first-child {
+    vertical-align: top;
+}
+.invoice-info div {
+    display: flex;
+    justify-content: center;
+}
+.logo {
+    width: 120px;
+}
+.section-title {
+    background: #f2f2f2;
+    padding: 6px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.items-table th {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-weight: bold;
+    text-align: left;
+}
+.items-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.items-table td.num {
+    text-align: right;
+}
+.summary-table tr td:last-child {
+    text-align: right;
+    width: 120px;
+}
+.grand-total {
+    font-size: 14px;
+    font-weight: bold;
+    background: #f5f5f5;
+}
+.grand-total td {
+    padding: 5px;
+    border-radius: 2px;
+}
+.footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+}
+.notes {
+    margin-top: 10px;
+    font-size: 14px;
+}
+.heading-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.print-btn {
+    background-color: #7367f0;
+    color: white;
+    padding: 20px
+}
+.text-right {
+    text-align: right !important;
+}
+.text-left {
+    text-align: left !important;
+}
+.text-center {
+    text-align: center !important;
+}
+
+
+/* A5 Invoice Format */
+body.a5-invoice {
+    font-size: 14px !important;
+    width: 559px !important;
+    padding: 12px 10px !important;
+}
+.a5-invoice .items-table td {
+    padding: 4px;
+    font-size: 12px;
+}
+.a5-invoice .items-table th {
+    padding: 4px;
+    font-size: 12px;
+}
+.a5-invoice p {
+    font-size: 14px;
+}
+.a5-invoice .heading-title {
+    font-size: 14px;
+}
+
+
+/* Letterhead Invoice Format */
+body.letterhead-invoice {
+    font-size: 15px !important;
+}
+.letterhead-invoice .items-table td {
+    padding: 4px;
+    font-size: 13px;
+}
+.letterhead-invoice .items-table th {
+    padding: 4px;
+    font-size: 13px;
+}
+.letterhead-invoice p {
+    font-size: 15px;
+}
+.letterhead-invoice .heading-title {
+    font-size: 15px;
+}
+
+
+/* 56mm and 80mm Invoice Format */
+body.invoice-56mm {
+    width: 447px !important;
+    font-size: 14px !important;
+}
+body.invoice-80mm {
+    width: 639px !important;
+}
+.invoice-56mm .items-table td {
+    padding: 4px;
+    font-size: 10px;
+}
+.invoice-56mm .items-table th {
+    padding: 4px;
+    font-size: 10px;
+}
+.invoice-56mm p {
+    font-size: 12px;
+}
+.invoice-56mm .heading-title {
+    font-size: 14px;
+}
+.invoice-56mm .company-info {
+    text-align: center !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.invoice-56mm .company-info h2 {
+    margin-top: 10px;
+}
+.invoice-56mm .customer-sale-info td {
+    font-size: 12px;
+    vertical-align: top;
+}
+.invoice-56mm .items-table th,
+.invoice-56mm .items-table td {
+    border: none;
+    border-top: 1px dashed #ddd;
+    border-bottom: 1px dashed #ddd;
+}
+.invoice-56mm .summary-table tr td {
+    font-size: 12px;
+}
+@media print {
+    .print-btn { display: none; }
+}

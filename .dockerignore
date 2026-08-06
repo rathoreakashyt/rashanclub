@@ -1,0 +1,15 @@
+.git
+.gitignore
+node_modules
+npm-debug.log
+yarn-error.log
+.env.example
+docker-compose.yml
+Dockerfile
+nginx.conf
+docker/
+README.md
+*.md
+.editorconfig
+.phpunit.result.cache
+tests/

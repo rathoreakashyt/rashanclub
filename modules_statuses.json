@@ -1,0 +1,10 @@
+{
+    "Stock": true,
+    "Sale": true,
+    "Configuration": true,
+    "Purchase": true,
+    "Administrator": true,
+    "Accounting": true,
+    "Report": true,
+    "BusinessClub": true
+}

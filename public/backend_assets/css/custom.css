@@ -1,0 +1,117 @@
+.card-footer .ti {
+    width: 1.25em;
+    height: 1.25em;
+}
+.datatable-action i{
+    font-size: 18px !important;
+}
+.datatable-action i.delete{
+    color: red;
+}
+.user-profile .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    border: 1px solid transparent;
+}
+.user-profile:hover .icon {
+    border: 1px dashed;
+    transition: 0.8 all ease;
+}
+.user-profile .title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--bs-card-title-color);
+}
+.user-profile .icon i {
+    width: 20px;
+    height: 20px;
+}
+.user-profile .purple{
+    background-color: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+.user-profile .success{
+    background-color: rgba(83, 166, 83, 0.15);
+    color: #53A653;
+}
+.user-profile .blue{
+    background-color: #7eeefe57;
+    color: #01A1B9;
+}
+.user-profile .danger{
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #DC3545;
+}
+.purple-wrap:hover .title{
+    color: #8b5cf6;
+}
+.success-wrap:hover .title{
+    color: #53A653;
+}
+.blue-wrap:hover .title{
+    color: #01A1B9;
+}
+.danger-wrap:hover .title{
+    color: #DC3545;
+}
+.h-40{
+    height: 40px;
+}
+.site-logo-sidebar img{
+    max-height: 55px;
+    max-width: 200px;
+}
+#itemForm h5.card-tile{
+    border-bottom: 1px dashed;
+    padding-bottom: 15px;
+}
+#openingStockForm .modal-body{
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.btn-primary span {
+    display: flex;
+    align-items: center;
+}
+.add-plus-btn {
+    margin-top: 23px;
+}
+.offcanvas-header {
+    border-bottom: 1px solid #dddddd;
+}
+.set-opening-stock {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    gap: 4px;
+}
+.set-opening-stock i{
+    font-size: 14px;
+}
+/* Select2 validation error styling */
+.select2-container.is-invalid .select2-selection {
+    border-color: #ff4c51 !important;
+}
+.select2-container.is-invalid .select2-selection:focus {
+    border-color: #ff4c51 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+.stock-alert-color {
+    color: #ff4c51 !important;
+}
+.btn-outline-primary {
+    height: 38px !important;
+}
+
+
+/* Hide Install App Button */
+@media (max-width: 991.98px) {
+    #installApp {
+        display: none !important;
+    }
+}

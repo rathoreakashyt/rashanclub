@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Korrie O'Crevy",
+      "email": "kocrevy0@thetimes.co.uk",
+      "phone": "+00998 77656",
+      "salary": "$23896.35",
+      "status": 2,
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Korrie O'Crevy",
+      "email": "kocrevy0@thetimes.co.uk",
+      "phone": "+00998 77656",
+      "salary": "$23896.35",
+      "status": 2,
+      "active": true
+    },
+    {
+      "id": 3,
+      "name": "Korrie O'Crevy",
+      "email": "kocrevy0@thetimes.co.uk",
+      "phone": "+00998 77656",
+      "salary": "$23896.35",
+      "status": 2,
+      "active": true
+    }
+  ]
+}

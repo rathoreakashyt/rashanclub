@@ -1,0 +1,193 @@
+<?php
+$sql = "CREATE TABLE IF NOT EXISTS `printers` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `type` VARCHAR(50) DEFAULT NULL,
+    `connection_type` VARCHAR(50) DEFAULT NULL,
+    `ip_address` VARCHAR(255) DEFAULT NULL,
+    `port` INT DEFAULT NULL,
+    `path` VARCHAR(255) DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `counters` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `outlet_id` BIGINT UNSIGNED DEFAULT NULL,
+    `printer_id` BIGINT UNSIGNED DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`outlet_id`) REFERENCES `outlets`(`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`printer_id`) REFERENCES `printers`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `delivery_partners` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `phone` VARCHAR(50) DEFAULT NULL,
+    `address` TEXT DEFAULT NULL,
+    `commission_percent` DECIMAL(5,2) DEFAULT 0.00,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `denominations` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `value` DECIMAL(15,2) DEFAULT 0.00,
+    `type` VARCHAR(50) DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `multiple_currencies` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `symbol` VARCHAR(10) DEFAULT NULL,
+    `exchange_rate` DECIMAL(15,4) DEFAULT 0.0000,
+    `is_base` TINYINT(1) DEFAULT 0,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `taxs` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `tax_name` VARCHAR(255) DEFAULT NULL,
+    `tax_rate` DECIMAL(5,2) DEFAULT 0.00,
+    `parent_tax_id` BIGINT UNSIGNED DEFAULT NULL,
+    `show_in_item_profile` TINYINT(1) DEFAULT 0,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`parent_tax_id`) REFERENCES `taxs`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `payment_methods` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `type` VARCHAR(50) DEFAULT NULL,
+    `configuration` JSON DEFAULT NULL,
+    `is_active` TINYINT(1) DEFAULT 1,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `expense_categories` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `description` TEXT DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `expenses` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `reference_no` VARCHAR(255) DEFAULT NULL,
+    `date` DATE DEFAULT NULL,
+    `category_id` BIGINT UNSIGNED DEFAULT NULL,
+    `payment_method_id` BIGINT UNSIGNED DEFAULT NULL,
+    `amount` DECIMAL(15,3) DEFAULT 0.000,
+    `note` TEXT DEFAULT NULL,
+    `attachment` VARCHAR(255) DEFAULT NULL,
+    `employee_id` BIGINT UNSIGNED DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `outlet_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`category_id`) REFERENCES `expense_categories`(`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods`(`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`employee_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `income_categories` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `description` TEXT DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `incomes` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `reference_no` VARCHAR(255) DEFAULT NULL,
+    `date` DATE DEFAULT NULL,
+    `category_id` BIGINT UNSIGNED DEFAULT NULL,
+    `payment_method_id` BIGINT UNSIGNED DEFAULT NULL,
+    `amount` DECIMAL(15,3) DEFAULT 0.000,
+    `note` TEXT DEFAULT NULL,
+    `attachment` VARCHAR(255) DEFAULT NULL,
+    `employee_id` BIGINT UNSIGNED DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `outlet_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`category_id`) REFERENCES `income_categories`(`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods`(`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`employee_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `deposit_withdraws` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `reference_no` VARCHAR(255) DEFAULT NULL,
+    `date` DATE DEFAULT NULL,
+    `type` ENUM('Deposit','Withdraw') DEFAULT NULL,
+    `payment_method_id` BIGINT UNSIGNED DEFAULT NULL,
+    `amount` DECIMAL(15,3) DEFAULT 0.000,
+    `note` TEXT DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `outlet_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+$sql .= "CREATE TABLE IF NOT EXISTS `attendances` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `reference_no` VARCHAR(255) DEFAULT NULL,
+    `date` DATE DEFAULT NULL,
+    `employee_id` BIGINT UNSIGNED DEFAULT NULL,
+    `in_time` TIME DEFAULT NULL,
+    `out_time` TIME DEFAULT NULL,
+    `note` TEXT DEFAULT NULL,
+    `user_id` BIGINT UNSIGNED DEFAULT NULL,
+    `company_id` BIGINT UNSIGNED DEFAULT 1,
+    `del_status` VARCHAR(20) DEFAULT 'Live',
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (`employee_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n";
+
+file_put_contents(__DIR__ . '/schema_part2.sql', $sql);
+echo "Part 2 written: " . strlen($sql) . " bytes\n";
