@@ -333,18 +333,23 @@ class CustomerController extends Controller
 
             $creditLimit = (float) ($customer->credit_limit ?? 0);
             $currentDue = 0;
+            $availableCredit = 0;
+            $creditAllowed = false;
 
+            // credit_limit = 0 means NO credit/udhar allowed
+            // credit_limit > 0 means credit allowed up to that limit
             if ($creditLimit > 0 && $customer->name !== 'Walk-in Customer') {
+                $creditAllowed = true;
                 $outletId = session('outlet.outlet_id') ?? session('outlet.id') ?? null;
                 $currentDue = $this->customerService->getCustomerDue($customer->id, $outletId);
                 $currentDue = max(0, $currentDue); // Only positive due counts against credit
+                $availableCredit = max(0, $creditLimit - $currentDue);
             }
-
-            $availableCredit = max(0, $creditLimit - $currentDue);
 
             return response()->json([
                 'status' => 'success',
                 'credit_limit' => $creditLimit,
+                'credit_allowed' => $creditAllowed,
                 'current_due' => $currentDue,
                 'available_credit' => $availableCredit,
             ]);
@@ -425,6 +430,62 @@ class CustomerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Look up customer by phone number for POS auto-fill.
+     * Returns customer details if found, empty if not.
+     */
+    public function posLookupByPhone(\Illuminate\Http\Request $request)
+    {
+        try {
+            $phone = trim($request->input('phone', ''));
+            if (strlen($phone) < 3) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Phone number too short'
+                ]);
+            }
+
+            $customer = \Modules\Sale\Models\Customer::where('company_id', session('company.company_id'))
+                ->where('del_status', 'Live')
+                ->whereRaw('LOWER(TRIM(phone)) = LOWER(?)', [$phone])
+                ->first();
+
+            if (!$customer) {
+                return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'No customer found with this phone number'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'customer' => [
+                    'id' => $customer->id,
+                    'encrypted_id' => $customer->encrypted_id,
+                    'name' => $customer->name,
+                    'phone' => $customer->phone,
+                    'email' => $customer->email ?? '',
+                    'opening_balance' => $customer->opening_balance ?? 0,
+                    'opening_balance_type' => $customer->opening_balance_type ?? 'Debit',
+                    'credit_limit' => $customer->credit_limit ?? 0,
+                    'discount' => $customer->discount ?? 0,
+                    'customer_type' => $customer->customer_type ?? '',
+                    'date_of_birth' => $customer->date_of_birth ?? '',
+                    'date_of_anniversary' => $customer->date_of_anniversary ?? '',
+                    'gst_number' => $customer->gst_number ?? '',
+                    'same_or_diff_state' => $customer->same_or_diff_state ?? '',
+                    'state_id' => $customer->state_id ?? '',
+                    'business_type' => $customer->business_type ?? 'B2C',
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
                 'message' => $e->getMessage()
             ], 500);
         }

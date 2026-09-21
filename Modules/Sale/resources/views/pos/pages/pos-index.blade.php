@@ -119,9 +119,43 @@
 @media (max-width: 992px) {
     .pos-shortcut-sidebar { display: none; position: fixed; right: 0; top: 0; bottom: 0; z-index: 100; width: 200px; box-shadow: -4px 0 12px rgba(0,0,0,0.2); }
     .pos-shortcut-sidebar.show { display: flex; }
+    .pos-header { padding: 0 8px; height: 48px; }
+    .pos-header-icon { width: 40px; height: 40px; }
+    .pos-grid-table .col-hsn, .pos-grid-table .col-unit, .pos-grid-table .col-tax { display: none; }
+    .pos-grid-table .col-item { min-width: 140px; }
+    .pos-footer-actions { padding: 4px 8px; gap: 4px; flex-wrap: wrap; }
+    .pos-footer-actions .btn { padding: 6px 10px; font-size: 11px; min-height: 40px; }
+    .pos-cart-summary { padding: 6px 8px; }
+    .pos-total-amount { padding: 8px; }
 }
 @media (max-width: 768px) {
+    .pos-header-brand span { display: none; }
+    .pos-header-time { display: none; }
     .pos-footer-actions .mobile-text { display: none; }
+    .pos-grid-table { font-size: 11px; }
+    .pos-grid-input { padding: 6px 4px; font-size: 11px; }
+    .pos-grid-table thead th { padding: 5px 3px; font-size: 10px; }
+    .pos-footer-actions .btn { min-height: 44px; min-width: 44px; }
+    .pos-product-dropdown { min-width: 300px; max-height: 220px; }
+    .pos-shortcut-sidebar { width: 180px; }
+    .pos-summary-input { width: 60px; }
+}
+@media (max-width: 480px) {
+    .pos-header { height: 44px; padding: 0 6px; }
+    .pos-header-icon { width: 38px; height: 38px; font-size: 16px; }
+    .pos-grid-table .col-mrp, .pos-grid-table .col-disc { display: none; }
+    .pos-grid-table .col-item { min-width: 100px; }
+    .pos-grid-table .col-qty { width: 45px; }
+    .pos-grid-table .col-price { width: 60px; }
+    .pos-grid-table .col-amount { width: 70px; }
+    .pos-footer-actions .btn { padding: 8px; font-size: 12px; min-height: 48px; }
+    .pos-product-dropdown { min-width: 260px; }
+    .pos-shortcut-sidebar { display: none !important; }
+}
+/* PWA Standalone mode - remove browser chrome spacing */
+@media (display-mode: standalone) {
+    body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+    .pos-container { height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 }
 </style>
 @endpush
@@ -195,6 +229,18 @@
                 <button class="pos-add-btn" id="pos-add-customer-btn" data-bs-toggle="modal" data-bs-target="#modal_pos_customer" title="Add Customer" style="padding:4px 8px;font-size:11px;">
                     <i class="icon-base ti tabler-user-plus"></i>
                 </button>
+            </div>
+            {{-- Business Club Member Wallet Badge --}}
+            <div id="bc-member-badge" style="display:none; background:linear-gradient(135deg,#1e3a5f,#2d5986); color:#fff; padding:6px 12px; font-size:11px; border-radius:6px; margin:4px 8px; display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="icon-base ti tabler-diamond" style="margin-right:4px;"></i> <strong id="bc-badge-member-id">BC-001</strong></span>
+                    <span style="font-size:10px; opacity:0.8;">Business Club Member</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:10px;">
+                    <span>🔒 Locked: ₹<span id="bc-badge-locked">0</span></span>
+                    <span>💰 Earned: ₹<span id="bc-badge-earned">0</span></span>
+                    <span style="color:#ffd700;">⚠️ No Offers Apply</span>
+                </div>
             </div>
             <div class="pos-cart-content">
                 <div class="pos-cart-items thin-scroll" id="pos-cart-items">

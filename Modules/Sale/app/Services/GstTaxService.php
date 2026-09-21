@@ -69,9 +69,9 @@ class GstTaxService
             $taxRate = (float) ($taxData['tax_rate'] ?? 0);
             $parentId = $taxData['parent_tax_id'] ?? null;
 
-            // GST parent (e.g. id=1): has rate 0, resolve from children based on Intra/Inter-State
+            // GST parent (e.g. "GST", "GST 5%", "GST 12%", "GST 18%"): resolve from children
             // Intra-State: CGST + SGST | Inter-State: IGST
-            $isGstParent = (strtoupper($taxName) === 'GST' || $taxRate <= 0) && $parentId === null;
+            $isGstParent = (str_starts_with(strtoupper($taxName), 'GST')) && $parentId === null;
             if ($isGstParent) {
                 foreach ($taxsMap as $childId => $childTax) {
                     $cData = is_object($childTax) ? (array) $childTax : $childTax;

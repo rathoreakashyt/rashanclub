@@ -4,6 +4,29 @@ use App\Services\InsTraService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+// ─── BusyNotify Auto-Sync Schedule ───────────────────────────
+// Har 30 min mein FULL Busy → Cloud → Desktop automatic sync
+// (products + customers + prices)
+Schedule::command('busy:import')
+    ->everyThirtyMinutes()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->onFailure(function () {
+        \Illuminate\Support\Facades\Log::warning('BusyNotify full auto-import failed');
+    });
+
+// Har 2 min mein STOCK-ONLY fast sync
+// Sirf stock_quantity update hoga — Busy mein sale hote hi 2 min mein reflect
+Schedule::command('busy:sync-stock')
+    ->everyTwoMinutes()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->onFailure(function () {
+        \Illuminate\Support\Facades\Log::warning('BusyNotify stock-sync failed');
+    });
+// ─────────────────────────────────────────────────────────────
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

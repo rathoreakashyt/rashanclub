@@ -201,6 +201,67 @@
                                 </div>
                             </div>
 
+                            <div class="col-12 type-3" style="display: none;">
+                                <div class="mb-5 border rounded p-3 bg-lighter">
+                                    <label class="form-label mb-1">{{ __('Tier_Pricing_For_Partial_Quantity') }}</label>
+                                    <p class="text-muted small mb-3">{{ __('Tier_Pricing_Help') }}</p>
+                                    <div id="tier-percentages-wrap">
+                                        <div class="row g-2 tier-percentage-row">
+                                            <div class="col-3">
+                                                <input type="text" class="form-control number-input tier-qty-input" placeholder="{{ __('Qty') }}" />
+                                            </div>
+                                            <div class="col-3">
+                                                <select class="form-select tier-type-select">
+                                                    <option value="percent">% ({{ __('Percentage') }})</option>
+                                                    <option value="amount">{{ $currencySymbol ?? '₹' }} ({{ __('Amount') }})</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="text" class="form-control number-input tier-value-input" placeholder="{{ __('Percentage') }}" />
+                                            </div>
+                                            <div class="col-2">
+                                                <button type="button" class="btn btn-outline-danger btn-sm remove-tier-row-btn w-100"><i class="ti tabler-x"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-tier-row-btn">
+                                        <i class="ti tabler-plus me-1"></i>{{ __('Add_Tier') }}
+                                    </button>
+                                    <input type="hidden" name="tier_percentages" id="tier_percentages"
+                                        value="{{ old('tier_percentages', isset($promotion) && is_array($promotion->tier_percentages) ? json_encode($promotion->tier_percentages) : '') }}" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 type-3" style="display: none;">
+                                <div class="mb-5 border rounded p-3 bg-lighter">
+                                    <label class="form-label mb-1">{{ __('Flavour_Alternatives') }}</label>
+                                    <p class="text-muted small mb-3">{{ __('Add alternative flavours for the free item. Customer can choose any of these at POS.') }}</p>
+                                    <div id="flavour-alternatives-wrap">
+                                        <div class="row g-2 flavour-alternative-row">
+                                            <div class="col-5">
+                                                <select class="form-select flavour-item-select" data-placeholder="{{ __('Select') }} {{ __('Item') }}">
+                                                    <option value="">{{ __('Select') }} {{ __('Item') }}</option>
+                                                    @foreach($items as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->display_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-5">
+                                                <input type="text" class="form-control flavour-name-input" placeholder="{{ __('Flavour Name (optional)') }}" />
+                                            </div>
+                                            <div class="col-2">
+                                                <button type="button" class="btn btn-outline-danger btn-sm remove-flavour-row-btn w-100"><i class="ti tabler-x"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-flavour-row-btn">
+                                        <i class="ti tabler-plus me-1"></i>{{ __('Add_Flavour') }}
+                                    </button>
+                                    <input type="hidden" name="flavour_alternatives" id="flavour_alternatives"
+                                        value="{{ old('flavour_alternatives', isset($promotion) && is_array($promotion->flavour_alternatives) ? json_encode($promotion->flavour_alternatives) : '') }}" />
+                                </div>
+                            </div>
+
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="mb-5">
                                     <label class="form-label" for="scheme_basis">{{ __('Scheme_Basis') }}</label>

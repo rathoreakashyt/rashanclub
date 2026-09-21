@@ -780,7 +780,7 @@ $(async function () {
             $('.whole_sale_price_wrap').slideUp();
             $('.variation_section').slideUp();
             $('.generated_variations_section').slideUp();
-            $('.stock_information_section').slideUp();
+            $('.stock_information_section').slideDown();
             $('.combo_product_section').slideDown();
             $('.hide-for-combo-product').slideUp();
             generatedVariations = [];
@@ -2305,7 +2305,7 @@ $(async function () {
             let outletData = existingData && existingData[outletId] ? existingData[outletId] : null;
 
 
-            if (itemType === 'General_Product' || itemType === 'Installment_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
+            if (itemType === 'General_Product' || itemType === 'Installment_Product' || itemType === 'Combo_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
                 // Simple quantity input for General and Installment products
                 let quantity = outletData ? outletData.quantity : '';
                 outletCard.html(`

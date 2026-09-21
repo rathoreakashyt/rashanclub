@@ -416,7 +416,7 @@ $(async function () {
         let outletIdVal = $('#outlet_id').val();
         let costingMethodVal = $('#costing_method').val();
         
-        if (dateFromVal || dateToVal || outletIdVal || costingMethodVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             dateFrom = dateFromVal || '';

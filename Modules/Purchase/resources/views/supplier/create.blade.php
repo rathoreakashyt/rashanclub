@@ -102,10 +102,10 @@
                                     <div class="mb-5 w-100">
                                         <select class="form-select select2 form-select @error('opening_balance_type') is-invalid @enderror" 
                                             name="opening_balance_type" id="opening_balance_type" data-placeholder="{{ __('opening_balance_type') }}">
-                                            <option value="Debit" {{ (old('opening_balance_type') == 'Debit' || (isset($supplier) && $supplier->opening_balance_type == 'Debit' && !old('opening_balance_type'))) ? 'selected' : '' }}>
+                                            <option value="Debit" {{ (old('opening_balance_type') == 'Debit' || (isset($supplier) && in_array($supplier->opening_balance_type, ['Debit', 'Dr']) && !old('opening_balance_type'))) ? 'selected' : '' }}>
                                                 {{ __('Debit') }}
                                             </option>
-                                            <option value="Credit" {{ (old('opening_balance_type') == 'Credit' || (isset($supplier) && $supplier->opening_balance_type == 'Credit' && !old('opening_balance_type'))) ? 'selected' : '' }}>
+                                            <option value="Credit" {{ (old('opening_balance_type') == 'Credit' || (isset($supplier) && in_array($supplier->opening_balance_type, ['Credit', 'Cr']) && !old('opening_balance_type'))) ? 'selected' : '' }}>
                                                 {{ __('Credit') }}
                                             </option>
                                         </select>

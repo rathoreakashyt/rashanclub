@@ -133,6 +133,38 @@ class PromotionService
      */
     protected function preparePromotionData(array $data, bool $isUpdate = false): array
     {
+        // Normalize type: string → integer
+        $type = $data['type'];
+        if (!is_numeric($type)) {
+            $type = match(strtolower(trim($type))) {
+                'discount' => 1,
+                'coupon discount', 'coupon discount (on entire sale)', 'coupon' => 2,
+                'free item', 'free_quantity', 'buy x get y' => 3,
+                default => 1,
+            };
+        }
+        $data['type'] = (int) $type;
+
+        // Normalize status: string → integer
+        $status = $data['status'] ?? '1';
+        if (!is_numeric($status)) {
+            $status = match(strtolower(trim($status))) {
+                'active', 'enable', 'yes' => 1,
+                'inactive', 'disable', 'no' => 2,
+                default => 1,
+            };
+        }
+        $data['status'] = (int) $status;
+
+        // Normalize scheme_basis
+        $basis = strtolower(trim($data['scheme_basis'] ?? 'item'));
+        $data['scheme_basis'] = match(true) {
+            str_contains($basis, 'bill') => 'bill',
+            str_contains($basis, 'party') => 'party',
+            str_contains($basis, 'item') => 'item',
+            default => 'item',
+        };
+
         $preparedData = [
             'type' => $data['type'],
             'scheme_basis' => $data['scheme_basis'] ?? 'item',
@@ -151,6 +183,8 @@ class PromotionService
             'applicable_categories' => !empty($data['applicable_categories']) ? $data['applicable_categories'] : null,
             'applicable_customers' => !empty($data['applicable_customers']) ? $data['applicable_customers'] : null,
             'applicable_customer_types' => !empty($data['applicable_customer_types']) ? $data['applicable_customer_types'] : null,
+            'tier_percentages' => $this->prepareTierPercentages($data['tier_percentages'] ?? null),
+            'flavour_alternatives' => $this->prepareFlavourAlternatives($data['flavour_alternatives'] ?? null),
         ];
 
         // Reset all type-specific fields to null first
@@ -196,6 +230,94 @@ class PromotionService
     protected function detectDiscountType(string $discount): string
     {
         return str_contains($discount, '%') ? 'percentage' : 'fixed';
+    }
+
+    /**
+     * Prepare tier pricing (partial quantity payment) for Buy X Get Y schemes.
+     * Each tier is either a percentage of list price or a fixed amount per unit:
+     * Input: JSON string or array like [{"qty":1,"percent":60},{"qty":2,"custom_price":85.5}]
+     * Output: sanitized array or null
+     */
+    protected function prepareTierPercentages($tierPercentages): ?array
+    {
+        if (empty($tierPercentages)) {
+            return null;
+        }
+
+        if (is_string($tierPercentages)) {
+            $decoded = json_decode($tierPercentages, true);
+            $tierPercentages = is_array($decoded) ? $decoded : null;
+        }
+
+        if (!is_array($tierPercentages)) {
+            return null;
+        }
+
+        $prepared = [];
+        foreach ($tierPercentages as $tier) {
+            if (!is_array($tier)) {
+                continue;
+            }
+            $qty = (int) ($tier['qty'] ?? 0);
+            if ($qty <= 0) {
+                continue;
+            }
+            $hasCustomPrice = array_key_exists('custom_price', $tier) && $tier['custom_price'] !== '' && $tier['custom_price'] !== null;
+            if ($hasCustomPrice) {
+                $price = (float) $tier['custom_price'];
+                if ($price >= 0) {
+                    $prepared[] = ['qty' => $qty, 'custom_price' => $price];
+                }
+            } else {
+                $percent = (float) ($tier['percent'] ?? 0);
+                if ($percent >= 0 && $percent <= 100) {
+                    $prepared[] = ['qty' => $qty, 'percent' => $percent];
+                }
+            }
+        }
+
+        usort($prepared, fn ($a, $b) => $a['qty'] <=> $b['qty']);
+
+        return empty($prepared) ? null : $prepared;
+    }
+
+    /**
+     * Prepare flavour alternatives for Buy X Get Y free items.
+     * Input: JSON string or array like [{"get_item_id":123,"name":"Chocolate"}]
+     * Output: sanitized array or null
+     */
+    protected function prepareFlavourAlternatives($flavourAlternatives): ?array
+    {
+        if (empty($flavourAlternatives)) {
+            return null;
+        }
+
+        if (is_string($flavourAlternatives)) {
+            $decoded = json_decode($flavourAlternatives, true);
+            $flavourAlternatives = is_array($decoded) ? $decoded : null;
+        }
+
+        if (!is_array($flavourAlternatives)) {
+            return null;
+        }
+
+        $prepared = [];
+        foreach ($flavourAlternatives as $flavour) {
+            if (!is_array($flavour)) {
+                continue;
+            }
+            $itemId = (int) ($flavour['get_item_id'] ?? $flavour['item_id'] ?? 0);
+            if ($itemId <= 0) {
+                continue;
+            }
+            $name = trim($flavour['name'] ?? '');
+            $prepared[] = [
+                'get_item_id' => $itemId,
+                'name' => $name ?: 'Flavour ' . count($prepared) + 1,
+            ];
+        }
+
+        return empty($prepared) ? null : $prepared;
     }
 
     /**

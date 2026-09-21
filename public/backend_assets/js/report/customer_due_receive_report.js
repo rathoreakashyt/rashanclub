@@ -447,7 +447,7 @@ $(async function () {
         $('#filterSection').hide();
         
         // Only show and load data if filters are present
-        if (dateFromVal || dateToVal || outletIdVal || customerIdVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             customerId = customerIdVal || '';

@@ -35,6 +35,14 @@ class ReportController extends Controller
     // ==================== Report View Methods ====================
 
     /**
+     * Reports index page.
+     */
+    public function index()
+    {
+        return view('report::index');
+    }
+
+    /**
      * Register Report - View + API (Outlet*, Date*, Register optional; closed registers for date)
      */
     public function registerReport(Request $request)
@@ -62,13 +70,13 @@ class ReportController extends Controller
                     ->where('company_id', $companyId)
                     ->where('outlet_id', $outletId)
                     ->where('register_status', 2)
-                    ->whereRaw('DATE(closing_balance_date_time) = ?', [$date])
+                    ->whereRaw('DATE(COALESCE(closing_balance_date_time, updated_at, created_at)) = ?', [$date])
                     ->orderBy('closing_balance_date_time', 'desc')
                     ->get(['id', 'user_id', 'opening_balance_date_time', 'closing_balance_date_time']);
                 $list = [];
                 foreach ($registers as $r) {
                     $empName = $r->user ? $r->user->name : __('N/A');
-                    $openDt = $r->opening_balance_date_time ? formatDateTime($r->opening_balance_date_time) : '-';
+                    $openDt = ($r->opening_balance_date_time ?: $r->created_at) ? formatDateTime($r->opening_balance_date_time ?: $r->created_at) : '-';
                     $list[] = ['id' => $r->id, 'label' => $empName . ' - ' . $openDt];
                 }
                 return response()->json(['success' => true, 'registers' => $list]);
@@ -84,7 +92,7 @@ class ReportController extends Controller
                 ->where('company_id', $companyId)
                 ->where('outlet_id', $outletId)
                 ->where('register_status', 2)
-                ->whereRaw('DATE(closing_balance_date_time) = ?', [$date])
+                ->whereRaw('DATE(COALESCE(closing_balance_date_time, updated_at, created_at)) = ?', [$date])
                 ->orderBy('closing_balance_date_time', 'desc');
 
             if ($registerId) {
@@ -105,8 +113,8 @@ class ReportController extends Controller
             $sn = 1;
             foreach ($registers as $r) {
                 $empName = $r->user ? $r->user->name : '-';
-                $openDt = $r->opening_balance_date_time ? formatDateTime($r->opening_balance_date_time) : '-';
-                $closeDt = $r->closing_balance_date_time ? formatDateTime($r->closing_balance_date_time) : '-';
+                $openDt = ($r->opening_balance_date_time ?: $r->created_at) ? formatDateTime($r->opening_balance_date_time ?: $r->created_at) : '-';
+                $closeDt = ($r->closing_balance_date_time ?: $r->updated_at) ? formatDateTime($r->closing_balance_date_time ?: $r->updated_at) : '-';
                 $paymentMethodsSale = $r->payment_methods_sale;
                 if (is_string($paymentMethodsSale)) {
                     $decoded = @json_decode($paymentMethodsSale, true);
@@ -3100,8 +3108,8 @@ class ReportController extends Controller
                 $totalReturnsBefore = $returnsBefore->sum('total_return_amount');
                 
                 // Calculate opening balance: Base opening balance + transactions before date
-                // Base opening balance
-                $baseOpeningBalance = ($openingBalanceType == 'Debit') ? $openingBalance : -$openingBalance;
+                // Base opening balance (ledger convention: Debit/Dr opening = +)
+                $baseOpeningBalance = in_array($openingBalanceType, ['Debit', 'Dr']) ? $openingBalance : -$openingBalance;
                 
                 // Transactions before date_from: Purchases (Debit) - Payments (Credit) - Returns (Credit)
                 $transactionsBefore = $totalPurchasesBefore - $totalPaymentsBefore - $totalReturnsBefore;
@@ -3111,10 +3119,10 @@ class ReportController extends Controller
             } else {
                 // If no date filter, opening balance is just the supplier opening balance
                 // (transactions will be shown separately, so opening balance is the base)
-                if ($openingBalanceType == 'Debit') {
+                if (in_array($openingBalanceType, ['Debit', 'Dr'])) {
                     $openingBalanceFromTransactions = $openingBalance;
                 } else {
-                    // Credit means supplier owes us, so it's negative in our ledger
+                    // Credit/Cr opening, so it's negative in our ledger
                     $openingBalanceFromTransactions = -$openingBalance;
                 }
             }
@@ -3368,36 +3376,38 @@ class ReportController extends Controller
                 $openingBalance = floatval($supplier->opening_balance ?? 0);
                 $openingBalanceType = $supplier->opening_balance_type ?? 'Debit';
                 
-                // Base opening balance
-                $baseOpeningBalance = ($openingBalanceType == 'Debit') ? $openingBalance : -$openingBalance;
+                // Base opening balance. Supplier: Cr opening = + (we owe supplier), Dr = - (supplier owes us).
+                $isCreditOpening = in_array($openingBalanceType, ['Credit', 'Cr']);
+                $baseOpeningBalance = $isCreditOpening ? $openingBalance : -$openingBalance;
                 
-                // Calculate total purchases (Debit - we owe supplier)
+                // Calculate total purchases (we owe supplier - positive)
                 $totalPurchases = Purchase::where('supplier_id', $supplier->id)
                     ->where('del_status', 'Live')
                     ->where('company_id', $companyId)
                     ->sum('grand_total');
                 
-                // Calculate total supplier payments (Credit - we pay supplier)
+                // Calculate total supplier payments (we pay supplier - negative)
                 $totalPayments = SupplierPayment::where('supplier_id', $supplier->id)
                     ->where('del_status', 'Live')
                     ->where('company_id', $companyId)
                     ->sum('amount');
                 
-                // Calculate total purchase returns (Credit - we return money/goods to supplier)
+                // Calculate total purchase returns (reduces what we owe)
                 $totalReturns = PurchaseReturn::where('supplier_id', $supplier->id)
                     ->where('del_status', 'Live')
                     ->where('company_id', $companyId)
                     ->sum('total_return_amount');
                 
-                // Current balance = Opening Balance + Purchases - Payments - Returns
+                // Current balance = Opening + Purchases - Payments - Returns.
+                // Positive = Credit (we owe supplier), Negative = Debit (supplier owes us).
                 $currentBalance = $baseOpeningBalance + $totalPurchases - $totalPayments - $totalReturns;
                 
                 // Apply type filter
-                if ($type == 'Debit' && $currentBalance <= 0) {
-                    continue; // Skip if not Debit (positive balance - we owe supplier)
+                if ($type == 'Debit' && $currentBalance >= 0) {
+                    continue; // Debit = negative balance (supplier owes us)
                 }
-                if ($type == 'Credit' && $currentBalance >= 0) {
-                    continue; // Skip if not Credit (negative balance - supplier owes us)
+                if ($type == 'Credit' && $currentBalance <= 0) {
+                    continue; // Credit = positive balance (we owe supplier)
                 }
                 
                 $totalBalance += $currentBalance;
@@ -3408,10 +3418,12 @@ class ReportController extends Controller
                     $supplierName .= ' (' . $supplier->phone . ')';
                 }
                 
+                $balanceLabel = $currentBalance >= 0 ? 'Credit' : 'Debit';
+                
                 $formattedSuppliers[] = [
                     'sn' => $index++,
                     'supplier_name' => $supplierName,
-                    'current_balance' => formatAmount($currentBalance),
+                    'current_balance' => '₹ ' . number_format(abs($currentBalance), 2) . ' (' . $balanceLabel . ')',
                     'balance_value' => $currentBalance, // For sorting/filtering
                 ];
             }
@@ -3550,8 +3562,8 @@ class ReportController extends Controller
                 $totalReturnsBefore = $returnsBefore->sum('total_return_amount');
                 
                 // Calculate opening balance: Base opening balance + transactions before date
-                // Base opening balance
-                $baseOpeningBalance = ($openingBalanceType == 'Debit') ? $openingBalance : -$openingBalance;
+                // Base opening balance (customer ledger convention: Debit/Dr opening = +)
+                $baseOpeningBalance = in_array($openingBalanceType, ['Debit', 'Dr']) ? $openingBalance : -$openingBalance;
                 
                 // Transactions before date_from: Sales (Credit) - Receives (Debit) - Returns (Debit)
                 // For customer: Credit increases what customer owes, Debit decreases what customer owes
@@ -3562,10 +3574,10 @@ class ReportController extends Controller
             } else {
                 // If no date filter, opening balance is just the customer opening balance
                 // (transactions will be shown separately, so opening balance is the base)
-                if ($openingBalanceType == 'Debit') {
+                if (in_array($openingBalanceType, ['Debit', 'Dr'])) {
                     $openingBalanceFromTransactions = $openingBalance;
                 } else {
-                    // Credit means we owe customer, so it's negative in our ledger
+                    // Credit/Cr means we owe customer, so it's negative in our ledger
                     $openingBalanceFromTransactions = -$openingBalance;
                 }
             }
@@ -3819,8 +3831,8 @@ class ReportController extends Controller
                 $openingBalance = floatval($customer->opening_balance ?? 0);
                 $openingBalanceType = $customer->opening_balance_type ?? 'Debit';
                 
-                // Base opening balance
-                $baseOpeningBalance = ($openingBalanceType == 'Debit') ? $openingBalance : -$openingBalance;
+                // Base opening balance. Customer: Dr opening = customer humara deta hai (+), Cr = hum dete hain (-).
+                $baseOpeningBalance = in_array($openingBalanceType, ['Debit', 'Dr']) ? $openingBalance : -$openingBalance;
                 
                 // Calculate total sales (Credit - customer owes us)
                 $totalSales = Sale::where('customer_id', $customer->id)
@@ -3859,10 +3871,12 @@ class ReportController extends Controller
                     $customerName .= ' (' . $customer->phone . ')';
                 }
                 
+                $balanceLabel = $currentBalance >= 0 ? 'Debit' : 'Credit';
+                
                 $formattedCustomers[] = [
                     'sn' => $index++,
                     'customer_name' => $customerName,
-                    'current_balance' => formatAmount($currentBalance),
+                    'current_balance' => '₹ ' . number_format(abs($currentBalance), 2) . ' (' . $balanceLabel . ')',
                     'balance_value' => $currentBalance, // For sorting/filtering
                 ];
             }
@@ -8089,7 +8103,7 @@ class ReportController extends Controller
         $type = $request->get('type');
 
         if ($request->ajax() || $request->wantsJson()) {
-            $query = \Modules\Sale\Models\Promotion::with(['employee'])
+            $query = \Modules\Sale\Models\Promotion::query()
                 ->where('del_status', 'Live')
                 ->where('company_id', $companyId);
 

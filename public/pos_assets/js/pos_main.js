@@ -261,6 +261,78 @@ $(function() {
     $(document).on('change', '#pos_customer_business_type', togglePosGstinRequired);
     $(document).on('shown.bs.modal', '#modal_pos_customer', togglePosGstinRequired);
 
+    // ═══ Phone Auto-Fill: lookup existing customer when phone is 10 digits ═══
+    let phoneLookupTimeout = null;
+    $(document).on('input', '#pos_customer_phone', function() {
+        let phone = $(this).val().trim();
+        clearTimeout(phoneLookupTimeout);
+        
+        // Only lookup when phone has >= 10 digits
+        if (phone.length < 10) {
+            // Reset form fields if phone is being cleared/edited
+            if (_posPhoneAutoFilled) {
+                _posPhoneAutoFilled = false;
+                $('#pos_customer_name').val('');
+                $('#pos_customer_email').val('');
+                $('#pos_customer_opening_balance').val('0');
+                $('#pos_customer_opening_balance_type').val('Debit').trigger('change');
+                $('#pos_customer_credit_limit').val('0');
+                $('#pos_customer_business_type').val('B2C').trigger('change');
+            }
+            return;
+        }
+        
+        phoneLookupTimeout = setTimeout(function() {
+            $.ajax({
+                url: base_url + '/pos/lookup-customer-by-phone',
+                type: 'GET',
+                data: { phone: phone },
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                success: function(response) {
+                    if (response.status === 'success' && response.customer) {
+                        let c = response.customer;
+                        _posPhoneAutoFilled = true;
+                        _posPhoneAutoFillCustomerId = c.id;
+                        $('#pos_customer_name').val(c.name || '');
+                        $('#pos_customer_email').val(c.email || '');
+                        $('#pos_customer_opening_balance').val(c.opening_balance || '0');
+                        $('#pos_customer_opening_balance_type').val(c.opening_balance_type || 'Debit').trigger('change');
+                        $('#pos_customer_credit_limit').val(c.credit_limit || '0');
+                        $('#pos_customer_discount').val(c.discount || '0');
+                        $('#pos_customer_business_type').val(c.business_type || 'B2C').trigger('change');
+                        $('#pos_customer_same_or_diff_state').val(c.same_or_diff_state || '1').trigger('change');
+                        $('#pos_customer_state_id').val(c.state_id || '').trigger('change');
+                        $('#pos_customer_gst_number').val(c.gst_number || '');
+                        $('#pos_customer_date_of_birth').val(c.date_of_birth || '');
+                        $('#pos_customer_date_of_anniversary').val(c.date_of_anniversary || '');
+                        togglePosGstinRequired();
+                        
+                        // Update modal title to indicate existing customer
+                        $('#pos_customer_modal_title').text('Edit Customer (Existing)');
+                        $('#pos_customer_id').val(c.id);
+                        
+                        if (typeof showInfoNotification !== 'undefined') {
+                            showInfoNotification('Customer found: ' + c.name + ' — details auto-filled');
+                        }
+                    } else {
+                        _posPhoneAutoFilled = false;
+                        _posPhoneAutoFillCustomerId = null;
+                        $('#pos_customer_modal_title').text('Add Customer');
+                        $('#pos_customer_id').val('');
+                    }
+                },
+                error: function() {
+                    // Silently ignore lookup errors
+                }
+            });
+        }, 300); // 300ms debounce
+    });
+    // Track whether form was auto-filled from phone lookup
+    window._posPhoneAutoFilled = false;
+    window._posPhoneAutoFillCustomerId = null;
+    var _posPhoneAutoFilled = false;
+    var _posPhoneAutoFillCustomerId = null;
+
     // Submit Customer Form
     $(document).on('submit', '#posCustomerForm', function(e) {
         e.preventDefault();
@@ -303,7 +375,7 @@ $(function() {
                         showValidationErrors(xhr.responseJSON.errors);
                     }
                     if (typeof showErrorNotification !== 'undefined') {
-                        showErrorNotification('Please check the form for errors');
+                        showErrorNotification(xhr.responseJSON?.message || 'Please check the form for errors');
                     }
                 } else {
                     if (typeof showErrorNotification !== 'undefined') {
@@ -1702,6 +1774,28 @@ $(function() {
     }
     $('#customer-select').on('change', function() {
         updateCustomerType();
+        // Business Club: check if selected customer is a BC member
+        var customerId = $(this).val();
+        if (customerId && customerId != '1' && typeof posCartManager !== 'undefined') {
+            var baseUrl = $('#base_url').val() || window.location.origin;
+            $.ajax({
+                url: baseUrl + '/business-club/api/check-membership/' + customerId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response && response.is_member === true) {
+                        posCartManager.setBcMemberStatus(true, response.member);
+                    } else {
+                        posCartManager.setBcMemberStatus(false, null);
+                    }
+                },
+                error: function() {
+                    posCartManager.setBcMemberStatus(false, null);
+                }
+            });
+        } else if (typeof posCartManager !== 'undefined') {
+            posCartManager.setBcMemberStatus(false, null);
+        }
     });
     updateCustomerType();
 

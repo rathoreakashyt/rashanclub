@@ -62,6 +62,7 @@ class TransferRepository
 
         $recordsTotal = $baseQuery->count();
         $filteredCount = $query->count();
+        $statusCounts = (clone $baseQuery)->select('status')->get()->groupBy('status')->map->count();
 
         $transfers = $query
             ->orderBy('id', 'desc')
@@ -72,6 +73,7 @@ class TransferRepository
         return [
             'recordsTotal' => $recordsTotal,
             'filteredCount' => $filteredCount,
+            'statusCounts' => $statusCounts,
             'data' => $transfers,
         ];
     }

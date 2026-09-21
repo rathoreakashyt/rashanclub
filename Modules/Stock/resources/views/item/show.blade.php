@@ -96,7 +96,7 @@
                         <span class="badge bg-label-secondary">Generic Name: {{ $item->generic_name }}</span>
                     @endif
                     @if($item->category && $item->category->name)
-                        <span class="badge bg-label-secondary">Category: {{ $item->category->name }}</span>
+                        <span class="badge bg-label-secondary">Group: {{ $item->category->name }}</span>
                     @endif
                 </div>
                 <div class="col-12 col-md-auto ms-md-auto">
@@ -138,7 +138,7 @@
                     </div>
                     @endif
                     <div class="detail-row">
-                        <span class="detail-label">{{ __('Category') }}</span>
+                        <span class="detail-label">{{ __('Group') }}</span>
                         <span class="detail-value">{{ $item->category->name ?? '—' }}</span>
                     </div>
                     @if($item->brand_id)

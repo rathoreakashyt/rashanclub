@@ -1,0 +1,2 @@
+- Code changes ke baad khud hi app build + run kar do (WPF: "software pos" folder me `dotnet build` / `dotnet run`), user se alag se na kaho
+- Software me har change ke baad khud hi rebuild + run karo: `cd "software pos" && dotnet build`, purani RashanKiDukan.exe taskkill karke `dotnet run` (background) — user se na kaho.

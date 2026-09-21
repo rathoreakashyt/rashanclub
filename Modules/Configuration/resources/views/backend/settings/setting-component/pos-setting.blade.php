@@ -43,7 +43,7 @@
                         <label class="form-label mb-1" for="pos_total_payable_type">{{ __('POS Total Payable Type') }} {!! requiredField() !!}</label>
                         <select class="select2 form-select" id="pos_total_payable_type" name="pos_total_payable_type" data-placeholder="{{ __('Select') }} {{ __('Type') }}">
                             <option value=""></option>
-                            <option value="0" {{ $company->pos_total_payable_type == '0' ? 'selected' : '' }}>{{ __('None') }}</option>
+                            <option value="0" {{ ($company->pos_total_payable_type ?? '0') == '0' ? 'selected' : '' }}>{{ __('None') }}</option>
                             <option value="1" {{ $company->pos_total_payable_type == '1' ? 'selected' : '' }}>{{ __('Round to nearest whole number') }}</option>
                             <option value="0.05" {{ $company->pos_total_payable_type == '0.05' ? 'selected' : '' }}>{{ __('Round to nearest decimal (multiple of 0.05)') }}</option>
                             <option value="0.01" {{ $company->pos_total_payable_type == '0.01' ? 'selected' : '' }}>{{ __('Round to nearest decimal (multiple of 0.1)') }}</option>

@@ -11,6 +11,8 @@ class POSCartManager {
         this.cartSummaryDiscount = 0;
         this.cartSummaryDiscountType = 'fixed';
         this.cartSummaryShipping = 0;
+        this.isBcMember = false; // Business Club member flag
+        this.bcMemberData = null; // Business Club member data
         this.init();
         this.company_session_data = this.getCompanySessionData() || {};
     }
@@ -24,6 +26,74 @@ class POSCartManager {
             console.error('Error parsing company info:', e);
             return {};
         }
+    }
+
+    /**
+     * Set Business Club member status for the selected customer.
+     * When a BC member is selected, all promotions/schemes/coupons are blocked.
+     * @param {Boolean} isMember
+     * @param {Object|null} memberData
+     */
+    setBcMemberStatus(isMember, memberData) {
+        this.isBcMember = !!isMember;
+        this.bcMemberData = memberData || null;
+
+        // Show/hide BC wallet badge in POS
+        var bcBadge = document.getElementById('bc-member-badge');
+        if (bcBadge) {
+            if (this.isBcMember && memberData) {
+                bcBadge.style.display = 'block';
+                var badgeMemberId = document.getElementById('bc-badge-member-id');
+                var badgeLocked = document.getElementById('bc-badge-locked');
+                var badgeEarned = document.getElementById('bc-badge-earned');
+                if (badgeMemberId) badgeMemberId.textContent = memberData.member_id || 'BC-???';
+                if (badgeLocked) badgeLocked.textContent = parseFloat(memberData.locked_balance || 0).toLocaleString('en-IN');
+                if (badgeEarned) badgeEarned.textContent = parseFloat(memberData.earned_balance || 0).toLocaleString('en-IN');
+            } else {
+                bcBadge.style.display = 'none';
+            }
+        }
+
+        if (this.isBcMember) {
+            // Strip promotions from all existing cart items
+            this.cartItems.forEach(item => {
+                if (item.is_promotion_free_item === true) {
+                    return; // will be removed below
+                }
+                if (item.promotion && item.has_promotion_discount) {
+                    item.promotion = null;
+                    item.has_promotion_discount = false;
+                    item.discount = 0;
+                    item.discount_type = 'fixed';
+                    item.total = this.calculateItemTotal(item);
+                }
+                if (item.promotion) {
+                    item.promotion = null;
+                }
+            });
+            // Remove any free promotion items (Buy X Get Y)
+            this.cartItems = this.cartItems.filter(item => item.is_promotion_free_item !== true);
+            // Remove any coupon discount
+            this.cartSummaryDiscount = 0;
+            this.cartSummaryDiscountType = 'fixed';
+
+            this.saveCartToStorage();
+            this.renderCart();
+            this.updateCartSummary();
+
+            // Show BC member badge notification
+            if (typeof showSuccessNotification !== 'undefined') {
+                showSuccessNotification('Business Club Member: ' + (memberData ? memberData.member_id : '') + ' — No offers/schemes apply');
+            }
+        }
+    }
+
+    /**
+     * Check if Business Club member (promotions blocked).
+     * @returns {Boolean}
+     */
+    isBusinessClubMember() {
+        return this.isBcMember === true;
     }
 
     /**
@@ -136,6 +206,71 @@ class POSCartManager {
             const price = parseFloat($input.val()) || 0;
             self.updateItemPrice(productId, price, true); // true = re-render
             self.editingFields.delete(fieldKey);
+        });
+
+        // Scheme % — Buy X Get Y (type 3) main item par custom % price override
+        // (partial qty: customer poori scheme qty nahi leta, toh shopkeeper apna % lagata hai)
+        $(document).on('click', '.scheme-pct-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const $btn = $(this);
+            const productId = $btn.data('product-id');
+            const item = self.cartItems.find(i => String(i.product_id) === String(productId) && i.is_promotion_free_item !== true);
+            if (!item) return;
+            const base = parseFloat(item.mrp_price) || parseFloat(item.unit_price) || 0;
+            const current = item.custom_scheme_percent != null ? item.custom_scheme_percent
+                : (base > 0 ? Math.round((parseFloat(item.unit_price) / base) * 100) : 100);
+            const input = prompt(
+                `Buy X Get Y — custom % price set karein\n\nItem: ${item.product_name}\nList Price: ${base}\n\n(0-100, e.g. 60 ya 70 — customer ne poori qty nahi li to us % ke hisaab se payment hogi)`,
+                current
+            );
+            if (input === null) return;
+            const pct = parseFloat(input);
+            if (isNaN(pct)) { alert('Invalid percentage.'); return; }
+            self.updateItemSchemePercent(productId, pct);
+        });
+
+        // Change Flavour — open flavour selection modal for Buy X Get Y free item
+        $(document).on('click', '.change-flavour-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const $btn = $(this);
+            const mainProductId = $btn.data('product-id');
+            const mainItem = self.cartItems.find(i => String(i.product_id) === String(mainProductId) && i.is_promotion_free_item !== true && i.promotion && String(i.promotion.type) === '3');
+            if (!mainItem || !mainItem.promotion) return;
+            const flavourAlternatives = mainItem.promotion.flavour_alternatives || [];
+            if (flavourAlternatives.length === 0 || typeof window.openFlavourSelectionModal === 'function') {
+                // Find existing free item to get current flavour
+                const freeItem = self.cartItems.find(item =>
+                    item.is_promotion_free_item === true &&
+                    item.promotion_main_item_id == mainProductId
+                );
+                const currentFlavourId = freeItem ? freeItem.selected_flavour_id : null;
+                window.openFlavourSelectionModal(flavourAlternatives, async function(selectedItemId) {
+                    // Update the free item with new flavour
+                    if (freeItem) {
+                        let newItem = typeof posIndexedDB !== 'undefined' && posIndexedDB.isInitialized
+                            ? await posIndexedDB.getProductOrVariationById(selectedItemId)
+                            : null;
+                        if (newItem) {
+                            freeItem.product_id = selectedItemId;
+                            freeItem.product_name = newItem.name || 'Free Item';
+                            freeItem.product_code = newItem.code || '';
+                            freeItem.product_type = newItem.type || 'Standard';
+                            freeItem.selected_flavour_id = selectedItemId;
+                            freeItem.tax_information = newItem.tax_information || [];
+                            freeItem.tax_string = newItem.tax_string || '';
+                            freeItem.applicable_tax_id = newItem.applicable_tax_id || null;
+                            freeItem.tax_type = newItem.tax_type || 'Inclusive';
+                        } else {
+                            freeItem.product_id = selectedItemId;
+                            freeItem.selected_flavour_id = selectedItemId;
+                        }
+                        self.saveCartToStorage();
+                        self.renderCart();
+                    }
+                }, currentFlavourId);
+            }
         });
 
         // Cart item discount change - use debounced input and blur, support % symbol
@@ -411,6 +546,20 @@ class POSCartManager {
         if (!cartItem.tax_information || !Array.isArray(cartItem.tax_information)) {
             cartItem.tax_information = [];
         }
+
+        // Business Club member: strip all promotions/schemes/coupons from the item
+        if (this.isBcMember) {
+            if (cartItem.is_promotion_free_item === true) {
+                // Do not add free promotion items for BC members
+                return;
+            }
+            if (cartItem.promotion || cartItem.has_promotion_discount) {
+                cartItem.promotion = null;
+                cartItem.has_promotion_discount = false;
+                cartItem.discount = 0;
+                cartItem.discount_type = 'fixed';
+            }
+        }
         
         // Check if item already exists in cart - distinguish main vs free items when same product_id (Buy X get X)
         const isFreeItem = cartItem.is_promotion_free_item === true;
@@ -537,6 +686,86 @@ class POSCartManager {
     }
 
     /**
+     * Get the applicable tier for a Buy X Get Y promotion.
+     * Tier rule: smallest configured tier qty >= current qty.
+     * e.g. tiers [{qty:1,percent:60},{qty:2,custom_price:85}], qty=1 -> {percent:60}, qty=2 -> {custom_price:85}.
+     * A tier stores either percent (of list price) or custom_price (fixed amount per unit).
+     * Returns null when no tier covers the quantity (normal scheme applies).
+     * @param {Object} promotion - Promotion object (type 3)
+     * @param {Number} qty - Current main item quantity
+     * @returns {Object|null}
+     */
+    getSchemeTier(promotion, qty) {
+        if (!promotion || !promotion.tier_percentages || !promotion.tier_percentages.length) return null;
+        let matched = null;
+        (promotion.tier_percentages || []).forEach(function(t) {
+            if (Number(t.qty) >= qty && (!matched || Number(t.qty) < Number(matched.qty))) {
+                matched = t;
+            }
+        });
+        return matched || null;
+    }
+
+    /**
+     * Get the applicable tier percentage for a Buy X Get Y promotion (percent-type tiers only).
+     * Returns null for fixed-amount tiers or when no tier covers the quantity.
+     * @param {Object} promotion - Promotion object (type 3)
+     * @param {Number} qty - Current main item quantity
+     * @returns {Number|null}
+     */
+    getSchemeTierPercent(promotion, qty) {
+        const tier = this.getSchemeTier(promotion, qty);
+        if (tier && tier.custom_price == null && tier.percent != null) {
+            return Number(tier.percent);
+        }
+        return null;
+    }
+
+    /**
+     * Apply tier pricing to a Buy X Get Y main item (partial quantity).
+     * When a tier covers the current qty, the customer pays the tier price
+     * (percent of list price OR fixed amount per unit) and NO free item is given.
+     * Otherwise restores the full price.
+     * @param {Object} item - Main cart item with type 3 promotion
+     */
+    applySchemeTierPricing(item) {
+        if (!item || !item.promotion || String(item.promotion.type) !== '3') return;
+
+        const qty = item.quantity || 1;
+        const tier = this.getSchemeTier(item.promotion, qty);
+        const base = parseFloat(item.mrp_price) || parseFloat(item.original_unit_price) || parseFloat(item.unit_price) || 0;
+        const originalPrice = parseFloat(item.original_unit_price) || parseFloat(item.unit_price) || 0;
+
+        if (tier) {
+            let price;
+            let marker;
+            if (tier.custom_price != null && tier.custom_price !== '') {
+                // Fixed amount tier: customer pays the exact unit price
+                price = parseFloat(tier.custom_price);
+                marker = -1; // sentinel: tier applied via fixed amount
+            } else {
+                // Percentage tier: customer pays percent% of the list price
+                const pct = Math.max(0, Math.min(100, parseFloat(tier.percent) || 0));
+                price = Math.round(base * pct / 100 * 100) / 100;
+                marker = pct;
+            }
+            if (!isNaN(price) && price >= 0) {
+                item.unit_price = Math.round(price * 100) / 100;
+                item.discount = 0;
+                item.discount_type = 'fixed';
+                item.scheme_tier_percent = marker;
+                item.custom_scheme_percent = marker === -1 ? null : marker;
+                item.total = this.calculateItemTotal(item);
+            }
+        } else if (item.scheme_tier_percent != null) {
+            item.unit_price = originalPrice;
+            item.scheme_tier_percent = null;
+            item.custom_scheme_percent = null;
+            item.total = this.calculateItemTotal(item);
+        }
+    }
+
+    /**
      * Update Buy X Get Y free item quantity based on main item quantity
      * @param {String|Number} mainItemProductId - Main item product ID
      * @param {Number} mainItemQuantity - Main item quantity
@@ -557,10 +786,38 @@ class POSCartManager {
         }
         
         const promotion = mainItem.promotion;
+
+        // Tier percentage pricing (partial quantity): if a tier covers current qty,
+        // customer pays tier% of the price and gets no free item.
+        this.applySchemeTierPricing(mainItem);
+        const tierApplied = mainItem.scheme_tier_percent != null;
+        if (tierApplied) {
+            this.removeFreeItemLinkedToMainItem(mainItemProductId);
+            this.saveCartToStorage();
+            if (shouldRender) {
+                this.renderCart();
+            }
+            return;
+        }
+
         // buy_qty from API; fallback to qty (DB column) for compatibility
         const buyQty = Math.max(1, Number(promotion.buy_qty ?? promotion.qty) || 1);
         const getQty = Math.max(1, Number(promotion.get_qty) || 1);
-        const getItemId = promotion.get_item_id;
+        let getItemId = promotion.get_item_id;
+
+        // Check flavour alternatives — use selected flavour if available
+        const flavourAlternatives = promotion.flavour_alternatives || [];
+        if (flavourAlternatives.length > 0) {
+            const existingFreeItem = this.cartItems.find(item =>
+                item.is_promotion_free_item === true &&
+                item.promotion_main_item_id == mainItemProductId
+            );
+            if (existingFreeItem && existingFreeItem.selected_flavour_id) {
+                getItemId = existingFreeItem.selected_flavour_id;
+            } else if (flavourAlternatives.length > 0) {
+                getItemId = flavourAlternatives[0].get_item_id;
+            }
+        }
         
         if (!getItemId) {
             return; // No free item ID specified
@@ -627,6 +884,7 @@ class POSCartManager {
                                 is_promotion_free_item: true, // Mark as promotion free item
                                 promotion_id: promotion.id,
                                 promotion_main_item_id: mainItemProductId, // Link to main item
+                                selected_flavour_id: getItemId,
                                 imei_number: [],
                                 medicine: [],
                                 combo_items: []
@@ -696,6 +954,35 @@ class POSCartManager {
             }
             this.updateCartSummary();
         }
+    }
+
+    /**
+     * Buy X Get Y (type 3) — custom scheme % price override.
+     * Customer ne poori scheme qty nahi li (e.g. buy 1 get 1 mein sirf 1 item),
+     * toh shopkeeper List Price ka custom % laga sakta hai (60%, 70% etc.).
+     * Price = MRP × pct ÷ 100 — free item calculation ko nahi chhedta.
+     * @param {String|Number} productId - Main item product ID
+     * @param {Number} pct - Custom percentage (0-100) of the list/MRP price
+     */
+    updateItemSchemePercent(productId, pct) {
+        const item = this.cartItems.find(item =>
+            String(item.product_id) === String(productId) &&
+            item.is_promotion_free_item !== true
+        );
+        if (!item) return;
+
+        pct = Math.max(0, Math.min(100, Number(pct) || 0));
+        const base = parseFloat(item.mrp_price) || parseFloat(item.unit_price) || 0;
+        const newPrice = Math.round(base * pct / 100 * 100) / 100;
+
+        item.unit_price = newPrice;
+        item.discount = 0;
+        item.discount_type = 'fixed';
+        item.custom_scheme_percent = pct;   // flag: custom % applied
+        item.total = this.calculateItemTotal(item);
+        this.saveCartToStorage();
+        this.renderCart();
+        this.updateCartSummary();
     }
 
     /**
@@ -916,12 +1203,33 @@ class POSCartManager {
         let promotionBadge = '';
         if (isPromotionFreeItem) {
             promotionBadge = '<br><small class="text-success badge bg-label-success" style="font-size: 0.75rem;"><i class="icon-base ti tabler-gift me-1"></i>Free Item</small>';
+            // Show flavour name if available
+            if (item.selected_flavour_id && item.promotion) {
+                const flavourAlts = item.promotion.flavour_alternatives || [];
+                const matchedFlavour = flavourAlts.find(f => String(f.get_item_id) === String(item.selected_flavour_id));
+                if (matchedFlavour && matchedFlavour.name) {
+                    promotionBadge += `<br><small class="text-primary badge bg-label-primary" style="font-size: 0.75rem;"><i class="icon-base ti tabler-flask me-1"></i>${this.escapeHtml(matchedFlavour.name)}</small>`;
+                }
+            }
+        } else if (isBuyXGetYMainItem && item.custom_scheme_percent) {
+            promotionBadge = `<br><small class="text-warning badge bg-label-warning" style="font-size: 0.75rem;"><i class="icon-base ti tabler-percentage me-1"></i>Scheme ${this.escapeHtml(String(item.custom_scheme_percent))}% custom price</small>`;
+        } else if (isBuyXGetYMainItem && item.scheme_tier_percent === -1) {
+            promotionBadge = `<br><small class="text-warning badge bg-label-warning" style="font-size: 0.75rem;"><i class="icon-base ti tabler-coin me-1"></i>Scheme tier price ${this.formatNumber(item.unit_price)}</small>`;
         } else if (hasPromotionDiscount && item.promotion) {
             promotionBadge = `<br><small class="text-info badge bg-label-info" style="font-size: 0.75rem;"><i class="icon-base ti tabler-tag me-1"></i>${this.escapeHtml(item.promotion.title || 'Promotion')}</small>`;
         }
 
         // For free items: hide unit price, discount, and subtotal - show only quantity
         const priceDisplay = isPromotionFreeItem ? '<span class="text-muted">—</span>' : `<input class="common-input unit-price number-input" value="${this.formatNumber(item.unit_price)}" type="text" ${priceDisabledAttr} ${priceReadonlyAttr}>`;
+        // Buy X Get Y main item: Scheme % button for custom price override (partial qty)
+        const schemePctBtn = isBuyXGetYMainItem
+            ? `<button type="button" class="btn btn-xs btn-outline-warning scheme-pct-btn ms-1" data-product-id="${item.product_id}" title="Buy X Get Y — custom % price (partial qty)"><i class="icon-base ti tabler-percentage me-1"></i>Scheme %</button>`
+            : '';
+        // Buy X Get Y main item with flavour alternatives: Change Flavour button
+        const hasFlavourAlternatives = isBuyXGetYMainItem && item.promotion && item.promotion.flavour_alternatives && item.promotion.flavour_alternatives.length > 0;
+        const changeFlavourBtn = hasFlavourAlternatives
+            ? `<button type="button" class="btn btn-xs btn-outline-info change-flavour-btn ms-1" data-product-id="${item.product_id}" title="Change free item flavour"><i class="icon-base ti tabler-flask me-1"></i>Flavour</button>`
+            : '';
         const discountDisplayCell = isPromotionFreeItem ? '<span class="text-muted">—</span>' : `<input class="common-input item-discount discount-format" value="${discountDisplay}" min="0" type="text" data-discount-type="${item.discount_type || 'fixed'}" ${discountDisabledAttr} ${discountReadonlyAttr}>`;
         const totalDisplay = isPromotionFreeItem ? '<span class="text-muted">—</span>' : `<span class="item-total">${this.formatNumber(item.total)}</span>`;
 
@@ -949,7 +1257,11 @@ class POSCartManager {
                 </td>
                 <td class="text-center"><span class="sale-unit">${this.escapeHtml(item.sale_unit_name || 'PCS')}</span></td>
                 <td>
-                    ${priceDisplay}
+                    <div class="d-flex align-items-center">
+                        ${priceDisplay}
+                        ${schemePctBtn}
+                        ${changeFlavourBtn}
+                    </div>
                 </td>
                 <td>
                     ${discountDisplayCell}
@@ -1355,7 +1667,8 @@ class POSCartManager {
             is_promotion_free_item: item.is_promotion_free_item || false,
             promotion_id: item.promotion_id || (item.promotion && item.promotion.id) || null,
             promotion: item.promotion || null,
-            has_promotion_discount: item.has_promotion_discount || false
+            has_promotion_discount: item.has_promotion_discount || false,
+            selected_flavour_id: item.selected_flavour_id || null
         }));
 
         const saleData = {
@@ -1619,6 +1932,11 @@ class POSCartManager {
      * Apply coupon discount (type 2 promotion) based on coupon code
      */
     applyCouponDiscount(couponCode) {
+        // Business Club members get no coupons
+        if (this.isBcMember) {
+            this.clearCouponDiscount();
+            return null;
+        }
         if (!this.promotionsCache) {
             this.promotionsCache = window.posPromotionsData || null;
         }
@@ -1657,6 +1975,8 @@ class POSCartManager {
      * Apply bill-level promotions (scheme_basis = 'bill')
      */
     applyBillLevelPromotions() {
+        // Business Club members get no bill-level promotions
+        if (this.isBcMember) return;
         if (this._billPromoApplied) return;
         if (!this.promotionsCache) return;
         var promotions = this.promotionsCache;

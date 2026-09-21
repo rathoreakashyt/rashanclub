@@ -1,0 +1,160 @@
+/* ═══════════════════════════════════════════════════════════════
+   RDK Invoice — Exact clone of desktop PdfService.cs layout
+   Paper: 80mm thermal (~302px @96dpi), font 9-11px equivalent
+   ═══════════════════════════════════════════════════════════════ */
+body.rdk-invoice {
+    font-family: Arial, 'Segoe UI', 'DM Sans', sans-serif;
+    font-size: 10px;
+    line-height: 1.35;
+    color: #000000;
+    width: 80mm;
+    margin: 0 auto !important;
+    padding: 2mm 2mm;
+    background: #fff;
+}
+body.rdk-invoice * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── HEADER ──────────────────────────────────────── */
+.rdk-header { text-align: center; padding-bottom: 1px; }
+.rdk-header .rdk-logo { text-align: center; padding-bottom: 2px; }
+.rdk-header .rdk-logo img { max-width: 55px; max-height: 45px; object-fit: contain; }
+.rdk-header .store-icon { font-size: 18px; font-weight: 700; color: #DC2626; }
+.rdk-header .store-name { font-size: 12px; font-weight: 700; color: #DC2626; }
+.rdk-header .tagline   { font-size: 8px;  color: #333333; }
+.rdk-header .tagline-line { border-top: 0.5px solid #000; margin: 2px 0; }
+.rdk-header .address   { font-size: 7px;  color: #333333; }
+.rdk-header .phone-left { font-size: 6px; text-align: left; }
+.rdk-header .email-left { font-size: 6px; text-align: left; }
+.rdk-header .gstin-center { font-size: 6.5px; font-weight: 700; padding-top: 1px; text-align: center; }
+
+/* ── TAX INVOICE DIVIDER ─────────────────────────── */
+.rdk-tax-invoice {
+    padding-top: 4px;
+    border-top: 1px solid #000;
+}
+.rdk-tax-invoice span {
+    display: block;
+    padding: 2px 0 1px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 700;
+    text-decoration: underline;
+}
+.rdk-tax-invoice::after {
+    content: '';
+    display: block;
+    border-bottom: 1px solid #000;
+}
+
+/* ── BILL INFO ───────────────────────────────────── */
+.rdk-bill-info { padding-top: 3px; font-size: 7px; }
+.rdk-bill-info table { width: 100%; border-collapse: collapse; }
+.rdk-bill-info td { padding: 1px 0; vertical-align: top; }
+.rdk-bill-info .lbl { font-weight: 700; white-space: nowrap; width: 45%; }
+.rdk-bill-info .val { padding-left: 4px; }
+
+/* ── ITEMS TABLE ─────────────────────────────────── */
+.rdk-items { padding-top: 4px; }
+.rdk-items .line-top { border-top: 0.5px solid #000; }
+.rdk-items .line-bot { border-top: 0.3px solid #000; }
+.rdk-items table { width: 100%; border-collapse: collapse; }
+.rdk-items th {
+    font-size: 6.5px; font-weight: 700; text-align: left;
+    padding: 2px 2px;
+}
+.rdk-items td { font-size: 7px; padding: 1px 2px; vertical-align: top; }
+.rdk-items .r { text-align: right; }
+.rdk-items .c1 { width: 20px; }
+.rdk-items .c2 { width: 28px; }
+.rdk-items .c4 { width: 52px; }
+.rdk-items .c5 { width: 52px; }
+.rdk-items .c6 { width: 58px; }
+
+/* ── TOTALS ──────────────────────────────────────── */
+.rdk-totals { padding-top: 3px; }
+.rdk-totals .line { border-top: 0.5px solid #000; }
+.rdk-totals table { width: 100%; border-collapse: collapse; }
+.rdk-totals td { padding: 2px 2px; font-size: 7px; }
+.rdk-totals .r { text-align: right; }
+.rdk-totals .lbl { font-weight: 700; }
+.rdk-totals .lblcol { width: 90px; }
+.rdk-totals .valcol { width: 70px; }
+.rdk-totals .net-payable {
+    border: 1px solid #000;
+    padding: 2px 2px;
+    font-size: 8px;
+    font-weight: 700;
+}
+
+/* ── MRP SUMMARY BOX (1x3) ───────────────────────── */
+.rdk-mrp-summary { padding-top: 4px; }
+.rdk-mrp-summary .rdk-words { font-size: 7px; font-weight: 700; text-align: center; }
+.rdk-mrp-summary .line { border-top: 0.5px solid #000; margin: 2px 0; }
+.rdk-mrp-box {
+    border: 1px solid #000;
+    padding: 2px 3px;
+    width: 100%;
+    border-collapse: collapse;
+}
+.rdk-mrp-box td {
+    text-align: center;
+    font-size: 6.5px;
+    padding: 1px 2px;
+    width: 33.33%;
+}
+.rdk-mrp-box .bold { font-weight: 700; }
+
+/* ── YOU SAVE ────────────────────────────────────── */
+.rdk-save { padding-top: 4px; }
+.rdk-save-box {
+    border: 2px solid #DC2626;
+    padding: 3px;
+    text-align: center;
+}
+.rdk-save-box .big { font-size: 11px; font-weight: 700; color: #DC2626; }
+.rdk-save-box .sub { font-size: 7px; color: #333333; padding-top: 1px; }
+
+/* ── TAX TABLE ───────────────────────────────────── */
+.rdk-tax { padding-top: 4px; }
+.rdk-tax .line { border-top: 0.3px solid #000; }
+.rdk-tax table { width: 100%; border-collapse: collapse; }
+.rdk-tax th { font-size: 6.5px; font-weight: 700; padding: 2px 2px; text-align: left; }
+.rdk-tax td { font-size: 6.5px; padding: 1px 2px; }
+.rdk-tax .r { text-align: right; }
+.rdk-tax .c1 { width: 55px; }
+.rdk-tax .c2 { width: 55px; }
+.rdk-tax .c3 { width: 50px; }
+.rdk-tax .c4 { width: 50px; }
+.rdk-tax .total-row { font-weight: 700; border-top: 0.3px solid #000; }
+
+/* ── PAYMENT INFO ────────────────────────────────── */
+.rdk-payment { padding-top: 3px; }
+.rdk-payment .line { border-top: 0.3px solid #000; }
+.rdk-payment p { font-size: 7px; padding: 1px 0; }
+
+/* ── FOOTER ──────────────────────────────────────── */
+.rdk-footer { padding-top: 6px; }
+.rdk-footer .line { border-top: 0.5px solid #000; margin-bottom: 3px; }
+.rdk-footer .thanks { font-size: 8px; font-weight: 700; text-align: center; }
+.rdk-footer .store { font-size: 10px; font-weight: 700; color: #DC2626; text-align: center; }
+.rdk-footer .noreturn { font-size: 6px; font-weight: 700; text-align: center; padding-top: 2px; }
+.rdk-footer .tc { font-size: 6px; text-align: center; }
+.rdk-footer .qr { text-align: center; padding-top: 4px; }
+.rdk-footer .qr img { width: 50px; height: 50px; }
+
+/* ── PRINT BUTTON (browser only) ─────────────────── */
+@media print {
+    .rdk-no-print { display: none !important; }
+    body.rdk-invoice { padding: 0; }
+}
+.rdk-print-btn-wrap { text-align: center; padding-top: 30px; }
+.rdk-print-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    background: #4f46e5;
+    color: #fff;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}

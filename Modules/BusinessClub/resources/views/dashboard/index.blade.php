@@ -55,13 +55,6 @@
     .bc-partner-card {
         text-align: center;
     }
-    .bc-partner-card .partner-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #e3e6f0;
-    }
     .bc-partner-card .partner-name {
         font-weight: 600;
         font-size: 0.85rem;
@@ -100,7 +93,7 @@
     <!-- Page Header -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
         <div class="d-flex flex-column justify-content-center">
-            <h4 class="mb-0 fw-bold">{{ strtoupper(getWhiteLabel('site_name') ?? 'Rashan Ki Dukan') }} {{ __('BUSINESS CLUB - ADMIN DASHBOARD') }}</h4>
+            <h4 class="mb-0 fw-bold">{{ __('BUSINESS CLUB DASHBOARD') }}</h4>
         </div>
         @include('backend.components.breadcrumb', [
             'breadcrumbs' => [
@@ -216,22 +209,16 @@
                     @if($settings)
                     <div class="setting-row">
                         <span class="setting-label">{{ __('Profit Share') }}</span>
-                        <span class="setting-value" style="color: #10b981;">{{ $settings->profit_percentage }}%</span>
+                        <span class="setting-value" style="color: #10b981;">{{ $settings->profit_share_percentage }}%</span>
                     </div>
                     <div class="setting-row">
                         <span class="setting-label">{{ __('Redemption Date') }}</span>
-                        <span class="setting-value">{{ $settings->redemption_date }}{{ ($settings->redemption_date % 10 == 1 && $settings->redemption_date != 11) ? 'st' : (($settings->redemption_date % 10 == 2 && $settings->redemption_date != 12) ? 'nd' : (($settings->redemption_date % 10 == 3 && $settings->redemption_date != 13) ? 'rd' : 'th')) }} of Month</span>
+                        <span class="setting-value">{{ $settings->redemption_day }}{{ ($settings->redemption_day % 10 == 1 && $settings->redemption_day != 11) ? 'st' : (($settings->redemption_day % 10 == 2 && $settings->redemption_day != 12) ? 'nd' : (($settings->redemption_day % 10 == 3 && $settings->redemption_day != 13) ? 'rd' : 'th')) }} of Month</span>
                     </div>
                     <div class="setting-row">
-                        <span class="setting-label">{{ __('Min Purchase to Redeem') }}</span>
-                        <span class="setting-value">₹{{ number_format($settings->min_purchase_amount) }}</span>
+                        <span class="setting-label">{{ __('Membership Amount') }}</span>
+                        <span class="setting-value">₹{{ number_format($settings->membership_amount) }}</span>
                     </div>
-                    @if($settings->minimum_bill_amount > 0)
-                    <div class="setting-row">
-                        <span class="setting-label">{{ __('Minimum Bill') }}</span>
-                        <span class="setting-value">₹{{ number_format($settings->minimum_bill_amount) }}</span>
-                    </div>
-                    @endif
                     @else
                     <p class="text-muted text-center">{{ __('No settings configured') }}</p>
                     @endif
@@ -258,8 +245,6 @@
                     <div class="d-flex justify-content-around align-items-end" style="height: 250px;">
                         @foreach($topPartners as $partner)
                         <div class="text-center bc-partner-card">
-                            <img src="{{ $partner['photo'] ? asset('uploads/customer/' . $partner['photo']) : asset('backend_assets/img/avatars/avatar.png') }}" 
-                                 alt="{{ $partner['name'] }}" class="partner-avatar mb-2">
                             <p class="partner-name mb-1">{{ \Str::limit($partner['name'], 10) }}</p>
                             <p class="partner-amount mb-0">₹{{ number_format($partner['earned']) }}</p>
                         </div>
@@ -330,21 +315,21 @@
                             <td>{{ $tx['date'] }}</td>
                             <td>{{ $tx['customer_name'] }}</td>
                             <td>
-                                @if($tx['type'] == 'credit')
+                                @if(strpos($tx['type'], 'profit') !== false)
                                     <span class="badge badge-credit">Credit - Profit Share</span>
                                 @else
-                                    <span class="badge badge-redeem">Redeem - Profit Share</span>
+                                    <span class="badge badge-redeem">{{ ucfirst($tx['type']) }}</span>
                                 @endif
                             </td>
                             <td>
-                                @if($tx['type'] == 'credit')
+                                @if(strpos($tx['type'], 'profit') !== false)
                                     <span class="text-success">₹{{ number_format($tx['sale_amount'], 2) }}</span>
                                 @else
                                     <span class="text-danger">-₹{{ number_format($tx['sale_amount'], 2) }}</span>
                                 @endif
                             </td>
                             <td>
-                                @if($tx['type'] == 'credit')
+                                @if(strpos($tx['type'], 'profit') !== false)
                                     <span class="text-success">₹{{ number_format($tx['amount'], 2) }}</span>
                                 @else
                                     <span class="text-danger">-₹{{ number_format($tx['amount'], 2) }}</span>

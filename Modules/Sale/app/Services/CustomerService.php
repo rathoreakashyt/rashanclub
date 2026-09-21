@@ -185,7 +185,7 @@ class CustomerService
         $openingBalance = floatval($customer->opening_balance ?? 0);
         $openingBalanceType = $customer->opening_balance_type ?? 'Debit';
 
-        if ($openingBalanceType == 'Credit') {
+        if (in_array($openingBalanceType, ['Credit', 'Cr'])) {
             $balance = -$openingBalance - $totalDueReceivedAmount + $totalSaleDueAmount - $totalSaleReturnAmount;
         } else {
             $balance = $openingBalance - $totalDueReceivedAmount + $totalSaleDueAmount - $totalSaleReturnAmount;
@@ -226,6 +226,19 @@ class CustomerService
                 throw new \Exception('A "Walk-in Customer" already exists for this company. Only one "Walk-in Customer" is allowed per company.');
             }
         }
+
+        // Phone duplicate check — prevent adding customer with same phone number
+        if (!empty($data['phone'])) {
+            $phone = trim($data['phone']);
+            $existingCustomer = Customer::where('company_id', $this->getCompanyId())
+                ->where('del_status', 'Live')
+                ->whereRaw('LOWER(TRIM(phone)) = LOWER(?)', [$phone])
+                ->first();
+            
+            if ($existingCustomer) {
+                throw new \Exception('A customer with this phone number already exists. Please use the existing customer or update it.');
+            }
+        }
         
         $storeData = $this->prepareCustomerData($data);
         return $this->customerRepository->create($storeData);
@@ -242,6 +255,10 @@ class CustomerService
         }
         
         $updateData = $this->prepareCustomerData($data, true, $customer);
+        // Bump the logical clock so a web edit wins the LWW compare against an
+        // older desktop edit (and vice-versa: the desktop edit bumps its own
+        // SyncVersion on the next push).
+        $updateData['sync_version'] = ((int) ($customer->sync_version ?? 0)) + 1;
         return $this->customerRepository->update($customer, $updateData);
     }
 

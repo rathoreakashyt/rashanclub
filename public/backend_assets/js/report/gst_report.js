@@ -221,4 +221,6 @@ $(async function () {
     if ($('#outlet_id').length && $.fn.select2) {
         $('#outlet_id').select2({ width: '100%', placeholder: language_key.AllOutlets || 'All Outlets' });
     }
+
+    loadReport();
 });

@@ -59,7 +59,7 @@ class StockRepository
             $baseQuery->where('generic_name', $genericName);
         }
         
-        $allFiltered = $baseQuery->orderBy('id')->get(['id', 'type', 'alert_quantity']);
+        $allFiltered = $baseQuery->orderBy('id')->get(['id', 'type', 'alert_quantity', 'last_three_purchase_avg', 'last_purchase_price', 'purchase_price']);
         $allIds = $allFiltered->pluck('id')->toArray();
         $stockBatch = $this->getStockQuantitiesBatch($allIds, $outletId);
         
@@ -122,7 +122,7 @@ class StockRepository
                 ($item->type == 'Medicine_Product' && $item->expiry_date_maintain == 'No')) {
                 $generalStock = $stockQty - $outQty;
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $genConvertedPrice = $itemPrice / $conversionRate;
                 $purchasePriceSum = $genConvertedPrice * $generalStock;
                 if ($item->unit_type == '1') {
@@ -146,7 +146,7 @@ class StockRepository
                     $variationStock = $variationData['stock_in'] - $variationData['stock_out'];
                     $generalStock += $variationStock;
                     $variationAlert = (int)$variationData['alert_quantity'];
-                    $varPrice = (float)($variationData[$priceCol] ?? 0);
+                    $varPrice = $this->getEffectivePrice($variationData, $priceCol);
                     $variationConvertedPrice = $varPrice / $conversionRate;
                     $purchasePriceSum += $variationConvertedPrice * $variationStock;
                     if ($variationStock < $variationAlert) {
@@ -163,14 +163,14 @@ class StockRepository
             } elseif (in_array($item->type, ['IMEI_Product', 'Serial_Product'])) {
                 $expStock = $stockQty - $outQty;
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $purchasePriceSum = ($itemPrice / $conversionRate) * $expStock;
                 $purchaseUnitSum = (int)$expStock;
                 $saleUnitSum = (int)$expStock;
                 $variation .= '<button type="button" class="btn btn-primary modal_trigger" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="' . $item->id . '" data-type="' . $item->type . '" data-name="' . e($item->name . '(' . $item->code . ')') . '">Show All ' . ($item->type == 'IMEI_Product' ? 'IMEI' : 'Serial') . '</button>';
             } elseif ($item->type == 'Medicine_Product' && $item->expiry_date_maintain == 'Yes') {
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $purchasePriceSum = ($itemPrice / $conversionRate) * ($stockQty - $outQty);
                 $expiryData = $expiryByItem[$item->id] ?? [];
                 foreach ($expiryData as $expiry) {
@@ -198,7 +198,7 @@ class StockRepository
             $unitType .= '</div>';
             $subArray[] = $unitType;
             $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-            $itemPrice = (float)($item->{$priceCol} ?? 0);
+            $itemPrice = $this->getEffectivePrice($item, $priceCol);
             $lpp = $itemPrice / $conversionRate;
             $subArray[] = '<div class="' . $itemStockAlertCls . '">' . number_format($lpp, 2) . '</div>';
             $totalHtml = '<div class="' . $itemStockAlertCls . '">' . number_format($purchasePriceSum, 2) . '</div>';
@@ -330,7 +330,7 @@ class StockRepository
                 ($item->type == 'Medicine_Product' && $item->expiry_date_maintain == 'No')) {
                 $generalStock = $stockQty - $outQty;
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $genConvertedPrice = $itemPrice / $conversionRate;
                 $purchasePriceSum = $genConvertedPrice * $generalStock;
                 
@@ -365,7 +365,7 @@ class StockRepository
                     $variationStock = $variationData['stock_in'] - $variationData['stock_out'];
                     $generalStock += $variationStock;
                     $variationAlert = (int)$variationData['alert_quantity'];
-                    $varPrice = (float)($variationData[$priceCol] ?? 0);
+                    $varPrice = $this->getEffectivePrice($variationData, $priceCol);
                     $variationConvertedPrice = $varPrice / $conversionRate;
                     $purchasePriceSum += $variationConvertedPrice * $variationStock;
                     
@@ -384,7 +384,7 @@ class StockRepository
             } elseif (in_array($item->type, ['IMEI_Product', 'Serial_Product'])) {
                 $expStock = $stockQty - $outQty;
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $expConvertedPrice = $itemPrice / $conversionRate;
                 $purchasePriceSum = $expConvertedPrice * $expStock;
                 $purchaseUnitSum = (int)$expStock;
@@ -392,7 +392,7 @@ class StockRepository
                 $variation .= '<button type="button" class="btn btn-primary modal_trigger" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="' . $item->id . '" data-type="' . $item->type . '" data-name="' . e($item->name . '(' . $item->code . ')') . '">Show All ' . ($item->type == 'IMEI_Product' ? 'IMEI' : 'Serial') . '</button>';
             } elseif ($item->type == 'Medicine_Product' && $item->expiry_date_maintain == 'Yes') {
                 $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 $purchasePriceSum = ($itemPrice / $conversionRate) * ($stockQty - $outQty);
                 
                 $expiryData = $expiryByItem[$item->id] ?? [];
@@ -426,7 +426,7 @@ class StockRepository
             
             // LPP/PP (Last Purchase Price / Purchase Price) - based on Price Type filter
             $conversionRate = (int)$item->conversion_rate > 0 ? (int)$item->conversion_rate : 1;
-            $itemPrice = (float)($item->{$priceCol} ?? 0);
+            $itemPrice = $this->getEffectivePrice($item, $priceCol);
             $lpp = $itemPrice / $conversionRate;
             $subArray[] = '<div class="' . $itemStockAlertCls . '">' . formatAmount($lpp, 2) . '</div>';
             
@@ -468,8 +468,9 @@ class StockRepository
                 ->where('enable_disable_status', 1)
                 ->where('del_status', 'Live')
                 ->where('type', '!=', 'Service_Product')
+                ->where('type', '!=', 'Combo_Product')
                 ->where('type', '!=', '0')
-                ->select('id', 'type', 'conversion_rate', 'unit_type', 'last_three_purchase_avg', 'last_purchase_price');
+                ->select('id', 'type', 'conversion_rate', 'unit_type', 'last_three_purchase_avg', 'last_purchase_price', 'purchase_price');
 
             if (!empty($filters['item_id'])) {
                 $parentId = $this->getItemParentId($filters['item_id']);
@@ -499,24 +500,12 @@ class StockRepository
 
             $items = $query->get();
             $mainIds = $items->pluck('id')->toArray();
-            $variationParentIds = $items->where('type', 'Variation_Product')->pluck('id')->toArray();
 
-            $variationItems = collect([]);
-            if (!empty($variationParentIds)) {
-                $variationItems = Item::whereIn('parent_id', $variationParentIds)
-                    ->where('type', '0')
-                    ->where('del_status', 'Live')
-                    ->select('id', 'parent_id', 'conversion_rate', 'unit_type', 'last_three_purchase_avg', 'last_purchase_price')
-                    ->get();
-            }
-
-            $allIds = array_unique(array_merge($mainIds, $variationItems->pluck('id')->toArray()));
-            $stockBatch = $this->getStockQuantitiesBatch($allIds, $outletId);
+            $stockBatch = $this->getStockQuantitiesBatch($mainIds, $outletId);
             $currentStock = [];
-            foreach ($allIds as $id) {
+            foreach ($mainIds as $id) {
                 $currentStock[$id] = ($stockBatch['in'][$id] ?? 0) - ($stockBatch['out'][$id] ?? 0);
             }
-            $variationsByParent = $variationItems->groupBy('parent_id');
 
             $totalStockValue = 0;
             $totalStockCount = 0;
@@ -524,27 +513,13 @@ class StockRepository
             foreach ($items as $item) {
                 $stock = $currentStock[$item->id] ?? 0;
                 $conversionRate = (int)($item->conversion_rate ?? 1) > 0 ? (int)$item->conversion_rate : 1;
-                $itemPrice = (float)($item->{$priceCol} ?? 0);
+                $itemPrice = $this->getEffectivePrice($item, $priceCol);
                 if ($item->unit_type == '2') {
                     $totalStockValue += ($itemPrice / $conversionRate) * $stock;
                 } else {
                     $totalStockValue += $itemPrice * $stock;
                 }
                 $totalStockCount += $stock;
-
-                if ($item->type == 'Variation_Product') {
-                    foreach ($variationsByParent->get($item->id, []) as $var) {
-                        $varStock = $currentStock[$var->id] ?? 0;
-                        $varConv = (int)($var->conversion_rate ?? 1) > 0 ? (int)$var->conversion_rate : 1;
-                        $varPrice = (float)($var->{$priceCol} ?? $var->last_three_purchase_avg ?? 0);
-                        if (($var->unit_type ?? '1') == '2') {
-                            $totalStockValue += ($varPrice / $varConv) * $varStock;
-                        } else {
-                            $totalStockValue += $varPrice * $varStock;
-                        }
-                        $totalStockCount += $varStock;
-                    }
-                }
             }
 
             return [
@@ -552,6 +527,30 @@ class StockRepository
                 'stock_count' => round($totalStockCount, 2),
             ];
         });
+    }
+
+    /**
+     * Get effective purchase price for an item with fallbacks.
+     * Order: selected price column -> last_purchase_price -> purchase_price.
+     * Works with Item objects and variation arrays.
+     */
+    private function getEffectivePrice($item, string $priceCol): float
+    {
+        $get = function (string $key) use ($item) {
+            if (is_array($item)) {
+                return $item[$key] ?? 0;
+            }
+            return $item->{$key} ?? 0;
+        };
+
+        $price = (float) $get($priceCol);
+        if ($price <= 0) {
+            $price = (float) $get('last_purchase_price');
+        }
+        if ($price <= 0) {
+            $price = (float) $get('purchase_price');
+        }
+        return $price;
     }
 
     /**
@@ -605,7 +604,7 @@ class StockRepository
             foreach ($variations as $variation) {
                 $stock = $variation['stock_in'] - $variation['stock_out'];
                 $conversionRate = (int)($variation['conversion_rate'] ?? 1) > 0 ? (int)$variation['conversion_rate'] : 1;
-                $lpp = $variation['last_three_purchase_avg'] / $conversionRate;
+                $lpp = $this->getEffectivePrice($variation, 'last_three_purchase_avg') / $conversionRate;
                 $total = $lpp * $stock;
                 
                 // Get variation item for unit info
@@ -745,6 +744,7 @@ class StockRepository
                 'alert_quantity' => $variation->alert_quantity,
                 'last_three_purchase_avg' => $variation->last_three_purchase_avg,
                 'last_purchase_price' => $variation->last_purchase_price ?? $variation->last_three_purchase_avg,
+                'purchase_price' => $variation->purchase_price,
                 'conversion_rate' => $variation->conversion_rate,
                 'unit_type' => $variation->unit_type,
             ];
@@ -784,6 +784,7 @@ class StockRepository
                 'alert_quantity' => $v->alert_quantity,
                 'last_three_purchase_avg' => $v->last_three_purchase_avg,
                 'last_purchase_price' => $v->last_purchase_price ?? $v->last_three_purchase_avg,
+                'purchase_price' => $v->purchase_price,
                 'conversion_rate' => $v->conversion_rate,
                 'unit_type' => $v->unit_type,
             ];

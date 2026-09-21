@@ -202,19 +202,19 @@ $(async function () {
         
         // Create row HTML
         let rowHtml = `
-            <td style="vertical-align: top;">${rowCount + 1}</td>
-            <td style="vertical-align: top;">
+            <td><span class="tf-sn">${rowCount + 1}</span></td>
+            <td>
                 <input type="hidden" class="item-id" name="items[]" value="${itemData ? itemData.id : ''}">
                 <input type="hidden" class="parent-id" name="parent_ids[]" value="${itemData && itemData.parentId ? itemData.parentId : ''}">
                 <input type="hidden" class="item-type" name="item_types[]" value="${itemData ? itemData.type : ''}">
-                <span class="item-name">${displayName}</span>
+                <span class="tf-item-name item-name">${displayName}</span>
             </td>
-            <td class="imei-serial-cell" style="vertical-align: top;">
+            <td class="imei-serial-cell">
                 <div class="imei-serial-container">
                     <input type="text" class="form-control imei-serial" name="expiry_imei_serial[]" placeholder="IMEI/Serial" readonly style="${showImeiSerial ? '' : 'display:none;'}">
                 </div>
             </td>
-            <td style="vertical-align: top;">
+            <td>
                 <div class="input-group">
                     <input type="text" class="form-control number-input quantity" name="quantity_amount[]" min="1" value="1" ${showImeiSerial && (itemData && (itemData.type === 'IMEI_Product' || itemData.type === 'Serial_Product')) ? 'readonly' : ''}>
                     <button type="button" class="btn btn-outline-secondary" type="button">
@@ -222,8 +222,8 @@ $(async function () {
                     </button>
                 </div>
             </td>
-            <td style="vertical-align: top;">
-                <button type="button" class="btn text-danger remove-row">
+            <td>
+                <button type="button" class="btn tf-row-remove remove-row">
                     <i class="icon-base ti tabler-trash"></i>
                 </button>
             </td>
@@ -427,7 +427,12 @@ $(async function () {
     // Function to update row numbers
     function updateRowNumbers() {
         $('#transferItems tr').each(function(index) {
-            $(this).find('td:first').text(index + 1);
+            const sn = $(this).find('.tf-sn');
+            if (sn.length > 0) {
+                sn.text(index + 1);
+            } else {
+                $(this).find('td:first').text(index + 1);
+            }
         });
     }
     

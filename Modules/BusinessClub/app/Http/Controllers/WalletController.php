@@ -6,11 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\BusinessClub\Services\BusinessClubService;
-use Modules\BusinessClub\Models\CustomerWallet;
-use Modules\BusinessClub\Models\WalletTransaction;
+use Modules\BusinessClub\Models\BusinessClubMember;
+use Modules\BusinessClub\Models\BusinessClubTransaction;
 use Modules\Sale\Models\Customer;
 use Modules\Sale\Models\Sale;
 
+/**
+ * WalletController kept for backward compatibility.
+ * Delegates to BusinessClubService using new tables (business_club_members, business_club_transactions).
+ */
 class WalletController extends Controller
 {
     protected $businessClubService;
@@ -20,6 +24,9 @@ class WalletController extends Controller
         $this->businessClubService = $businessClubService;
     }
 
+    /**
+     * Members list page (replaces old wallet index).
+     */
     public function index(Request $request)
     {
         $companyId = session('company.company_id');
@@ -30,20 +37,23 @@ class WalletController extends Controller
             $length = (int) $request->input('length', 10);
             $search = $request->input('search.value', '') ?? '';
 
-            $result = $this->businessClubService->getWalletReport($companyId, $search, $start, $length);
+            $result = $this->businessClubService->getMembersList($companyId, $search, $start, $length);
 
-            $data = $result['data']->map(function ($row) use ($start) {
-                static $index = 0;
-                $index++;
+            $data = $result['data']->map(function ($row, $index) use ($start) {
                 return [
                     'id' => $row->id,
+                    'sn' => $start + $index + 1,
+                    'member_id' => $row->member_id,
                     'customer_id' => $row->customer_id,
-                    'sn' => $start + $index,
                     'customer_name' => $row->customer_name ?? 'N/A',
                     'customer_phone' => $row->customer_phone ?? '-',
+                    'membership_amount' => number_format($row->membership_amount, 2),
+                    'locked_balance' => number_format($row->locked_balance, 2),
+                    'earned_balance' => number_format($row->earned_balance, 2),
                     'total_earned' => number_format($row->total_earned, 2),
-                    'balance' => number_format($row->balance, 2),
                     'total_redeemed' => number_format($row->total_redeemed, 2),
+                    'status' => $row->status,
+                    'joined_at' => $row->joined_at ? \Carbon\Carbon::parse($row->joined_at)->format('d-m-Y') : '-',
                 ];
             });
 
@@ -58,27 +68,38 @@ class WalletController extends Controller
         return view('businessclub::wallets.index');
     }
 
-    public function transactions(Request $request, int $walletId)
+    /**
+     * Member transactions.
+     */
+    public function transactions(Request $request, int $memberId)
     {
         $companyId = session('company.company_id');
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 100);
 
-        $result = $this->businessClubService->getTransactions($walletId, $companyId, 0, 100);
+        $result = $this->businessClubService->getMemberTransactions($memberId, $companyId, $start, $length);
 
         return response()->json([
             'data' => $result['data']->map(function ($tx) {
                 return [
                     'id' => $tx->id,
-                    'type' => ucfirst($tx->type),
+                    'type' => ucfirst(str_replace('_', ' ', $tx->type)),
                     'amount' => number_format($tx->amount, 2),
                     'balance_before' => number_format($tx->balance_before, 2),
                     'balance_after' => number_format($tx->balance_after, 2),
                     'description' => $tx->description,
                     'date' => $tx->transaction_date->format('d-m-Y'),
+                    'sale_id' => $tx->sale_id,
                 ];
             }),
+            'recordsTotal' => $result['recordsTotal'],
+            'recordsFiltered' => $result['filteredCount'],
         ]);
     }
 
+    /**
+     * Member profile page.
+     */
     public function profile(int $customerId)
     {
         $companyId = session('company.company_id');
@@ -88,27 +109,24 @@ class WalletController extends Controller
             ->where('del_status', 'Live')
             ->firstOrFail();
 
-        $wallet = CustomerWallet::where('customer_id', $customerId)
+        $member = BusinessClubMember::where('customer_id', $customerId)
             ->where('company_id', $companyId)
             ->where('del_status', 'Live')
             ->first();
 
-        $settings = \Modules\BusinessClub\Models\BusinessClubSetting::where('company_id', $companyId)
-            ->where('del_status', 'Live')
-            ->first();
+        $settings = $this->businessClubService->getSettings($companyId);
 
-        $transactions = WalletTransaction::with('sale')
-            ->where('customer_id', $customerId)
+        $transactions = BusinessClubTransaction::where('customer_id', $customerId)
             ->where('company_id', $companyId)
             ->where('del_status', 'Live')
             ->orderBy('id', 'desc')
             ->take(50)
             ->get();
 
-        $recentProfitShares = WalletTransaction::where('customer_id', $customerId)
+        $recentProfitShares = BusinessClubTransaction::where('customer_id', $customerId)
             ->where('company_id', $companyId)
             ->where('del_status', 'Live')
-            ->where('type', 'credit')
+            ->where('type', 'profit_credit')
             ->orderBy('id', 'desc')
             ->take(10)
             ->get();
@@ -133,9 +151,6 @@ class WalletController extends Controller
             ->where('del_status', 'Live')
             ->sum('grand_total');
 
-        $minPurchase = $settings ? (float) $settings->min_purchase_amount : 0;
-        $profitPercentage = $settings ? (float) $settings->profit_percentage : 0;
-
         $recentSales = Sale::with(['saleDetails.item'])
             ->where('customer_id', $customerId)
             ->where('company_id', $companyId)
@@ -144,17 +159,41 @@ class WalletController extends Controller
             ->take(5)
             ->get();
 
+        // Backward compatibility: map $member to $wallet for existing views
+        $wallet = $member;
+        $minPurchase = $settings ? (float) $settings->membership_amount : 0;
+        $profitPercentage = $settings ? (float) $settings->profit_share_percentage : 0;
+
         return view('businessclub::wallets.profile', compact(
-            'customer', 'wallet', 'transactions', 'recentProfitShares',
+            'customer', 'member', 'wallet', 'transactions', 'recentProfitShares',
             'totalSales', 'totalSaleAmount', 'monthlySpend',
-            'minPurchase', 'profitPercentage', 'recentSales'
+            'minPurchase', 'profitPercentage', 'recentSales', 'settings'
         ));
     }
 
+    /**
+     * Get wallet/earned balance for a customer (API endpoint for POS).
+     */
     public function getBalance(int $customerId)
     {
         $companyId = session('company.company_id');
-        $balance = $this->businessClubService->getWalletBalance($customerId, $companyId);
-        return response()->json(['balance' => $balance]);
+        $member = $this->businessClubService->getMember($customerId, $companyId);
+
+        if (!$member) {
+            return response()->json([
+                'is_member' => false,
+                'balance' => 0,
+                'earned_balance' => 0,
+                'locked_balance' => 0,
+            ]);
+        }
+
+        return response()->json([
+            'is_member' => true,
+            'balance' => (float) $member->earned_balance,
+            'earned_balance' => (float) $member->earned_balance,
+            'locked_balance' => (float) $member->locked_balance,
+            'member_id' => $member->member_id,
+        ]);
     }
 }

@@ -3,37 +3,69 @@
 namespace Modules\BusinessClub\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Modules\BusinessClub\Models\CustomerWallet;
-use Modules\BusinessClub\Models\WalletTransaction;
+use Modules\BusinessClub\Models\BusinessClubMember;
+use Modules\BusinessClub\Models\BusinessClubTransaction;
 use Modules\BusinessClub\Models\BusinessClubSetting;
+use Modules\BusinessClub\Services\BusinessClubService;
 use Illuminate\Support\Facades\DB;
 
 class BusinessClubDashboardController extends Controller
 {
+    protected $businessClubService;
+
+    public function __construct(BusinessClubService $businessClubService)
+    {
+        $this->businessClubService = $businessClubService;
+    }
+
     public function index()
     {
         $companyId = session('company.company_id');
+        $settings = $this->businessClubService->getSettings($companyId);
 
-        // Basic stats
-        $totalWallets = CustomerWallet::where('company_id', $companyId)->where('del_status', 'Live')->count();
-        $totalBalance = CustomerWallet::where('company_id', $companyId)->where('del_status', 'Live')->sum('balance');
-        $totalEarned = CustomerWallet::where('company_id', $companyId)->where('del_status', 'Live')->sum('total_earned');
-        $totalRedeemed = CustomerWallet::where('company_id', $companyId)->where('del_status', 'Live')->sum('total_redeemed');
-        $settings = BusinessClubSetting::where('company_id', $companyId)->where('del_status', 'Live')->first();
+        // Basic stats from new tables
+        $totalWallets = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->where('status', 'active')
+            ->count();
+
+        $totalBalance = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->where('status', 'active')
+            ->sum('earned_balance');
+
+        $totalEarned = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->sum('total_earned');
+
+        $totalRedeemed = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->sum('total_redeemed');
+
+        $totalLockedAmount = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->where('status', 'active')
+            ->sum('locked_balance');
 
         // Previous month stats for percentage change
         $prevMonth = now()->subMonth();
-        $prevTotalWallets = CustomerWallet::where('company_id', $companyId)
+        $prevTotalWallets = BusinessClubMember::where('company_id', $companyId)
             ->where('del_status', 'Live')
-            ->where('created_at', '<', $prevMonth->startOfMonth())
+            ->where('joined_at', '<', $prevMonth->startOfMonth())
             ->count();
-        $prevTotalBalance = CustomerWallet::where('company_id', $companyId)
-            ->where('del_status', 'Live')
-            ->where('created_at', '<', $prevMonth->startOfMonth())
-            ->sum('balance');
 
-        $walletChange = $prevTotalWallets > 0 ? round((($totalWallets - $prevTotalWallets) / $prevTotalWallets) * 100, 2) : 0;
-        $balanceChange = $prevTotalBalance > 0 ? round((($totalBalance - $prevTotalBalance) / $prevTotalBalance) * 100, 2) : 0;
+        $prevTotalBalance = BusinessClubMember::where('company_id', $companyId)
+            ->where('del_status', 'Live')
+            ->where('joined_at', '<', $prevMonth->startOfMonth())
+            ->sum('earned_balance');
+
+        $walletChange = $prevTotalWallets > 0
+            ? round((($totalWallets - $prevTotalWallets) / $prevTotalWallets) * 100, 2)
+            : 0;
+
+        $balanceChange = $prevTotalBalance > 0
+            ? round((($totalBalance - $prevTotalBalance) / $prevTotalBalance) * 100, 2)
+            : 0;
 
         // Weekly earning & redemption data (last 4 weeks)
         $weeklyData = [];
@@ -41,44 +73,45 @@ class BusinessClubDashboardController extends Controller
             $weekStart = now()->subWeeks($i)->startOfWeek();
             $weekEnd = now()->subWeeks($i)->endOfWeek();
 
-            $earned = WalletTransaction::where('company_id', $companyId)
+            $earned = BusinessClubTransaction::where('company_id', $companyId)
                 ->where('del_status', 'Live')
-                ->where('type', 'credit')
+                ->where('type', 'profit_credit')
                 ->whereBetween('transaction_date', [$weekStart, $weekEnd])
                 ->sum('amount');
 
-            $redeemed = WalletTransaction::where('company_id', $companyId)
+            $redeemed = BusinessClubTransaction::where('company_id', $companyId)
                 ->where('del_status', 'Live')
-                ->where('type', 'redeem')
+                ->where('type', 'redemption')
                 ->whereBetween('transaction_date', [$weekStart, $weekEnd])
                 ->sum('amount');
 
             $weeklyData[] = [
-                'label' => 'Week ' . ($i + 1),
+                'label' => 'Week ' . (4 - $i),
                 'earned' => (float) $earned,
                 'redeemed' => (float) $redeemed,
             ];
         }
 
-        // Top earning business partners (customers)
-        $topPartners = CustomerWallet::with('customer')
+        // Top earning business partners (members)
+        $topPartners = BusinessClubMember::with('customer')
             ->where('company_id', $companyId)
             ->where('del_status', 'Live')
             ->where('total_earned', '>', 0)
             ->orderBy('total_earned', 'desc')
             ->take(5)
             ->get()
-            ->map(function ($wallet) {
+            ->map(function ($member) {
                 return [
-                    'name' => optional($wallet->customer)->name ?? 'N/A',
-                    'earned' => (float) $wallet->total_earned,
-                    'balance' => (float) $wallet->balance,
-                    'photo' => optional($wallet->customer)->photo ?? null,
+                    'name' => optional($member->customer)->name ?? 'N/A',
+                    'member_id' => $member->member_id,
+                    'earned' => (float) $member->total_earned,
+                    'balance' => (float) $member->earned_balance,
+                    'photo' => optional($member->customer)->photo ?? null,
                 ];
             });
 
         // Recent transactions with sale data
-        $recentTransactions = WalletTransaction::with(['customer', 'sale'])
+        $recentTransactions = BusinessClubTransaction::with(['member.customer', 'sale'])
             ->where('company_id', $companyId)
             ->where('del_status', 'Live')
             ->orderBy('id', 'desc')
@@ -86,9 +119,10 @@ class BusinessClubDashboardController extends Controller
             ->get()
             ->map(function ($tx) {
                 return [
-                    'date' => $tx->transaction_date ? $tx->transaction_date->format('d-m-Y H:i:s') : '-',
-                    'customer_name' => optional($tx->customer)->name ?? 'N/A',
-                    'type' => $tx->type,
+                    'date' => $tx->transaction_date ? $tx->transaction_date->format('d-m-Y') : '-',
+                    'customer_name' => optional(optional($tx->member)->customer)->name ?? 'N/A',
+                    'member_id' => optional($tx->member)->member_id ?? '-',
+                    'type' => str_replace('_', ' ', $tx->type),
                     'sale_amount' => $tx->sale ? (float) $tx->sale->grand_total : 0,
                     'amount' => (float) $tx->amount,
                     'balance_after' => (float) $tx->balance_after,
@@ -96,30 +130,27 @@ class BusinessClubDashboardController extends Controller
             });
 
         // Membership growth
-        $thisMonthWallets = CustomerWallet::where('company_id', $companyId)
+        $thisMonthWallets = BusinessClubMember::where('company_id', $companyId)
             ->where('del_status', 'Live')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+            ->whereMonth('joined_at', now()->month)
+            ->whereYear('joined_at', now()->year)
             ->count();
 
-        $lastMonthWallets = CustomerWallet::where('company_id', $companyId)
+        $lastMonthWallets = BusinessClubMember::where('company_id', $companyId)
             ->where('del_status', 'Live')
-            ->whereMonth('created_at', now()->subMonth()->month)
-            ->whereYear('created_at', now()->subMonth()->year)
+            ->whereMonth('joined_at', now()->subMonth()->month)
+            ->whereYear('joined_at', now()->subMonth()->year)
             ->count();
 
-        $membershipGrowth = $lastMonthWallets > 0 ? round((($thisMonthWallets - $lastMonthWallets) / $lastMonthWallets) * 100) : 0;
+        $membershipGrowth = $lastMonthWallets > 0
+            ? round((($thisMonthWallets - $lastMonthWallets) / $lastMonthWallets) * 100)
+            : 0;
 
-        // Latest member joins
-        $latestJoins = CustomerWallet::where('company_id', $companyId)
-            ->where('del_status', 'Live')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
+        $latestJoins = $thisMonthWallets;
 
         return view('businessclub::dashboard.index', compact(
             'totalWallets', 'totalBalance', 'totalEarned', 'totalRedeemed',
-            'settings', 'walletChange', 'balanceChange',
+            'totalLockedAmount', 'settings', 'walletChange', 'balanceChange',
             'weeklyData', 'topPartners', 'recentTransactions',
             'membershipGrowth', 'latestJoins'
         ));

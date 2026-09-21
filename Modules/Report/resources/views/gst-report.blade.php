@@ -38,7 +38,7 @@
                             <option value="b2c-small">{{ __('5. B2C Small (State Wise)') }}</option>
                             <option value="b2c-large">{{ __('6. B2C Large (Interstate >2.5L)') }}</option>
                             <option value="hsn-summary">{{ __('7. HSN Summary') }}</option>
-                            <!-- <option value="gstr3b">{{ __('8. GSTR-3B Summary') }}</option> -->
+                            <option value="gstr3b">{{ __('8. GSTR-3B Summary') }}</option>
                         </select>
                     </div>
                     <div class="col-md-2 mb-3">

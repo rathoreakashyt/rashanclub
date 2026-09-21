@@ -44,6 +44,7 @@
     @include('sale::pos.component.hold')
     @include('sale::pos.component.calculator')
     @include('sale::pos.component.register-summary')
+    @include('sale::pos.component.flavour-selection')
     <!-- POS Modals End -->
 
     <!-- Main JS Part -->
@@ -64,6 +65,6 @@
     <script src="{{ asset('pos_assets/js/hold_sale.js') }}"></script>
     <script src="{{ asset('pos_assets/js/pos_utilities.js') }}"></script>
     <script src="{{ asset('backend_assets/js/pages_js/add_sale_return.js') }}"></script>
-    <!-- @include('backend.components.pwa_scripts') -->
+    @include('backend.components.pwa_scripts')
   </body>
 </html>

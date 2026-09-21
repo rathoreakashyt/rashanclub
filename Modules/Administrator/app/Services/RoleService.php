@@ -102,6 +102,11 @@ class RoleService
         try {
             DB::beginTransaction();
             
+            // Built-in roles kabhi delete nahi hote (Super Admin / admin / Administrator)
+            if (in_array(strtolower($role->name ?? ''), ['super admin', 'admin', 'administrator'], true)) {
+                throw new \Exception('Cannot delete built-in role: ' . $role->name);
+            }
+            
             // Check if role is assigned to any users
             if ($role->users()->count() > 0) {
                 throw new \Exception('Cannot delete role as it is assigned to users');

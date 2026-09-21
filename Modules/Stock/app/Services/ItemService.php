@@ -144,10 +144,10 @@ class ItemService
 
         // Combo_Product specific handling
         if ($data['type'] === 'Combo_Product') {
-            // Combo products don't need purchase price, whole sale price, or stock information
+            // Combo products don't need purchase price, whole sale price
+            $data['sale_price'] = $request->combo_sale_price ?? 0;
             $data['purchase_price'] = null;
             $data['whole_sale_price'] = null;
-            $data['alert_quantity'] = null;
             $data['unit_type'] = null;
             $data['sale_unit_id'] = null;
             $data['purchase_unit_id'] = null;
@@ -173,8 +173,8 @@ class ItemService
 
         $item = $this->itemRepository->create($data);
 
-        // Handle opening stock if present (not applicable for Service_Product or Combo_Product)
-        if ($data['type'] !== 'Service_Product' && $data['type'] !== 'Combo_Product') {
+        // Handle opening stock if present (not applicable for Service_Product)
+        if ($data['type'] !== 'Service_Product') {
             $this->saveOpeningStock($item, $request, $data['type']);
         }
 
@@ -237,6 +237,11 @@ class ItemService
         $parentData['whole_sale_price'] = null;
         $parentData['user_id'] = Auth::id();
         $parentData['company_id'] = session('company.company_id');
+        
+        // Convert expiry_date_maintain from Yes/No to 1/0
+        if (array_key_exists('expiry_date_maintain', $parentData)) {
+            $parentData['expiry_date_maintain'] = $parentData['expiry_date_maintain'] === 'Yes' ? 1 : 0;
+        }
         
         // Store variation details in new format
         // Format: ["{\"variation_name\":\"Color\",\"attribute_id\":\"2\",\"child_row_attribute\":\"[\\\"White\\\",\\\"Black\\\"]\"}","{\"variation_name\":\"Size\",\"attribute_id\":\"1\",\"child_row_attribute\":\"[\\\"M\\\",\\\"L\\\"]\"}"]
@@ -303,6 +308,10 @@ class ItemService
             $childData['company_id'] = session('company.company_id');
             // Set variation child type to '0'
             $childData['type'] = '0';
+            // Convert expiry_date_maintain from Yes/No to 1/0 for child items
+            if (array_key_exists('expiry_date_maintain', $childData)) {
+                $childData['expiry_date_maintain'] = $childData['expiry_date_maintain'] === 'Yes' ? 1 : 0;
+            }
             
             // If unit type is single, save conversion_rate = 1 and purchase_unit_id = sale_unit_id
             if (isset($childData['unit_type']) && $childData['unit_type'] == 1) {
@@ -555,6 +564,12 @@ class ItemService
             $data['photo'] = $this->storePhoto($request->file('photo'));
         }
 
+        // For Variation_Product parents, don't overwrite prices with parent form data
+        // (parent prices should stay 0; real prices live on children)
+        if ($item->type === 'Variation_Product') {
+            unset($data['sale_price'], $data['purchase_price'], $data['mrp_price'], $data['whole_sale_price']);
+        }
+
         $updated = $this->itemRepository->update($item, $data);
 
         // Handle Variation Product updates
@@ -659,6 +674,7 @@ class ItemService
      */
     private function saveOpeningStock(Item $item, $request, string $itemType): void
     {
+        $totalStock = 0;
         // Handle opening stock from modal (for IMEI, Serial, Medicine products)
         if ($request->has('outlet_id') && is_array($request->outlet_id)) {
             foreach ($request->outlet_id as $key => $outletId) {
@@ -680,6 +696,7 @@ class ItemService
                         'user_id' => Auth::id(),
                         'company_id' => session('company.company_id'),
                     ]);
+                    $totalStock += $quantity;
                 }
             }
         }
@@ -703,7 +720,13 @@ class ItemService
                     'user_id' => Auth::id(),
                     'company_id' => session('company.company_id'),
                 ]);
+                $totalStock += $quantity;
             }
+        }
+        // Update items.stock_quantity so desktop sync picks it up
+        if ($totalStock > 0) {
+            $item->stock_quantity = $totalStock;
+            $item->save();
         }
     }
 
@@ -712,6 +735,7 @@ class ItemService
      */
     private function saveVariationOpeningStock(Item $item, array $openingStockData, string $itemType): void
     {
+        $totalStock = 0;
         foreach ($openingStockData as $outletId => $quantity) {
             $quantity = (float)$quantity;
             $quantity = $quantity * $item->conversion_rate;
@@ -725,7 +749,13 @@ class ItemService
                     'user_id' => Auth::id(),
                     'company_id' => session('company.company_id'),
                 ]);
+                $totalStock += $quantity;
             }
+        }
+        // Update items.stock_quantity so desktop sync picks it up
+        if ($totalStock > 0) {
+            $item->stock_quantity = $totalStock;
+            $item->save();
         }
     }
 }

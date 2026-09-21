@@ -67,7 +67,7 @@
                                 <th>{{ __('SN') }}</th>
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('Type') }}</th>
-                                <th>{{ __('Category') }}</th>
+                                <th>{{ __('Group') }}</th>
                                 <th>{{ __('Purchase') }} {{ __('Price') }}</th>
                                 <th>{{ __('Sale') }} {{ __('Price') }}</th>
                                 <th>{{ __('MRP') }} {{ __('Price') }}</th>

@@ -1,0 +1,50 @@
+CREATE TABLE `companies` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) DEFAULT NULL,
+    `business_name` varchar(255) DEFAULT NULL,
+    `short_name` varchar(50) DEFAULT NULL,
+    `email` varchar(255) DEFAULT NULL,
+    `phone` varchar(50) DEFAULT NULL,
+    `address` text DEFAULT NULL,
+    `currency` varchar(10) DEFAULT NULL,
+    `currency_symbol` varchar(10) DEFAULT NULL,
+    `currency_position` varchar(50) DEFAULT NULL,
+    `precision` varchar(10) DEFAULT '2',
+    `default_customer` int(11) DEFAULT 1,
+    `default_cursor_position` varchar(50) DEFAULT NULL,
+    `product_display` varchar(50) DEFAULT NULL,
+    `default_payment` int(11) DEFAULT 1,
+    `inv_logo_is_show` varchar(10) DEFAULT 'Yes',
+    `invoice_logo` varchar(255) DEFAULT NULL,
+    `installment_days` int(11) DEFAULT 3,
+    `minimum_point_to_redeem` int(11) DEFAULT 0,
+    `loyalty_rate` decimal(5,2) DEFAULT 0.00,
+    `e_commerce_checker` varchar(10) DEFAULT 'Yes',
+    `product_code_start_from` varchar(20) DEFAULT '000001',
+    `white_label` json DEFAULT NULL,
+    `collect_tax` varchar(10) DEFAULT 'Yes',
+    `tax_is_gst` varchar(10) DEFAULT 'Yes',
+    `tax_title` varchar(50) DEFAULT NULL,
+    `tax_registration_no` varchar(50) DEFAULT NULL,
+    `timezone` varchar(50) DEFAULT NULL,
+    `zone_name` varchar(100) DEFAULT NULL,
+    `smtp_details` longtext DEFAULT NULL,
+    `busynotify_token` text DEFAULT NULL,
+    `busynotify_company_id` varchar(50) DEFAULT NULL,
+    `date_format` varchar(20) DEFAULT NULL,
+    `time_format` varchar(20) DEFAULT NULL,
+    `fy_start_month` int(11) DEFAULT 1,
+    `accounting_method` varchar(50) DEFAULT 'fifo',
+    `default_profit_percent` decimal(5,2) DEFAULT 0.00,
+    `logo` varchar(255) DEFAULT NULL,
+    `del_status` varchar(20) DEFAULT 'Live',
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `companies` (`id`, `name`, `business_name`, `short_name`, `email`, `phone`, `address`, `currency`, `currency_symbol`, `currency_position`, `precision`, `default_customer`, `default_cursor_position`, `product_display`, `default_payment`, `inv_logo_is_show`, `invoice_logo`, `installment_days`, `minimum_point_to_redeem`, `loyalty_rate`, `e_commerce_checker`, `product_code_start_from`, `white_label`, `collect_tax`, `tax_is_gst`, `tax_title`, `tax_registration_no`, `timezone`, `zone_name`, `date_format`, `time_format`, `fy_start_month`, `accounting_method`, `default_profit_percent`, `logo`, `del_status`, `created_at`, `updated_at`)
+SELECT `id`, `name`, `business_name`, `short_name`, `email`, `phone`, `address`, `currency`, `currency_symbol`, `currency_position`, `precision`, `default_customer`, `default_cursor_position`, `product_display`, `default_payment`, `inv_logo_is_show`, `invoice_logo`, `installment_days`, `minimum_point_to_redeem`, `loyalty_rate`, `e_commerce_checker`, `product_code_start_from`, `white_label`, `collect_tax`, `tax_is_gst`, `tax_title`, `tax_registration_no`, `timezone`, `zone_name`, `date_format`, `time_format`, `fy_start_month`, `accounting_method`, `default_profit_percent`, `logo`, `del_status`, `created_at`, `updated_at`
+FROM `companies_temp`;
+
+DROP TABLE `companies_temp`;

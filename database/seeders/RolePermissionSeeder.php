@@ -12,22 +12,6 @@ class RolePermissionSeeder extends Seeder
 {
     public function run()
     {
-        $adminUser = User::where('email', 'admin@example.com')->first();
-        if (!$adminUser) {
-            $adminUser = User::create([
-                'name' => 'Super Admin',
-                'role' => 1,
-                'email' => 'admin@example.com',
-                'password' => '123456',
-                'question' => 'What is the name of your first pet?',
-                'answer' => 'Mickey',
-                'company_id' => 1,
-                'del_status' => 'Live',
-                'email_verified_at' => now(),
-            ]);
-        }
-        $adminUser->assignRole('Super Admin');
-        
         $permissions = [
             'accounting' => [
                 'account_balance', 'account_statement', 'balancesheet', 'trial_balance', 'transaction_history'
@@ -217,7 +201,21 @@ class RolePermissionSeeder extends Seeder
         }
         $superAdminRole->syncPermissions($allPermissions);
 
-        // Assign role to the admin user
+        // Create admin user and assign role
+        $adminUser = User::where('email', 'admin@example.com')->first();
+        if (!$adminUser) {
+            $adminUser = User::create([
+                'name' => 'Super Admin',
+                'role' => 1,
+                'email' => 'admin@example.com',
+                'password' => '123456',
+                'question' => 'What is the name of your first pet?',
+                'answer' => 'Mickey',
+                'company_id' => 1,
+                'del_status' => 'Live',
+                'email_verified_at' => now(),
+            ]);
+        }
         $adminUser->assignRole($superAdminRole);
 
         // Clear cache after role assignment

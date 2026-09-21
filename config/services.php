@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'busynotify' => [
+        'base_url'       => env('BUSYNOTIFY_BASE_URL', 'https://api.busynotify.in'),
+        'api_key'        => env('BUSYNOTIFY_API_KEY', ''),
+        'company_id'     => env('BUSYNOTIFY_COMPANY_ID', ''),
+        'financial_year' => env('BUSYNOTIFY_FINANCIAL_YEAR', date('Y')),
+    ],
+
 ];

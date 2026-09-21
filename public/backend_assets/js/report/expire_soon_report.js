@@ -394,7 +394,7 @@ $(async function () {
         let outletIdVal = $('#outlet_id').val();
         let genericNameVal = $('#generic_name').val();
         
-        if (dateFromVal || dateToVal || outletIdVal || genericNameVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             genericName = genericNameVal || '';

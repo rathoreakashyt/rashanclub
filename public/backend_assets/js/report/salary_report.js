@@ -441,7 +441,7 @@ $(async function () {
         let toYearVal = $('#to_year').val();
         let outletIdVal = $('#outlet_id').val();
         
-        if (fromMonthVal || toMonthVal || fromYearVal || toYearVal || outletIdVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             fromMonth = fromMonthVal || '';

@@ -26,11 +26,11 @@ class VerifyInstallationIntegrity
             return $next($request);
         }
 
-        // $result = $this->installer->checkSecurityIntegrity();
+        $result = $this->installer->checkSecurityIntegrity();
 
-        // if (!$result['ok'] && $result['code'] !== null) {
-        //     abort($result['code']);
-        // }
+        if (!$result['ok'] && $result['code'] !== null) {
+            abort($result['code']);
+        }
 
         return $next($request);
     }

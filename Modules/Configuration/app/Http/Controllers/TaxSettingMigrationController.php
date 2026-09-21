@@ -113,7 +113,7 @@ class TaxSettingMigrationController extends Controller
                     'tax_name' => 'GST',
                     'tax_rate' => $igstRate,
                     'parent_tax_id' => null,
-                    'show_in_item_profile' => 'Yes',
+                    'show_in_item_profile' => 1,
                     'company_id' => $companyId,
                     'del_status' => 'Live',
                 ]);
@@ -139,7 +139,7 @@ class TaxSettingMigrationController extends Controller
                     'tax_name' => $nameUpper,
                     'tax_rate' => $rate,
                     'parent_tax_id' => $parentId,
-                    'show_in_item_profile' => 'Yes',
+                    'show_in_item_profile' => 1,
                     'company_id' => $companyId,
                     'del_status' => 'Live',
                 ]);

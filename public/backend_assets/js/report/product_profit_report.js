@@ -471,7 +471,7 @@ $(async function () {
         let itemIdVal = $('#item_id').val();
         let calculateFormulaVal = $('#calculate_formula').val();
         
-        if (dateFromVal || dateToVal || outletIdVal || itemIdVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             itemId = itemIdVal || '';

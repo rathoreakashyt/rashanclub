@@ -359,7 +359,7 @@ $(async function () {
         $('#filterSection').hide();
         
         // Only show and load data if filters are present
-        if (dateFromVal || dateToVal || employeeIdVal) {
+        if (true) {
             // Set global variables before loading data
             employeeId = employeeIdVal || '';
             dateFrom = dateFromVal || '';

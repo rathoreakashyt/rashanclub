@@ -453,7 +453,7 @@ $(async function () {
         let itemIdVal = $('#item_id').val();
         let customerIdVal = $('#customer_id').val();
         
-        if (dateFromVal || dateToVal || outletIdVal || itemIdVal || customerIdVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             itemId = itemIdVal || '';

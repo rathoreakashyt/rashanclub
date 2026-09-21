@@ -219,5 +219,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Resource route - Define AFTER specific routes to avoid conflicts
-    Route::resource('reports', ReportController::class)->names('report');
+    Route::resource('reports', ReportController::class)->only(['index'])->names('report');
 });

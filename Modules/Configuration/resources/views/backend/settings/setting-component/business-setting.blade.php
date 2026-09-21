@@ -113,6 +113,7 @@
                             <option value="3" {{ $company->installment_days == '3' ? 'selected' : '' }}>{{ __('3 Days') }}</option>
                             <option value="7" {{ $company->installment_days == '7' ? 'selected' : '' }}>{{ __('7 Days') }}</option>
                             <option value="15" {{ $company->installment_days == '15' ? 'selected' : '' }}>{{ __('15 Days') }}</option>
+                            <option value="30" {{ $company->installment_days == '30' ? 'selected' : '' }}>{{ __('30 Days') }}</option>
                         </select>
                     </div>
 

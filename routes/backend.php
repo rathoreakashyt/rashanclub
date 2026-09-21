@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Backend\BusinessClubController;
 use App\Http\Controllers\Backend\DamageController;
 use App\Http\Controllers\Backend\MasterController;
 use App\Http\Controllers\Backend\SearchController;
@@ -141,6 +142,29 @@ Route::middleware(['auth'])->group(function () {
         })->name('generate-key');
     });
 
+    // Module Management Routes
+    Route::get('modules', [\App\Http\Controllers\Backend\ModuleController::class, 'index'])->name('modules.index');
+    Route::get('modules/create', [\App\Http\Controllers\Backend\ModuleController::class, 'create'])->name('modules.create');
+    Route::post('modules', [\App\Http\Controllers\Backend\ModuleController::class, 'store'])->name('modules.store');
+    Route::post('modules/{id}/toggle', [\App\Http\Controllers\Backend\ModuleController::class, 'toggle'])->name('modules.toggle');
+    Route::delete('modules/{id}', [\App\Http\Controllers\Backend\ModuleController::class, 'destroy'])->name('modules.destroy');
+
+    // Feature Activation
+    Route::get('feature-activation', [\App\Http\Controllers\Backend\FeatureActivationController::class, 'index'])->name('feature-activation.index');
+    Route::put('feature-activation', [\App\Http\Controllers\Backend\FeatureActivationController::class, 'update'])->name('feature-activation.update');
+
+    // Business Club Routes
+    Route::controller(BusinessClubController::class)->group(function () {
+        Route::get('business-club', 'dashboard')->name('businessclub.dashboard');
+        Route::get('business-club/settings', 'settings')->name('businessclub.settings');
+        Route::post('business-club/settings', 'saveSettings')->name('businessclub.settings.save');
+        Route::get('business-club/wallets', 'wallets')->name('businessclub.wallets');
+        Route::get('business-club/register', 'register')->name('businessclub.register');
+        Route::post('business-club/members/register', 'storeMember')->name('businessclub.members.register');
+        Route::post('business-club/members/redeem', 'redeem')->name('businessclub.members.redeem');
+        Route::get('business-club/members/{id}/id-card', 'idCard')->name('businessclub.members.idcard');
+    });
+
     // Payment Gateway Routes
     Route::prefix('payment-gateway')->name('payment.gateway.')->group(function () {
         Route::controller(PaymentGatewayController::class)->group(function () {
@@ -153,12 +177,51 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
+    // BusyNotify Import Routes
+    Route::prefix('busy-import')->name('busy-import.')->group(function () {
+        Route::controller(\App\Http\Controllers\Backend\BusyNotifyImportController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('save-token', 'saveToken')->name('save-token');
+            Route::get('token-config', 'getTokenConfig')->name('token-config');
+            Route::post('test-connection', 'testConnection')->name('test-connection');
+            Route::post('customers', 'importCustomers')->name('customers');
+            Route::post('products', 'importProducts')->name('products');
+            Route::post('bills', 'importBills')->name('bills');
+            Route::post('all', 'importAll')->name('all');
+        });
+    });
+
 });
 
 Route::get('refresh-stock-view', function () {
     try {
         DB::statement("TRUNCATE TABLE view_stock_detail");
-        DB::statement("INSERT INTO view_stock_detail SELECT item_id, 1 AS type, quantity_amount AS stock_quantity, outlet_id, company_id, del_status FROM purchase_details WHERE del_status = 'Live' AND quantity_amount > 0 UNION ALL SELECT item_id, 2 AS type, qty AS stock_quantity, outlet_id, company_id, del_status FROM sale_details WHERE del_status = 'Live' AND qty > 0 UNION ALL SELECT item_id, 1 AS type, stock_quantity, outlet_id, company_id, 'Live' AS del_status FROM set_opening_stocks WHERE stock_quantity > 0");
+        DB::statement("
+            INSERT INTO view_stock_detail (item_id, type, stock_quantity, outlet_id, company_id, del_status)
+            -- Purchases IN
+            SELECT item_id, 1, quantity_amount, outlet_id, company_id, del_status
+            FROM purchase_details WHERE del_status='Live' AND quantity_amount > 0
+            UNION ALL
+            -- Opening Stock IN
+            SELECT item_id, 1, stock_quantity, outlet_id, company_id, 'Live'
+            FROM set_opening_stocks WHERE stock_quantity > 0
+            UNION ALL
+            -- Sale Returns IN
+            SELECT item_id, 1, return_quantity_amount, outlet_id, company_id, del_status
+            FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount > 0
+            UNION ALL
+            -- Sales OUT
+            SELECT item_id, 2, qty, outlet_id, company_id, del_status
+            FROM sale_details WHERE del_status='Live' AND qty > 0
+            UNION ALL
+            -- Purchase Returns OUT
+            SELECT item_id, 2, return_quantity_amount, outlet_id, company_id, del_status
+            FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount > 0
+            UNION ALL
+            -- Damages OUT
+            SELECT item_id, 2, damage_quantity, outlet_id, company_id, del_status
+            FROM damage_details WHERE del_status='Live' AND damage_quantity > 0
+        ");
         return response()->json(['status' => 'success', 'message' => 'Stock view refreshed successfully']);
     } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);

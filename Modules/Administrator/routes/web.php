@@ -10,7 +10,7 @@ use Modules\Administrator\Http\Controllers\EmployeeAdvancePaymentController;
 use Modules\Administrator\Models\Role;
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('administrators', AdministratorController::class)->names('administrator');
+    Route::resource('administrators', AdministratorController::class)->only(['index'])->names('administrator');
 
     // Role Controller
     Route::controller(RoleController::class)->group(function () {

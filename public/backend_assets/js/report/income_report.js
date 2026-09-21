@@ -451,7 +451,7 @@ $(async function () {
         let categoryIdVal = $('#category_id').val();
         let employeeIdVal = $('#employee_id').val();
         
-        if (dateFromVal || dateToVal || outletIdVal || categoryIdVal || employeeIdVal) {
+        if (true) {
             // Set global variables before loading data
             outletId = outletIdVal || '';
             categoryId = categoryIdVal || '';

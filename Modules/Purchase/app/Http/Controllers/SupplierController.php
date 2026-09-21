@@ -153,7 +153,7 @@ class SupplierController extends Controller
 
             $outletId = session('outlet.id');
             $balance = $this->supplierService->getSupplierDue($supplier->id, $outletId);
-            $balanceType = $balance >= 0 ? 'Debit' : 'Credit';
+            $balanceType = $balance >= 0 ? 'Credit' : 'Debit';
             $balanceAmount = abs($balance);
 
             return response()->json([

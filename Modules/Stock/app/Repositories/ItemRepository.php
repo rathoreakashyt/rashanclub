@@ -77,6 +77,10 @@ class ItemRepository
      */
     public function create(array $data): Item
     {
+        // Safety net: ensure expiry_date_maintain is always integer
+        if (array_key_exists('expiry_date_maintain', $data) && is_string($data['expiry_date_maintain'])) {
+            $data['expiry_date_maintain'] = in_array(strtolower($data['expiry_date_maintain']), ['yes', 'true', '1']) ? 1 : 0;
+        }
         return $this->model->create($data);
     }
 
@@ -85,6 +89,10 @@ class ItemRepository
      */
     public function update(Item $item, array $data): bool
     {
+        // Safety net: ensure expiry_date_maintain is always integer
+        if (array_key_exists('expiry_date_maintain', $data) && is_string($data['expiry_date_maintain'])) {
+            $data['expiry_date_maintain'] = in_array(strtolower($data['expiry_date_maintain']), ['yes', 'true', '1']) ? 1 : 0;
+        }
         return $item->update($data);
     }
 
@@ -105,10 +113,15 @@ class ItemRepository
         $start = $params['start'] ?? 0;
         $search = $params['search'] ?? '';
 
+        // For Variation_Product parents, show children with prices.
+        // For other types, show as-is. Exclude orphaned children (type='0' without valid parent).
         $query = $this->model->where('items.del_status', 'Live')
-            ->where('items.type',  '!=', '0')
             ->where('items.company_id', session('company.company_id'))
-            ->join('item_categories', 'items.category_id', '=', 'item_categories.id')
+            ->where(function ($q) {
+                // Show non-variation items (not type '0')
+                $q->where('items.type', '!=', '0');
+            })
+            ->leftJoin('item_categories', 'items.category_id', '=', 'item_categories.id')
             ->select('items.*', 'item_categories.name as category_name');
 
         if ($search) {
@@ -122,6 +135,7 @@ class ItemRepository
 
         $recordsTotal = $this->model->where('del_status', 'Live')
             ->where('company_id', session('company.company_id'))
+            ->where('type', '!=', '0')
             ->count();
 
         $filteredCount = $query->count();
@@ -131,22 +145,89 @@ class ItemRepository
             ->take($length)
             ->get();
 
+        // For variation parent items, get min/max prices and total stock from children
+        $variationChildrenMap = [];
+        $parentIds = $items->where('type', 'Variation_Product')->pluck('id')->toArray();
+        if (!empty($parentIds)) {
+            $children = $this->model->where('parent_id', $parentIds)
+                ->where('del_status', 'Live')
+                ->get();
+            foreach ($children as $child) {
+                $pid = $child->parent_id;
+                if (!isset($variationChildrenMap[$pid])) {
+                    $variationChildrenMap[$pid] = [
+                        'min_sale' => null, 'max_sale' => null,
+                        'min_purchase' => null, 'min_mrp' => null,
+                        'min_wholesale' => null,
+                        'total_stock' => 0, 'has_prices' => false
+                    ];
+                }
+                $sale = (float) ($child->sale_price ?? 0);
+                $purchase = (float) ($child->purchase_price ?? 0);
+                $mrp = (float) ($child->mrp_price ?? 0);
+                $wholesale = (float) ($child->whole_sale_price ?? 0);
+                if ($sale > 0 || $purchase > 0) {
+                    $variationChildrenMap[$pid]['has_prices'] = true;
+                    if ($sale > 0 && ($variationChildrenMap[$pid]['min_sale'] === null || $sale < $variationChildrenMap[$pid]['min_sale'])) {
+                        $variationChildrenMap[$pid]['min_sale'] = $sale;
+                    }
+                    if ($sale > 0 && ($variationChildrenMap[$pid]['max_sale'] === null || $sale > $variationChildrenMap[$pid]['max_sale'])) {
+                        $variationChildrenMap[$pid]['max_sale'] = $sale;
+                    }
+                    if ($purchase > 0 && ($variationChildrenMap[$pid]['min_purchase'] === null || $purchase < $variationChildrenMap[$pid]['min_purchase'])) {
+                        $variationChildrenMap[$pid]['min_purchase'] = $purchase;
+                    }
+                    if ($mrp > 0 && ($variationChildrenMap[$pid]['min_mrp'] === null || $mrp < $variationChildrenMap[$pid]['min_mrp'])) {
+                        $variationChildrenMap[$pid]['min_mrp'] = $mrp;
+                    }
+                    if ($wholesale > 0 && ($variationChildrenMap[$pid]['min_wholesale'] === null || $wholesale < $variationChildrenMap[$pid]['min_wholesale'])) {
+                        $variationChildrenMap[$pid]['min_wholesale'] = $wholesale;
+                    }
+                }
+                $variationChildrenMap[$pid]['total_stock'] += (float) ($child->stock_quantity ?? 0);
+            }
+        }
+
         // Calculate the starting number for the current page
         $startingNumber = $filteredCount - $start;
 
-        $transformedData = $items->map(function ($item, $index) use ($startingNumber) {
+        $transformedData = $items->map(function ($item, $index) use ($startingNumber, $variationChildrenMap) {
+            $isVariation = $item->type === 'Variation_Product';
+            $childData = $variationChildrenMap[$item->id] ?? null;
+
+            // For variation products, show child prices if parent has 0
+            $purchasePrice = (float) ($item->purchase_price ?? 0);
+            $salePrice = (float) ($item->sale_price ?? 0);
+            $mrpPrice = (float) ($item->mrp_price ?? 0);
+            $wholeSalePrice = (float) ($item->whole_sale_price ?? 0);
+
+            if ($isVariation && $childData && $childData['has_prices']) {
+                if ($salePrice == 0 && $childData['min_sale'] !== null) {
+                    $salePrice = $childData['min_sale'];
+                }
+                if ($purchasePrice == 0 && $childData['min_purchase'] !== null) {
+                    $purchasePrice = $childData['min_purchase'];
+                }
+                if ($mrpPrice == 0 && $childData['min_mrp'] !== null) {
+                    $mrpPrice = $childData['min_mrp'];
+                }
+                if ($wholeSalePrice == 0 && $childData['min_wholesale'] !== null) {
+                    $wholeSalePrice = $childData['min_wholesale'];
+                }
+            }
+
             return [
                 'id' => $startingNumber - $index,
                 'actual_id' => $item->id,
                 'name' => $item->name . ' (' . $item->code . ')',
                 'code' => $item->code,
                 'type' => str_replace('_', ' ', $item->type),
-                'category_id' => $item->category_name,
-                'purchase_price' => formatAmount($item->purchase_price),
-                'sale_price' => formatAmount($item->sale_price),
-                'sale_price_raw' => $item->sale_price,
-                'whole_sale_price' => formatAmount($item->whole_sale_price ?? 0),
-                'mrp_price' => formatAmount($item->mrp_price ?? 0),
+                'category_id' => $item->category_name ?? '-',
+                'purchase_price' => formatAmount($purchasePrice),
+                'sale_price' => formatAmount($salePrice),
+                'sale_price_raw' => $salePrice,
+                'whole_sale_price' => formatAmount($wholeSalePrice),
+                'mrp_price' => formatAmount($mrpPrice),
                 'enable_disable_status' => $item->enable_disable_status ?? 'Disable',
                 'photo' => $item->photo,
                 'encrypted_id' => $item->encrypted_id

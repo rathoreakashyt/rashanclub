@@ -582,8 +582,13 @@ class POSPaymentManager {
                 return { allowed: true }; // Allow if API fails (don't block sale)
             }
             const creditLimit = parseFloat(data.credit_limit) || 0;
+            // credit_limit = 0 means NO credit allowed (customer cannot take udhar)
+            // Only customers with explicit credit_limit > 0 can take due/credit
             if (creditLimit <= 0) {
-                return { allowed: true }; // No credit limit set
+                return {
+                    allowed: false,
+                    message: `This customer has no credit limit set. Due/credit (udhar) is not allowed. Please collect full payment.`
+                };
             }
             const availableCredit = parseFloat(data.available_credit) || 0;
             if (dueAmount <= availableCredit) {
@@ -724,7 +729,8 @@ class POSPaymentManager {
             is_promotion_free_item: item.is_promotion_free_item || false,
             promotion_id: item.promotion_id || (item.promotion && item.promotion.id) || null,
             promotion: item.promotion || null,
-            has_promotion_discount: item.has_promotion_discount || false
+            has_promotion_discount: item.has_promotion_discount || false,
+            selected_flavour_id: item.selected_flavour_id || null
         }));
 
         // Prepare payment data (empty for due sale)

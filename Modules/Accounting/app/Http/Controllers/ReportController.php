@@ -35,7 +35,7 @@ class ReportController extends Controller
      */
     public function accountBalance(Request $request)
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $outletId = $request->get('outlet_id');
 
         $paymentMethods = PaymentMethod::where('del_status', 'Live')
@@ -341,7 +341,7 @@ class ReportController extends Controller
      */
     public function accountStatement(Request $request)
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $paymentMethodId = (int) $request->get('payment_method_id');
         $outletId = $request->get('outlet_id') ? (int) $request->get('outlet_id') : null;
         $dateFrom = $request->get('date_from');
@@ -933,7 +933,7 @@ class ReportController extends Controller
      */
     public function transactionHistory(Request $request)
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $paymentMethodId = $request->get('payment_method_id');
         $outletId = $request->get('outlet_id') ? (int) $request->get('outlet_id') : null;
         $dateFrom = $request->get('date_from');
@@ -1252,7 +1252,7 @@ class ReportController extends Controller
      */
     public function showAccountBalance()
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $outlets = Outlet::where('del_status', 'Live')
             ->where('company_id', $companyId)
             ->select('id', 'outlet_name as name', 'address', 'phone')
@@ -1271,7 +1271,7 @@ class ReportController extends Controller
      */
     public function showTransactionHistory()
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $outlets = Outlet::where('del_status', 'Live')
             ->where('company_id', $companyId)
             ->select('id', 'outlet_name as name', 'address', 'phone')
@@ -1289,7 +1289,7 @@ class ReportController extends Controller
      */
     public function getFilterOptions()
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         
         $outlets = Outlet::where('del_status', 'Live')
             ->where('company_id', $companyId)
@@ -1320,7 +1320,7 @@ class ReportController extends Controller
      */
     public function trialBalance(Request $request)
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $outletId = $request->get('outlet_id') ? (int) $request->get('outlet_id') : null;
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
@@ -1569,7 +1569,7 @@ class ReportController extends Controller
      */
     public function balanceSheet(Request $request)
     {
-        $companyId = session('company.company_id');
+        $companyId = session('company.company_id') ?? $this->getCompanyIdForDesktop();
         $outletId = $request->get('outlet_id') ? (int) $request->get('outlet_id') : null;
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
@@ -1672,6 +1672,93 @@ class ReportController extends Controller
     public function showBalanceSheet()
     {
         return view('accounting::reports.balance-sheet');
+    }
+
+    // ═══════════ DESKTOP APP API METHODS ═══════════
+    // These get company_id from the authenticated user instead of session
+
+    private function getCompanyIdForDesktop()
+    {
+        $user = auth()->user();
+        if ($user && $user->company_id) return $user->company_id;
+        if ($user && $user->company) return $user->company->id;
+        return session('company.company_id', 1);
+    }
+
+    /**
+     * For desktop API calls the session company is empty, which breaks helpers that
+     * rely on session('company.company_id') (e.g. StockService stock evaluation) and
+     * formatAmount() (returns raw floats without company settings). Populate the
+     * session company from the authenticated user's company so calculations match web.
+     */
+    private function setCompanySessionForDesktop()
+    {
+        try {
+            $companyId = $this->getCompanyIdForDesktop();
+            if (! $companyId || session('company.company_id') == $companyId) return;
+
+            $company = \Modules\Configuration\Models\Company::find($companyId);
+            if (! $company) return;
+
+            session([
+                'company' => [
+                    'company_id' => $company->id,
+                    'business_name' => $company->business_name ?? $company->name,
+                    'short_name' => $company->short_name,
+                    'currency' => $company->currency,
+                    'currency_position' => $company->currency_position,
+                    'precision' => $company->precision,
+                    'thousands_separator' => $company->thousands_separator,
+                    'decimals_separator' => $company->decimals_separator,
+                    'date_format' => $company->date_format,
+                    'default_outlet_id' => $company->default_outlet_id,
+                ],
+            ]);
+
+            $outletId = request()->header('X-Outlet-Id');
+            if ($outletId) {
+                session(['outlet' => ['outlet_id' => (int) $outletId]]);
+            }
+        } catch (\Throwable $e) {
+            // ignore - fall back to raw values
+        }
+    }
+
+    public function accountBalanceDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        $request->merge(['_desktop' => true]);
+        return $this->accountBalance($request);
+    }
+
+    public function accountStatementDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        return $this->accountStatement($request);
+    }
+
+    public function transactionHistoryDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        return $this->transactionHistory($request);
+    }
+
+    public function trialBalanceDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        return $this->trialBalance($request);
+    }
+
+    public function balanceSheetDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        return $this->balanceSheet($request);
+    }
+
+    public function getFilterOptionsDesktop(Request $request)
+    {
+        $this->setCompanySessionForDesktop();
+        return $this->getFilterOptions($request);
     }
 }
 

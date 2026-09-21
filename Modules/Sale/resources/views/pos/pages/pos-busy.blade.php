@@ -34,6 +34,13 @@
                     <span class="subtitle">Series - {{ session('outlet.outlet_name') ?? 'Counter 1' }}</span>
                 </div>
             </div>
+            <div class="info-item" style="margin-right:16px;">
+                <span id="desktopLiveBadge"
+                      style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;">
+                    <span id="desktopLiveDot" style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block;"></span>
+                    <span id="desktopLiveText">Desktop: checking…</span>
+                </span>
+            </div>
             <div class="busy-header-info">
                 <div class="info-item"><label>Salesman:</label><span>{{ Auth::user()->name ?? 'User' }}</span></div>
                 <div class="info-item"><label>User:</label><span>{{ substr(Auth::user()->name ?? 'U', 0, 1) }}</span></div>
@@ -247,6 +254,45 @@ window.posAllowLessSale = @json(session('company.allow_less_sale') ?? 'No');
 window.posSaleTaxType = @json(session('company.sale_tax_type') ?? 'Inclusive');
 </script>
 <script src="{{ asset('pos_assets/js/busy_pos.js') }}"></script>
+<script>
+// ═══ DESKTOP LIVE BADGE — web POS par desktop software ka live status ═══
+// Har 30s me /api/live-status poll — desktop ne pichhle 5 min me sync ki
+// ho to GREEN "Desktop: Live", warna amber "Desktop: hh:mm last sync".
+(function () {
+    var dot = document.getElementById('desktopLiveDot');
+    var txt = document.getElementById('desktopLiveText');
+    var badge = document.getElementById('desktopLiveBadge');
+    if (!dot || !txt || !badge) return;
+
+    function setStyle(bg, color, border, dotColor) {
+        badge.style.background = bg; badge.style.color = color; badge.style.borderColor = border;
+        dot.style.background = dotColor;
+    }
+
+    function poll() {
+        fetch('/api/live-status', { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d) { setStyle('#FEE2E2', '#B91C1C', '#FCA5A5', '#EF4444'); txt.textContent = 'Desktop: offline'; return; }
+                if (d.any_live) {
+                    setStyle('#DCFCE7', '#166534', '#86EFAC', '#10B981');
+                    txt.textContent = 'Desktop: Live' + (d.devices && d.devices[0] && d.devices[0].last_sync ? ' · ' + d.devices[0].last_sync.slice(11, 19) : '');
+                } else {
+                    var last = d.devices && d.devices[0] ? d.devices[0].last_sync : null;
+                    setStyle('#FEF3C7', '#92400E', '#FCD34D', '#F59E0B');
+                    txt.textContent = 'Desktop: ' + (last ? last.slice(11, 19) + ' last sync' : 'no sync yet');
+                }
+            })
+            .catch(function () {
+                setStyle('#FEE2E2', '#B91C1C', '#FCA5A5', '#EF4444');
+                txt.textContent = 'Desktop: offline';
+            });
+    }
+
+    poll();
+    setInterval(poll, 30000);
+})();
+</script>
 @if(!empty($editSaleId))
 <script>window.posEditSaleId = @json($editSaleId);</script>
 @endif

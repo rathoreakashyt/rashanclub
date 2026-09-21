@@ -59,7 +59,7 @@ class SupplierService
         // Calculate balance for each supplier and filter by type if needed
         $suppliersWithBalance = $allSuppliers->map(function ($supplier) use ($outletId) {
             $balance = $this->getSupplierDue($supplier->id, $outletId);
-            $balanceType = $balance >= 0 ? 'Debit' : 'Credit';
+            $balanceType = $balance >= 0 ? 'Credit' : 'Debit';
             $balanceAmount = abs($balance);
             
             return [
@@ -278,7 +278,7 @@ class SupplierService
         // Formula from CodeIgniter:
         // If Credit: (supplier_due - supplier_payment) + opening_balance - purchase_return
         // If Debit: (supplier_due - supplier_payment) - opening_balance - purchase_return
-        if ($openingBalanceType == 'Credit') {
+        if (in_array($openingBalanceType, ['Credit', 'Cr'])) {
             $remainingDue = ($supplierDueAmount - $supplierPaymentAmount) + $openingBalance - $purchaseReturnAmount;
         } else {
             $remainingDue = ($supplierDueAmount - $supplierPaymentAmount) - $openingBalance - $purchaseReturnAmount;

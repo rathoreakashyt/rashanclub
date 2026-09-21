@@ -87,9 +87,11 @@ Route::middleware(['redirect.if.not.installed', 'verify.installation.integrity']
         ->name('language.switch');
 });
 
-// Uninstall license (when app is installed)
-Route::get('uninstall-license', [InstallController::class, 'uninstall'])->name('uninstall.license');
-Route::post('uninstall-license', [InstallController::class, 'uninstallLicense'])->name('uninstall.submit');
+// Uninstall license (when app is installed, auth required)
+Route::middleware('auth')->group(function () {
+    Route::get('uninstall-license', [InstallController::class, 'uninstall'])->name('uninstall.license');
+    Route::post('uninstall-license', [InstallController::class, 'uninstallLicense'])->name('uninstall.submit');
+});
 
 /*
 |--------------------------------------------------------------------------

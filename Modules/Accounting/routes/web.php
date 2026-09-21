@@ -11,7 +11,7 @@ use Modules\Accounting\Http\Controllers\ExpenseCategoryController;
 use Modules\Accounting\Http\Controllers\ReportController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('accountings', AccountingController::class)->names('accounting');
+    Route::resource('accountings', AccountingController::class)->only(['index'])->names('accounting');
 
     // Payment Method CRUD Routes
     Route::controller(PaymentMethodController::class)->group(function () {
@@ -93,12 +93,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('account-reports/trial-balance/view', 'showTrialBalance')->name('accounting.reports.trial-balance.view')->middleware('permission:accounting-trial_balance');
         Route::get('account-reports/balance-sheet/view', 'showBalanceSheet')->name('accounting.reports.balance-sheet.view')->middleware('permission:accounting-balancesheet');
         
-        // API Routes
-        Route::get('account-reports/account-balance', 'accountBalance')->name('accounting.reports.account-balance')->middleware('permission:accounting-account_balance');
-        Route::get('account-reports/account-statement', 'accountStatement')->name('accounting.reports.account-statement')->middleware('permission:accounting-account_statement');
-        Route::get('account-reports/transaction-history', 'transactionHistory')->name('accounting.reports.transaction-history')->middleware('permission:accounting-transaction_history');
-        Route::get('account-reports/trial-balance', 'trialBalance')->name('accounting.reports.trial-balance')->middleware('permission:accounting-trial_balance');
-        Route::get('account-reports/balance-sheet', 'balanceSheet')->name('accounting.reports.balance-sheet')->middleware('permission:accounting-balancesheet');
-        Route::get('account-reports/filter-options', 'getFilterOptions')->name('accounting.reports.filter-options')->middleware('permission:accounting-account_balance|accounting-trial_balance');
+        // API Routes (no permission middleware - used by desktop app)
+        Route::get('account-reports/account-balance', 'accountBalance')->name('accounting.reports.account-balance');
+        Route::get('account-reports/account-statement', 'accountStatement')->name('accounting.reports.account-statement');
+        Route::get('account-reports/transaction-history', 'transactionHistory')->name('accounting.reports.transaction-history');
+        Route::get('account-reports/trial-balance', 'trialBalance')->name('accounting.reports.trial-balance');
+        Route::get('account-reports/balance-sheet', 'balanceSheet')->name('accounting.reports.balance-sheet');
+        Route::get('account-reports/filter-options', 'getFilterOptions')->name('accounting.reports.filter-options');
     });
+});
+
+// Desktop App API routes - auth via Sanctum token, company from token user
+Route::prefix('api/desktop')->middleware('auth:sanctum')->group(function () {
+    Route::get('account-balance', [ReportController::class, 'accountBalanceDesktop']);
+    Route::get('account-statement', [ReportController::class, 'accountStatementDesktop']);
+    Route::get('transaction-history', [ReportController::class, 'transactionHistoryDesktop']);
+    Route::get('trial-balance', [ReportController::class, 'trialBalanceDesktop']);
+    Route::get('balance-sheet', [ReportController::class, 'balanceSheetDesktop']);
+    Route::get('filter-options', [ReportController::class, 'getFilterOptionsDesktop']);
 });

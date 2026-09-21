@@ -215,10 +215,13 @@
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="mb-5">
                                     <label class="form-label" for="gst_number">{{ __('GSTIN') }}<span class="gstin-required text-danger" style="{{ old('business_type', isset($customer) ? $customer->business_type : 'B2C') === 'B2B' ? '' : 'display:none' }}">*</span></label>
-                                    <input type="text" class="form-control @error('gst_number') is-invalid @enderror"
-                                        placeholder="27AABCU9603R1ZM" name="gst_number" id="gst_number" maxlength="15"
-                                        value="{{ old('gst_number', isset($customer) ? $customer->gst_number : '') }}" />
-                                    <div class="form-text" id="gstin-hint">{{ __('15 character Indian GSTIN') }}</div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control @error('gst_number') is-invalid @enderror"
+                                            placeholder="27AABCU9603R1ZM" name="gst_number" id="gst_number" maxlength="15"
+                                            value="{{ old('gst_number', isset($customer) ? $customer->gst_number : '') }}" />
+                                        <button type="button" class="btn btn-primary" id="btn-validate-gstin" onclick="validateGstin()">Validate</button>
+                                    </div>
+                                    <div class="form-text" id="gstin-status">{{ __('15 character Indian GSTIN') }}</div>
                                     <div class="invalid-feedback" id="gst_number-error">@error('gst_number'){{ $message }}@enderror</div>
                                 </div>
                             </div>
@@ -342,6 +345,47 @@ document.addEventListener('DOMContentLoaded', function() {
         businessType.addEventListener('change', toggleGstinRequired);
         toggleGstinRequired();
     }
+});
+</script>
+<script>
+function validateGstin() {
+    var gstin = document.getElementById('gst_number').value.trim().toUpperCase();
+    var statusEl = document.getElementById('gstin-status');
+    if (!gstin || gstin.length < 15) {
+        statusEl.innerHTML = '<span class="text-warning">⏳ GSTIN must be 15 characters</span>';
+        return;
+    }
+    statusEl.innerHTML = '<span class="text-primary">🔄 Validating...</span>';
+    fetch('/api/gst/validate/' + gstin, {
+        headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + (document.querySelector('meta[name="api-token"]')?.content || '')}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.valid) {
+            var name = (data.online && data.online.legal_name) ? data.online.legal_name : '';
+            var trade = (data.online && data.online.trade_name) ? data.online.trade_name : '';
+            var display = trade || name;
+            var status = (data.online && data.online.status) ? data.online.status : '';
+            statusEl.innerHTML = '<span class="text-success">✅ ' + (display ? display + ' — ' : '') + data.state_name + ' | ' + data.entity_type + (status ? ' | ' + status : '') + '</span>';
+            // Auto-fill name if empty
+            var nameField = document.getElementById('name');
+            if (nameField && !nameField.value && display) nameField.value = display;
+        } else {
+            statusEl.innerHTML = '<span class="text-danger">❌ ' + data.message + '</span>';
+        }
+    })
+    .catch(function() {
+        // Offline fallback - basic format check
+        if (/^[0-3][0-9][A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+            statusEl.innerHTML = '<span class="text-success">✅ Format valid (offline)</span>';
+        } else {
+            statusEl.innerHTML = '<span class="text-danger">❌ Invalid format</span>';
+        }
+    });
+}
+// Auto-validate on input
+document.getElementById('gst_number')?.addEventListener('input', function() {
+    if (this.value.trim().length === 15) validateGstin();
 });
 </script>
 @endif

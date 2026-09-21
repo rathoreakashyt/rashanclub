@@ -94,9 +94,9 @@ class SettingService
         
         $updateData = [
             'allow_less_sale' => $data['allow_less_sale'],
-            'default_customer' => $data['default_customer'],
-            'default_payment' => $data['default_payment'],
-            'pos_total_payable_type' => $data['pos_total_payable_type'],
+            'default_customer' => ! empty($data['default_customer']) ? $data['default_customer'] : null,
+            'default_payment' => ! empty($data['default_payment']) ? $data['default_payment'] : null,
+            'pos_total_payable_type' => $data['pos_total_payable_type'] ?? null,
             'default_cursor_position' => $data['default_cursor_position'],
             'product_display' => $data['product_display'],
             'onscreen_keyboard_status' => $data['onscreen_keyboard_status'],

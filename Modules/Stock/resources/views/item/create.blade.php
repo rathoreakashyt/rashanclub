@@ -110,7 +110,7 @@
                                 <div class="d-flex justify-content-between">
                                     <div class="mb-5 w-100 validate_wrapper">
                                         <label class="form-label" for="category_id">
-                                            <span>{{ __('Category') }}</span> {!! requiredField() !!}
+                                            <span>{{ __('Group') }}</span> {!! requiredField() !!}
                                         </label>
                                         <select id="category_id" name="category_id" class="select2 form-select" data-placeholder="{{ __('Select Category') }}">
                                             <option value="">{{ __('Select Category') }}</option>
@@ -437,10 +437,10 @@
                         </div>
                     </div>
 
-                    <div class="card-header pt-0 stock_information_section hide-for-service-product hide-for-combo-product">
+                    <div class="card-header pt-0 stock_information_section hide-for-service-product">
                         <h5 class="card-tile mb-0">{{ __('Stock Information') }}</h5>
                     </div>
-                    <div class="card-body stock_information_section hide-for-service-product hide-for-combo-product">
+                    <div class="card-body stock_information_section hide-for-service-product">
                         <div class="row">
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="mb-5 validate_wrapper">
@@ -539,7 +539,11 @@
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="mb-5 validate_wrapper">
                                     <label class="form-label" for="hsn_code">{{ __('HSN Code') }}</label>
-                                    <input type="text" class="form-control" placeholder="{{ __('HSN Code') }}" name="hsn_code" id="hsn_code" />
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="{{ __('HSN Code') }}" name="hsn_code" id="hsn_code" />
+                                        <button type="button" class="btn btn-primary" id="btn-validate-hsn" onclick="validateHsn()">Validate</button>
+                                    </div>
+                                    <div class="form-text" id="hsn-status">4/6/8 digit HSN or SAC code</div>
                                 </div>
                             </div>
                             @endif
@@ -850,5 +854,53 @@
 <script src="{{ asset('backend_assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
 <script src="{{ asset('backend_assets/vendor/js/cropper.js') }}"></script>
 <script src="{{ asset('backend_assets/js/pages_js/add_item.js') }}"></script>
+<script>
+function validateHsn() {
+    var hsn = document.getElementById('hsn_code').value.trim();
+    var statusEl = document.getElementById('hsn-status');
+    if (!hsn) {
+        statusEl.innerHTML = '<span class="text-warning">Please enter HSN code first</span>';
+        return;
+    }
+    if (!/^\d+$/.test(hsn) || (hsn.length !== 4 && hsn.length !== 6 && hsn.length !== 8)) {
+        statusEl.innerHTML = '<span class="text-danger">❌ HSN must be 4, 6, or 8 digits</span>';
+        return;
+    }
+    statusEl.innerHTML = '<span class="text-primary">🔄 Validating...</span>';
+    fetch('/api/hsn/validate/' + hsn, {
+        headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + (document.querySelector('meta[name="api-token"]')?.content || '')}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.valid) {
+            var desc = data.description || 'Valid format';
+            var rate = data.gst_rate !== null && data.gst_rate !== undefined ? ' (GST ' + data.gst_rate + '%)' : '';
+            statusEl.innerHTML = '<span class="text-success">✅ ' + desc + rate + '</span>';
+            // Auto-select tax rate if available
+            if (data.gst_rate !== null && data.gst_rate !== undefined) {
+                var taxSelect = document.querySelector('[name="taxes[]"], [name="tax_string"], #tax_string');
+                if (taxSelect) {
+                    var targetVal = 'GST ' + data.gst_rate + '%';
+                    for (var i = 0; i < taxSelect.options.length; i++) {
+                        if (taxSelect.options[i].text.includes(data.gst_rate + '%')) {
+                            taxSelect.selectedIndex = i; break;
+                        }
+                    }
+                }
+            }
+        } else {
+            statusEl.innerHTML = '<span class="text-danger">❌ ' + data.message + '</span>';
+        }
+    })
+    .catch(function() {
+        statusEl.innerHTML = '<span class="text-success">✅ Format valid (offline)</span>';
+    });
+}
+// Auto-validate on input when 4/6/8 digits
+document.getElementById('hsn_code')?.addEventListener('input', function() {
+    var len = this.value.trim().length;
+    if (len === 4 || len === 6 || len === 8) validateHsn();
+});
+</script>
 @endpush
 

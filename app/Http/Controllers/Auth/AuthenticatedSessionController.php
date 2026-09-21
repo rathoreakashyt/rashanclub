@@ -150,13 +150,17 @@ class AuthenticatedSessionController extends Controller
         if (!session()->has('outlet.outlet_id')) {
             return redirect()->route('outlet.index')->with('error', 'Please select an outlet first.');
         } else {
+            // Cashier/Salesman → direct POS (no dashboard)
+            $userRole = Auth::user()->roles->first()->name ?? '';
+            if (in_array($userRole, ['Cashier', 'Salesman'])) {
+                return redirect()->route('pos.index');
+            }
             // if have dashboard access then redirect to dashboard else home page
             if (Auth::user()->hasPermissionTo('dashboard.dashboard')) {
                 return redirect()->intended(route('dashboard', absolute: false));
             } else {
                 return redirect()->route('home');
             }
-            // return redirect()->intended(route('dashboard', absolute: false));
         }
     }
 

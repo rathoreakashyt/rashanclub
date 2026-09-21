@@ -45,6 +45,13 @@ class TransferService
         // Calculate the starting number for the current page
         $startingNumber = $result['filteredCount'] - $start;
 
+        // Summary counts for the dashboard stat cards
+        $statusMap = [1 => 'Draft', 2 => 'Sent', 3 => 'Received'];
+        $summary = ['total' => $result['recordsTotal'], 'Draft' => 0, 'Sent' => 0, 'Received' => 0];
+        foreach ($result['statusCounts'] as $status => $count) {
+            $summary[$statusMap[$status] ?? 'Draft'] = $count;
+        }
+
         // Transform data for DataTable
         $transformedData = $result['data']->map(function ($transfer, $index) use ($startingNumber) {
             // Convert status integer to string
@@ -68,6 +75,7 @@ class TransferService
             'recordsTotal' => $result['recordsTotal'],
             'recordsFiltered' => $result['filteredCount'],
             'data' => $transformedData,
+            'summary' => $summary,
         ];
     }
 

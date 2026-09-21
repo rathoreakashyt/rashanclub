@@ -71,8 +71,8 @@ class ItemRequest extends BaseRequest
             'type' => 'required|in:General_Product,Variation_Product,IMEI_Product,Serial_Product,Medicine_Product,Installment_Product,Service_Product,Combo_Product',
         ];
 
-        // Sale price validation (not required for Variation_Product, required for Service_Product)
-        if ($this->type !== 'Variation_Product') {
+        // Sale price validation (not required for Variation_Product and Combo_Product)
+        if ($this->type !== 'Variation_Product' && $this->type !== 'Combo_Product') {
             $validationRules['sale_price'] = 'required|numeric|min:0';
         }
         $validationRules['mrp_price'] = 'nullable|numeric|min:0';
@@ -186,7 +186,7 @@ class ItemRequest extends BaseRequest
             }
         } else {
             // For non-service products
-            if ($this->type !== 'Service_Product') {
+            if ($this->type !== 'Service_Product' && $this->type !== 'Combo_Product') {
                 // Check if opening stock exists to make purchase_price required
                 $hasOpeningStock = false;
                 

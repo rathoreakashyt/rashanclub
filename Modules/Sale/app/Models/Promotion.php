@@ -20,6 +20,8 @@ class Promotion extends Model
         'applicable_categories' => 'array',
         'applicable_customers' => 'array',
         'applicable_customer_types' => 'array',
+        'tier_percentages' => 'array',
+        'flavour_alternatives' => 'array',
     ];
 
     protected $append = [

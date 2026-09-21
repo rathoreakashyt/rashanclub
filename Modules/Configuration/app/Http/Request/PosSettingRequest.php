@@ -21,9 +21,9 @@ class PosSettingRequest extends BaseRequest
     {
         return [
             'allow_less_sale' => ['required', 'string', 'in:Yes,No'],
-            'default_customer' => ['required', 'exists:customers,id'],
-            'default_payment' => ['required', 'exists:payment_methods,id'],
-            'pos_total_payable_type' => ['required', 'string', 'in:0,1,0.05,0.01,0.5'],
+            'default_customer' => ['nullable', 'exists:customers,id'],
+            'default_payment' => ['nullable', 'exists:payment_methods,id'],
+            'pos_total_payable_type' => ['nullable', 'string', 'in:0,1,0.05,0.01,0.5'],
             'default_cursor_position' => ['required', 'string', 'in:Search Box,Barcode Box'],
             'product_display' => ['required', 'string', 'in:Image View,Box View'],
             'onscreen_keyboard_status' => ['required', 'string', 'in:Enable,Disable'],

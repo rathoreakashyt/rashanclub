@@ -54,13 +54,7 @@ class AppServiceProvider extends ServiceProvider
         //     $this->app->make(InsTraService::class)->run(request());
         // }
 
-        // Configure Razorpay SSL for development environments
-        if (file_exists(app_path('Helpers/RazorpaySslHelper.php'))) {
-            require_once app_path('Helpers/RazorpaySslHelper.php');
-            if (function_exists('configureRazorpaySsl')) {
-                configureRazorpaySsl();
-            }
-        }
+        // RazorpaySslHelper removed — SSL must be configured properly via php.ini/CAs
         
         // Gate::before(function ($user, $ability) {
         //     if ($user->hasRole('Super-Admin')) {

@@ -38,6 +38,33 @@ class GstReportService
     }
 
     /**
+     * Parse tax for a sale - uses sale_vat_objects when present, otherwise
+     * falls back to the legacy "vat" column (split CGST/SGST half-half for
+     * intra-state, all IGST for inter-state)
+     */
+    public static function parseSaleTax(Sale $sale): array
+    {
+        $tax = self::parseVatObjects($sale->sale_vat_objects ?? '');
+        if ($tax['total_tax'] > 0) {
+            return $tax;
+        }
+        $vatAmount = (float) ($sale->vat ?? 0);
+        if ($vatAmount <= 0) {
+            return $tax;
+        }
+        $outletCode = $sale->outlet?->state?->state_code ?? $sale->outlet?->state_code ?? null;
+        $customerCode = $sale->customer?->state?->state_code ?? null;
+        if (self::isIntraState($outletCode, $customerCode)) {
+            $tax['cgst'] = round($vatAmount / 2, 2);
+            $tax['sgst'] = round($vatAmount / 2, 2);
+        } else {
+            $tax['igst'] = $vatAmount;
+        }
+        $tax['total_tax'] = $vatAmount;
+        return $tax;
+    }
+
+    /**
      * Determine if sale is Intra-State (same state) or Inter-State
      */
     public static function isIntraState(?string $outletStateCode, ?string $customerStateCode): bool
@@ -56,9 +83,12 @@ class GstReportService
         $query = Sale::with(['outlet.state', 'customer.state'])
             ->where('del_status', 'Live')
             ->where('company_id', $companyId)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $query->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $query->whereDate('sale_date', '<=', $dateTo);
@@ -74,7 +104,7 @@ class GstReportService
             $customerCode = $sale->customer?->state?->state_code ?? null;
             $isIntra = self::isIntraState($outletCode, $customerCode);
 
-            $tax = self::parseVatObjects($sale->sale_vat_objects);
+            $tax = self::parseSaleTax($sale);
             $taxableValue = (float) ($sale->sub_total ?? 0);
 
             if ($isIntra) {
@@ -134,9 +164,12 @@ class GstReportService
         $query = Sale::with(['outlet'])
             ->where('del_status', 'Live')
             ->where('company_id', $companyId)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $query->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $query->whereDate('sale_date', '<=', $dateTo);
@@ -152,7 +185,7 @@ class GstReportService
 
         foreach ($sales as $sale) {
             $totalTaxableValue += (float) ($sale->sub_total ?? 0);
-            $tax = self::parseVatObjects($sale->sale_vat_objects);
+            $tax = self::parseSaleTax($sale);
             $totalCgst += $tax['cgst'];
             $totalSgst += $tax['sgst'];
             $totalIgst += $tax['igst'];
@@ -182,9 +215,12 @@ class GstReportService
     {
         $saleQuery = Sale::where('del_status', 'Live')
             ->where('company_id', $companyId)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $saleQuery->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $saleQuery->whereDate('sale_date', '<=', $dateTo);
@@ -273,9 +309,12 @@ class GstReportService
             ->whereHas('customer', fn ($q) => $q->where('business_type', 'B2B'))
             ->where('del_status', 'Live')
             ->where('company_id', $companyId)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $query->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $query->whereDate('sale_date', '<=', $dateTo);
@@ -287,7 +326,7 @@ class GstReportService
         $totals = ['taxable_value' => 0, 'cgst' => 0, 'sgst' => 0, 'igst' => 0, 'total_invoice_value' => 0];
 
         foreach ($sales as $sale) {
-            $tax = self::parseVatObjects($sale->sale_vat_objects);
+            $tax = self::parseSaleTax($sale);
             $taxableValue = (float) ($sale->sub_total ?? 0);
             $totalInvoiceValue = (float) ($sale->total_payable ?? 0);
 
@@ -332,9 +371,12 @@ class GstReportService
             ->where('del_status', 'Live')
             ->where('company_id', $companyId)
             ->where('total_payable', '<=', $b2cLimit)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $query->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $query->whereDate('sale_date', '<=', $dateTo);
@@ -346,7 +388,7 @@ class GstReportService
         $totals = ['taxable_value' => 0, 'cgst' => 0, 'sgst' => 0, 'igst' => 0, 'total' => 0];
 
         foreach ($sales as $sale) {
-            $tax = self::parseVatObjects($sale->sale_vat_objects);
+            $tax = self::parseSaleTax($sale);
             $taxableValue = (float) ($sale->sub_total ?? 0);
             $totalVal = $taxableValue + $tax['cgst'] + $tax['sgst'] + $tax['igst'];
 
@@ -393,9 +435,12 @@ class GstReportService
             ->where('del_status', 'Live')
             ->where('company_id', $companyId)
             ->where('total_payable', '>', $b2cLimit)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $query->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $query->whereDate('sale_date', '<=', $dateTo);
@@ -436,9 +481,12 @@ class GstReportService
     {
         $saleQuery = Sale::where('del_status', 'Live')
             ->where('company_id', $companyId)
-            ->whereNotNull('sale_vat_objects')
-            ->where('sale_vat_objects', '!=', '[]')
-            ->where('sale_vat_objects', '!=', '');
+            ->where(function ($q) {
+                $q->whereNotNull('sale_vat_objects')
+                    ->where('sale_vat_objects', '!=', '[]')
+                    ->where('sale_vat_objects', '!=', '')
+                    ->orWhere('vat', '>', 0);
+            });
 
         if ($dateFrom) $saleQuery->whereDate('sale_date', '>=', $dateFrom);
         if ($dateTo) $saleQuery->whereDate('sale_date', '<=', $dateTo);
@@ -510,7 +558,7 @@ class GstReportService
 
         foreach ($sales as $sale) {
             $taxableValue = (float) ($sale->sub_total ?? 0);
-            $tax = self::parseVatObjects($sale->sale_vat_objects ?? '');
+            $tax = self::parseSaleTax($sale);
             $totalTax = $tax['total_tax'];
 
             if ($totalTax > 0) {

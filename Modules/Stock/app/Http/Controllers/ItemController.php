@@ -108,10 +108,17 @@ class ItemController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
         
-        // Taxes shown in item profile: show_in_item_profile = Yes, parent_tax_id = null
+        // Taxes shown in item profile (parent-level taxes for dropdown)
         $data['itemProfileTaxes'] = Tax::forCompany($companyId)->live()
-            ->where('show_in_item_profile', 'Yes')
-            ->whereNull('parent_tax_id')
+            ->where(function ($q) {
+                $q->where('show_in_item_profile', 1)
+                  ->orWhere('show_in_item_profile', 'Yes');
+            })
+            ->where(function ($q) {
+                $q->whereNull('parent_tax_id')
+                  ->orWhere('parent_tax_id', 0)
+                  ->orWhere('parent_tax_id', '');
+            })
             ->orderBy('tax_name')
             ->get(['id', 'tax_name', 'tax_rate']);
         
@@ -503,10 +510,17 @@ class ItemController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
         
-        // Taxes shown in item profile: show_in_item_profile = Yes, parent_tax_id = null
+        // Taxes shown in item profile (parent-level taxes for dropdown)
         $data['itemProfileTaxes'] = Tax::forCompany($companyId)->live()
-            ->where('show_in_item_profile', 'Yes')
-            ->whereNull('parent_tax_id')
+            ->where(function ($q) {
+                $q->where('show_in_item_profile', 1)
+                  ->orWhere('show_in_item_profile', 'Yes');
+            })
+            ->where(function ($q) {
+                $q->whereNull('parent_tax_id')
+                  ->orWhere('parent_tax_id', 0)
+                  ->orWhere('parent_tax_id', '');
+            })
             ->orderBy('tax_name')
             ->get(['id', 'tax_name', 'tax_rate']);
         

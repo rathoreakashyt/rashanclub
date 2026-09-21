@@ -82,6 +82,8 @@ class Item extends Model
         'parent_id' => 'integer',
         'user_id' => 'integer',
         'company_id' => 'integer',
+        'expiry_date_maintain' => 'integer',
+        'enable_disable_status' => 'integer',
     ];
 
     /**

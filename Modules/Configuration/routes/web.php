@@ -10,7 +10,7 @@ use Modules\Configuration\Http\Controllers\MultipleCurrencyController;
 use Modules\Configuration\Http\Controllers\DeliveryPartnerController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('configurations', ConfigurationController::class)->names('configuration');
+    Route::resource('configurations', ConfigurationController::class)->only(['index'])->names('configuration');
 
     // Denomination CRUD Routes
     Route::controller(DenominationController::class)->group(function () {

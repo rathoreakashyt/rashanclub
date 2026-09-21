@@ -1,7 +1,7 @@
 <script>
 (function() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ route("pwa.serviceworker") }}', { scope: '/pwa/' });
+        navigator.serviceWorker.register('{{ route("pwa.serviceworker") }}', { scope: '/' });
     }
     var deferredPrompt;
 

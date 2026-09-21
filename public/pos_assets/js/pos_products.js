@@ -648,17 +648,6 @@ class POSProductsDisplay {
             </div>
         `);
     }
-                        <span class="mrp-value">${mrpPrice}</span>
-                    </h6>` : ''}
-                    <h6>
-                        <span class="stock-label">Stock:</span> 
-                        <span class="stock-value">${stockDisplay}</span>
-                        ${stock > 0 ? `<span class="stock-unit">-${stockUnit}</span>` : ''}
-                    </h6>
-                </div>
-            </div>
-        `);
-    }
 
     /**
      * Format price with currency
@@ -1024,6 +1013,7 @@ class POSProductsDisplay {
             product_type: finalProduct.type,
             quantity: 1,
             unit_price: unitPrice,
+            original_unit_price: unitPrice,
             mrp_price: mrpPrice,
             hsn_code: finalProduct.hsn_code || '',
             sale_unit_name: finalProduct.sale_unit_name || 'PCS',
@@ -1043,8 +1033,8 @@ class POSProductsDisplay {
         if (typeof posCartManager !== 'undefined') {
             posCartManager.addItem(cartItem);
             
-            // Handle Buy X Get Y promotion (Type 3)
-            if (promotion && promotion.type === '3' && promotion.get_item_id) {
+            // Handle Buy X Get Y promotion (Type 3) — skip for Business Club members
+            if (promotion && promotion.type === '3' && promotion.get_item_id && !posCartManager.isBusinessClubMember()) {
                 await this.handleBuyXGetYPromotion(promotion, 1, cartItem);
             }
         } else {
@@ -2263,6 +2253,7 @@ class POSProductsDisplay {
             product_type: productType,
             quantity: quantity,
             unit_price: unitPrice,
+            original_unit_price: unitPrice,
             mrp_price: mrpPrice,
             hsn_code: (getItem && getItem.hsn_code) ? getItem.hsn_code : '',
             sale_unit_name: (getItem && getItem.sale_unit_name) ? getItem.sale_unit_name : 'PCS',
@@ -2285,8 +2276,8 @@ class POSProductsDisplay {
         if (typeof posCartManager !== 'undefined') {
             posCartManager.addItem(cartItem, true);
             
-            // Handle Buy X Get Y promotion (Type 3)
-            if (promotion && promotion.type === '3' && promotion.get_item_id) {
+            // Handle Buy X Get Y promotion (Type 3) — skip for Business Club members
+            if (promotion && promotion.type === '3' && promotion.get_item_id && !posCartManager.isBusinessClubMember()) {
                 await this.handleBuyXGetYPromotion(promotion, quantity, cartItem);
             }
         } else {
@@ -2313,10 +2304,23 @@ class POSProductsDisplay {
      */
     async handleBuyXGetYPromotion(promotion, mainItemQuantity, mainCartItem) {
         try {
+            // Tier pricing (partial quantity): if a tier covers current qty,
+            // customer pays the tier price (percent of list price OR fixed amount) and gets NO free item.
+            if (typeof posCartManager !== 'undefined' && typeof posCartManager.getSchemeTier === 'function') {
+                const tier = posCartManager.getSchemeTier(promotion, mainItemQuantity);
+                if (tier) {
+                    posCartManager.applySchemeTierPricing(mainCartItem);
+                    posCartManager.saveCartToStorage();
+                    posCartManager.renderCart();
+                    posCartManager.updateCartSummary();
+                    return;
+                }
+            }
+
             // buy_qty from API; fallback to qty (DB column) for compatibility
             const buyQty = Math.max(1, Number(promotion.buy_qty ?? promotion.qty) || 1);
             const getQty = Math.max(1, Number(promotion.get_qty) || 1);
-            const getItemId = promotion.get_item_id;
+            let getItemId = promotion.get_item_id;
             
             // Calculate how many free items should be given
             // Example: Buy 5 Get 2, if quantity is 10, then free items = (10 / 5) * 2 = 4
@@ -2330,63 +2334,92 @@ class POSProductsDisplay {
                 }
                 return;
             }
-            
-            // Get free item details from IndexedDB (use getProductOrVariationById for both General_Product and Variation_Product)
-            let getItem = typeof posIndexedDB !== 'undefined' && posIndexedDB.isInitialized
-                ? await posIndexedDB.getProductOrVariationById(getItemId)
-                : null;
-            if (!getItem) {
-                getItem = {
-                    id: getItemId,
-                    name: 'Free Item',
-                    code: '',
-                    type: 'Standard',
-                    tax_information: [],
-                    tax_string: ''
-                };
-            }
-            
-            // Check if free item already exists in cart (linked to this main item)
-            if (typeof posCartManager !== 'undefined') {
-                const existingFreeItem = posCartManager.cartItems.find(item => 
-                    item.product_id == getItemId && 
-                    item.is_promotion_free_item === true &&
-                    item.promotion_main_item_id == mainCartItem.product_id
-                );
-                
-                if (existingFreeItem) {
-                    // Update quantity of existing free item directly (don't use updateItemQuantity as it will be blocked)
-                    existingFreeItem.quantity = freeItemQuantity;
-                    existingFreeItem.total = 0; // Free items always have 0 total
-                    posCartManager.saveCartToStorage();
-                    posCartManager.renderCart();
-                } else {
-                    // Add new free item to cart
-                    const freeCartItem = {
-                        product_id: getItemId,
-                        product_name: getItem.name || 'Free Item',
-                        product_code: getItem.code || '',
-                        product_type: getItem.type || 'Standard',
-                        unit_price: 0, // Free item has no price
-                        quantity: freeItemQuantity,
-                        discount: 0,
-                        discount_type: 'fixed',
-                        total: 0, // Free item total is always 0
-                        tax_information: getItem.tax_information || [],
-                        tax_string: getItem.tax_string || '',
-                        applicable_tax_id: getItem.applicable_tax_id || null,
-                        tax_type: getItem.tax_type || 'Inclusive',
-                        is_promotion_free_item: true, // Mark as promotion free item
-                        promotion_id: promotion.id,
-                        promotion_main_item_id: mainCartItem.product_id, // Link to main item
-                        imei_number: [],
-                        medicine: [],
-                        combo_items: []
+
+            // Check if promotion has flavour alternatives — show selection modal
+            const flavourAlternatives = promotion.flavour_alternatives || [];
+            const self = this;
+
+            async function addFreeItemToCart(resolvedItemId) {
+                // Get free item details from IndexedDB (use getProductOrVariationById for both General_Product and Variation_Product)
+                let getItem = typeof posIndexedDB !== 'undefined' && posIndexedDB.isInitialized
+                    ? await posIndexedDB.getProductOrVariationById(resolvedItemId)
+                    : null;
+                if (!getItem) {
+                    getItem = {
+                        id: resolvedItemId,
+                        name: 'Free Item',
+                        code: '',
+                        type: 'Standard',
+                        tax_information: [],
+                        tax_string: ''
                     };
+                }
+                
+                // Check if free item already exists in cart (linked to this main item)
+                if (typeof posCartManager !== 'undefined') {
+                    const existingFreeItem = posCartManager.cartItems.find(item => 
+                        item.product_id == resolvedItemId && 
+                        item.is_promotion_free_item === true &&
+                        item.promotion_main_item_id == mainCartItem.product_id
+                    );
                     
-                    posCartManager.addItem(freeCartItem, true);
+                    if (existingFreeItem) {
+                        existingFreeItem.quantity = freeItemQuantity;
+                        existingFreeItem.total = 0;
+                        posCartManager.saveCartToStorage();
+                        posCartManager.renderCart();
+                    } else {
+                        // Remove any old free item linked to this main item (different flavour)
+                        posCartManager.removeFreeItemLinkedToMainItem(mainCartItem.product_id);
+
+                        const freeCartItem = {
+                            product_id: resolvedItemId,
+                            product_name: getItem.name || 'Free Item',
+                            product_code: getItem.code || '',
+                            product_type: getItem.type || 'Standard',
+                            unit_price: 0,
+                            quantity: freeItemQuantity,
+                            discount: 0,
+                            discount_type: 'fixed',
+                            total: 0,
+                            tax_information: getItem.tax_information || [],
+                            tax_string: getItem.tax_string || '',
+                            applicable_tax_id: getItem.applicable_tax_id || null,
+                            tax_type: getItem.tax_type || 'Inclusive',
+                            is_promotion_free_item: true,
+                            promotion_id: promotion.id,
+                            promotion_main_item_id: mainCartItem.product_id,
+                            selected_flavour_id: resolvedItemId,
+                            imei_number: [],
+                            medicine: [],
+                            combo_items: []
+                        };
+                        
+                        posCartManager.addItem(freeCartItem, true);
+                    }
                 }
             }
+
+            if (flavourAlternatives.length > 0 && typeof window.openFlavourSelectionModal === 'function') {
+                // Check if there's already a selected flavour on the existing free item
+                const existingFreeItem = (typeof posCartManager !== 'undefined')
+                    ? posCartManager.cartItems.find(item =>
+                        item.is_promotion_free_item === true &&
+                        item.promotion_main_item_id == mainCartItem.product_id
+                    )
+                    : null;
+                const currentFlavourId = existingFreeItem ? existingFreeItem.selected_flavour_id : null;
+
+                return new Promise(function(resolve) {
+                    window.openFlavourSelectionModal(flavourAlternatives, async function(selectedItemId) {
+                        await addFreeItemToCart(selectedItemId);
+                        resolve();
+                    }, currentFlavourId);
+                });
+            }
+            
+            // No flavour alternatives — use default get_item_id
+            await addFreeItemToCart(getItemId);
         } catch (error) {
             console.error('Error handling Buy X Get Y promotion:', error);
         }

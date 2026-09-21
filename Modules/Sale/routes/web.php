@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pos/get-customer/{id}', 'posGetCustomer')->name('pos.customer.get');
         Route::get('pos/customers', 'posGetCustomers')->name('pos.customers.get');
         Route::get('pos/customer/{id}/credit-info', 'posGetCustomerCreditInfo')->name('pos.customer.credit-info');
+        Route::get('pos/lookup-customer-by-phone', 'posLookupByPhone')->name('pos.customer.lookup-phone');
     });
     
     // POS Routes

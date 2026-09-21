@@ -52,8 +52,7 @@
             "app/Helpers/BusinessManageHelper.php",
             "app/Helpers/GlobalHelper.php",
             "app/Helpers/LibraryManageHelper.php",
-            "app/Helpers/PrinterHelper.php",
-            "app/Helpers/RazorpaySslHelper.php"
+            "app/Helpers/PrinterHelper.php"
         ]
     },
     "autoload-dev": {

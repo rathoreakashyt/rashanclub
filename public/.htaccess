@@ -23,3 +23,13 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Enable assert() — required by brick/math library
+<IfModule mod_php.c>
+    php_value assert.active 1
+    php_value zend.assertions 1
+</IfModule>
+<IfModule mod_php8.c>
+    php_value assert.active 1
+    php_value zend.assertions 1
+</IfModule>

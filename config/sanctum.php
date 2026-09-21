@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => 43200, // 30 days (in minutes) — tokens auto-expire for security
 
     /*
     |--------------------------------------------------------------------------

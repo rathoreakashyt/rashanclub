@@ -2,10 +2,19 @@
 # rashankidukan - Retail POS (Off POS v11.0)
 # PHP 8.2 EXACT — installer requires PHP >= 8.2.0 && < 8.3.0
 # ============================================================
-FROM php:8.2-fpm
+# NOTE: php:8.2-fpm (trixie, 2026-08-03 build) is BROKEN upstream (empty entrypoint/config files).
+#       Using stable bookworm variant instead.
+FROM php:8.2-fpm-bookworm
 
 # System dependencies
-RUN apt-get update && apt-get install -y \
+# Note 1: deb.debian.org serves corrupted/truncated responses on some networks; use kernel.org mirror + security.debian.org
+# Note 2: php:8.2-fpm trixie image (2026-08-03) ships empty /var/lib/dpkg/info/format -> repair before apt
+# Note 3: noninteractive + force-confold needed (image lacks apt-utils/debconf frontends; adduser.conf prompt)
+RUN echo "1" > /var/lib/dpkg/info/format \
+    && sed -i 's|http://deb.debian.org/debian-security|http://security.debian.org/debian-security|g' /etc/apt/sources.list.d/*.sources \
+    && sed -i 's|http://deb.debian.org/debian|http://mirrors.edge.kernel.org/debian|g' /etc/apt/sources.list.d/*.sources \
+    && DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::=--force-confold \
     git \
     curl \
     libpng-dev \
@@ -39,7 +48,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # PHP config for production-like installer environment
-RUN echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/custom.ini \
+# Note 4: upstream php:8.2-fpm trixie image ships EMPTY docker-php-entrypoint -> recreate the standard one
+RUN printf '#!/bin/sh\nset -e\nif [ "${1#-}" != "$1" ]; then set -- php-fpm "$@"; fi\nexec "$@"\n' > /usr/local/bin/docker-php-entrypoint \
+    && chmod +x /usr/local/bin/docker-php-entrypoint \
+    && echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/custom.ini \
     && echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/custom.ini \
     && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/custom.ini \
     && echo "max_input_time = 300" >> /usr/local/etc/php/conf.d/custom.ini \
@@ -53,6 +65,17 @@ WORKDIR /var/www
 
 # Create www user/group (UID/GID 1000)
 RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www
+
+# Install cron for Laravel scheduler (busy:import every 30 min)
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y cron \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Laravel scheduler cron — runs every minute, scheduler decides what to execute
+RUN echo "* * * * * www cd /var/www && php artisan schedule:run >> /var/log/laravel-cron.log 2>&1" \
+    > /etc/cron.d/laravel-scheduler \
+    && chmod 0644 /etc/cron.d/laravel-scheduler \
+    && crontab /etc/cron.d/laravel-scheduler
 
 # Copy project files with correct ownership
 COPY --chown=www:www . /var/www
@@ -73,4 +96,8 @@ USER www
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+# entrypoint: cron (background) + php-fpm (foreground)
+COPY --chown=root:root entrypoint.sh /entrypoint.sh
+USER root
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]

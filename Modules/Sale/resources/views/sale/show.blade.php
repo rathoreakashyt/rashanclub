@@ -1,40 +1,47 @@
 @extends('backend.backend_layout')
 @section('page-title', __('Sale Details'))
 @push('page-css')
+<style>
+    .rdk-save-box {
+        border: 2px solid #DC2626;
+        border-radius: 6px;
+        padding: 10px;
+        text-align: center;
+        margin-top: 12px;
+    }
+    .rdk-save-box .big { font-size: 16px; font-weight: 700; color: #DC2626; }
+    .rdk-save-box .sub { font-size: 11px; color: #333; margin-top: 4px; }
+    .rdk-mrp-box {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-around;
+        margin-top: 12px;
+        text-align: center;
+    }
+    .rdk-mrp-box .col strong { display: block; font-size: 11px; color: #666; margin-bottom: 2px; }
+    .rdk-mrp-box .col span { font-size: 13px; font-weight: 700; }
+</style>
 @endpush
 @section('page-content')
 <div class="container-xxl flex-grow-1 container-p-y">
-    <!-- Sale Header -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
         <div class="d-flex flex-column justify-content-center">
             <h4 class="mb-0">{{ __('Sale') }} {{ __('Details') }}</h4>
         </div>
         @include('backend.components.breadcrumb', [
             'breadcrumbs' => [
-                [
-                    'label' => '<i class="ti tabler-home"></i>',
-                    'link' => route('dashboard')
-                ],
-                [
-                    'label' => __('Sale'),
-                    'link' => '#'
-                ],
-                [
-                    'label' => __('Sale') . ' ' . __('Details'),
-                    'active' => true
-                ]
+                ['label' => '<i class="ti tabler-home"></i>', 'link' => route('dashboard')],
+                ['label' => __('Sale'), 'link' => '#'],
+                ['label' => __('Sale') . ' ' . __('Details'), 'active' => true]
             ]
         ])
     </div>
 
-    @if(session('success'))
-        {!! insertSuccess(session('success')) !!}
-    @endif
-    @if(session('error'))
-        {!! insertFailed(session('error')) !!}
-    @endif
+    @if(session('success')) {!! insertSuccess(session('success')) !!} @endif
+    @if(session('error'))   {!! insertFailed(session('error')) !!}     @endif
 
-    <!-- Sale Info Card -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
@@ -67,77 +74,87 @@
                             @if($sale->employee)
                             <p><strong>{{ __('Employee') }}:</strong> {{ $sale->employee->name }}</p>
                             @endif
+                            @if($sale->user)
+                            <p><strong>{{ __('Cashier') }}:</strong> {{ $sale->user->name }}</p>
+                            @endif
                         </div>
                         <div class="col-md-6">
                             <p><strong>{{ __('Subtotal') }}:</strong> {{ formatAmount($sale->sub_total) }}</p>
-                            @if($sale->total_discount_amount > 0)
+                            @if(($sale->total_discount_amount ?? 0) > 0)
                             <p><strong>{{ __('Discount') }}:</strong> {{ formatAmount($sale->total_discount_amount) }}</p>
                             @endif
-                            @if($sale->vat > 0)
+                            @if(($sale->vat ?? 0) > 0)
                             <p><strong>{{ __('VAT') }}:</strong> {{ formatAmount($sale->vat) }}</p>
+                            @endif
+                            @if(($sale->rounding ?? 0) != 0)
+                            <p><strong>{{ __('Rounding Off') }}:</strong> {{ formatAmount($sale->rounding) }}</p>
                             @endif
                             <p><strong>{{ __('Paid Amount') }}:</strong> {{ formatAmount($sale->paid_amount) }}</p>
                             <p><strong>{{ __('Due Amount') }}:</strong> {{ formatAmount($sale->due_amount) }}</p>
-                            <p><strong>{{ __('Grand Total') }}:</strong> <span class="text-primary fw-bold">{{ formatAmount($sale->grand_total) }}</span></p>
+                            <p><strong>{{ __('Grand Total') }}:</strong> <span class="text-primary fw-bold">{{ formatAmount($sale->total_payable ?? $sale->grand_total) }}</span></p>
                         </div>
                     </div>
+
+                    {{-- MRP Summary (same as desktop invoice) --}}
+                    @if(($sale->mrp_total ?? 0) > 0)
+                    <div class="rdk-mrp-box">
+                        <div class="col"><strong>MRP TOTAL</strong><span>{{ formatAmount($sale->mrp_total) }}</span></div>
+                        <div class="col"><strong>Price Total</strong><span>{{ formatAmount($sale->sub_total) }}</span></div>
+                        <div class="col"><strong>Amt. Total</strong><span>{{ formatAmount($sale->total_payable ?? $sale->grand_total) }}</span></div>
+                    </div>
+                    @if(($sale->savings ?? 0) > 0)
+                    <div class="rdk-save-box">
+                        <div class="big">YOU SAVE:&nbsp;&nbsp;{{ formatAmount($sale->savings) }}</div>
+                        <div class="sub">MRP {{ formatAmount($sale->mrp_total) }} - Bill {{ formatAmount($sale->total_payable ?? $sale->grand_total) }} = {{ formatAmount($sale->savings) }}</div>
+                    </div>
+                    @endif
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sale Details Table -->
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">{{ __('Sale') }} {{ __('Items') }}</h5>
-                </div>
+                <div class="card-header"><h5 class="mb-0">{{ __('Sale') }} {{ __('Items') }}</h5></div>
                 <div class="card-datatable table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>{{ __('SN') }}</th>
-                                <th>{{ __('Item') }}({{ __('Code') }})</th>
+                                <th>#</th>
+                                <th>{{ __('Item') }}</th>
                                 <th>{{ __('IMEI/Serial') }}</th>
-                                <th>{{ __('Quantity') }}</th>
+                                <th>{{ __('Qty') }}</th>
+                                <th>{{ __('MRP') }}</th>
                                 <th>{{ __('Unit Price') }}</th>
                                 <th>{{ __('Total') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $i = 0;
-                            @endphp
+                            @php $i=0; @endphp
                             @if($sale->saleDetails && $sale->saleDetails->count() > 0)
-                                @foreach($sale->saleDetails as $detail)
+                                @foreach($sale->saleDetails as $d)
                                     @php
                                         $i++;
+                                        $mrpP = $d->item->mrp_price ?? $d->menu_unit_price ?? 0;
                                     @endphp
                                     <tr>
                                         <td>{{ $i }}</td>
                                         <td>
-                                            @if($detail->item)
-                                                @if($detail->item->parent_id && $detail->item->parent)
-                                                    {{ $detail->item->parent->name }} - {{ $detail->item->name }}
+                                            @if($d->item)
+                                                @if($d->item->parent_id && $d->item->parent)
+                                                    {{ $d->item->parent->name }} - {{ $d->item->name }}
                                                 @else
-                                                    {{ $detail->item->name }}
-                                                @endif
-                                                @if($detail->item->code)
-                                                    ({{ $detail->item->code }})
+                                                    {{ $d->item->name }}
                                                 @endif
                                             @endif
                                         </td>
-                                        <td>
-                                            @if($detail->expiry_imei_serial)
-                                                {{ $detail->expiry_imei_serial }}
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                        <td>{{ $detail->qty }}</td>
-                                        <td>{{ formatAmount($detail->menu_unit_price) }}</td>
-                                        <td>{{ formatAmount($detail->qty * $detail->menu_price_with_discount) }}</td>
+                                        <td>{{ $d->expiry_imei_serial ?: '-' }}</td>
+                                        <td>{{ $d->qty }}</td>
+                                        <td>{{ formatAmount($mrpP) }}</td>
+                                        <td>{{ formatAmount($d->menu_unit_price) }}</td>
+                                        <td>{{ formatAmount($d->qty * $d->menu_price_with_discount) }}</td>
                                     </tr>
                                 @endforeach
                             @endif
@@ -149,5 +166,3 @@
     </div>
 </div>
 @endsection
-@push('page-js')
-@endpush

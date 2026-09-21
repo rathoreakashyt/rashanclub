@@ -320,7 +320,7 @@
     <div class="profile-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h2>{{ strtoupper(getWhiteLabel('site_name') ?? 'Rashan Ki Dukan') }} MART - CUSTOMER DASHBOARD</h2>
+                <h2>{{ __('CUSTOMER DASHBOARD') }}</h2>
                 <p class="subtitle mb-0">{{ __('आपकी खरीदारी, आपका फायदा') }}</p>
             </div>
             <a href="{{ route('businessclub.wallets') }}" class="btn btn-outline-secondary btn-sm">
@@ -333,18 +333,6 @@
     <div class="row">
         <!-- Left Column -->
         <div class="col-lg-8">
-            <!-- Customer Dashboard Card -->
-            <div class="d-flex align-items-center mb-4">
-                <div class="me-3">
-                    <img src="{{ $customer->photo ? asset('uploads/customer/' . $customer->photo) : asset('uploads/dummy_images/admin.png') }}"
-                         alt="{{ $customer->name }}" class="avatar">
-                </div>
-                <div>
-                    <h5 class="mb-0 fw-bold">{{ __('CUSTOMER DASHBOARD') }}</h5>
-                    <p class="text-muted mb-0 small">{{ $customer->name }} | {{ $customer->phone ?? '' }}</p>
-                </div>
-            </div>
-
             <!-- Monthly Spend Tracker + Wallet Balance -->
             <div class="row mb-4">
                 <div class="col-md-7 mb-4">
@@ -379,7 +367,7 @@
                     <div class="wallet-balance-card">
                         <h5>{{ __('Wallet Balance') }}</h5>
                         <div>
-                            <span class="wallet-amount">₹{{ number_format($wallet->balance ?? 0, 2) }}</span>
+                            <span class="wallet-amount">₹{{ number_format($wallet->earned_balance ?? 0, 2) }}</span>
                             @if(($wallet->total_earned ?? 0) > 0)
                                 <span class="wallet-credit">+ ₹{{ number_format($wallet->total_earned, 2) }}</span>
                             @endif

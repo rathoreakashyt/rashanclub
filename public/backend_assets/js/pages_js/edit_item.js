@@ -848,7 +848,7 @@ $(async function () {
             $('.whole_sale_price_wrap').slideUp();
             $('.variation_section').slideUp();
             $('.generated_variations_section').slideUp();
-            $('.stock_information_section').slideUp();
+            $('.stock_information_section').slideDown();
             $('.combo_product_section').slideDown();
             $('.hide-for-combo-product').slideUp();
             generatedVariations = [];
@@ -2560,7 +2560,7 @@ $(async function () {
             let outletCard = $(this);
             let outletData = existingData && existingData[outletId] ? existingData[outletId] : null;
             
-            if (itemType === 'General_Product' || itemType === 'Installment_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
+            if (itemType === 'General_Product' || itemType === 'Installment_Product' || itemType === 'Combo_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
                 // Simple quantity input for General and Installment products
                 let quantity = outletData ? outletData.quantity : '';
                 outletCard.html(`
@@ -3075,7 +3075,7 @@ $(async function () {
             expiryDateMaintain = $('#expiry_date_maintain').val() || 'Yes';
         }
         
-        if (itemType === 'General_Product' || itemType === 'Installment_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
+        if (itemType === 'General_Product' || itemType === 'Installment_Product' || itemType === 'Combo_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
             Object.keys(openingStockData).forEach(function(outletId) {
                 let outletData = openingStockData[outletId];
                 if (outletData && outletData.quantity && parseFloat(outletData.quantity) > 0) {
@@ -3148,7 +3148,7 @@ $(async function () {
         $('.opening_stock_append').empty(); // Clear previous data
         let newOpeningStockData = {}; // Store new data temporarily
         
-        if (itemType === 'General_Product' || itemType === 'Installment_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
+        if (itemType === 'General_Product' || itemType === 'Installment_Product' || itemType === 'Combo_Product' || (itemType === 'Medicine_Product' && expiryDateMaintain === 'No')) {
             // Simple quantity per outlet
             $('.opening-stock-quantity').each(function() {
                 let outletId = $(this).data('outlet-id');

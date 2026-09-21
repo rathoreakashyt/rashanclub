@@ -1,6 +1,6 @@
 # ============================================================
 # rashankidukan - Docker Compose
-# Port 8080 (rasanclub already uses 80)
+# Ports 8080 + 8081 (rasanclub already uses 80)
 # MySQL port 3307 (rasanclub uses 3306)
 # No Redis needed - SESSION_DRIVER=file, CACHE_STORE=file
 # ============================================================
@@ -32,13 +32,13 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www
+      # Production-parity: opcache enabled exactly like it will be on hosting
+      - ./docker/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - rdk-network
-    environment:
-      - PHP_OPCACHE_ENABLE=0
 
   # ── MySQL 8.0 ─────────────────────────────────────────────
   # Port 3307 on host to avoid conflict with rasanclub's 3306

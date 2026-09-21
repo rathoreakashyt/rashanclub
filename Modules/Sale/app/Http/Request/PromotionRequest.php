@@ -22,30 +22,42 @@ class PromotionRequest extends BaseRequest
     public function rules(): array
     {
         $rules = [
-            'type' => ['required', 'integer'],
+            'type' => ['required'],
             'title' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:55'],
             'end_date' => ['required', 'string', 'max:55'],
-            'status' => ['required', 'in:1,2'],
+            'status' => ['required'],
             'start_time' => ['nullable', 'string', 'max:10'],
             'end_time' => ['nullable', 'string', 'max:10'],
             'min_purchase_amount' => ['nullable', 'numeric', 'min:0'],
             'max_discount_amount' => ['nullable', 'numeric', 'min:0'],
-            'scheme_basis' => ['nullable', 'string', 'in:item,bill,party'],
+            'scheme_basis' => ['nullable', 'string'],
             'applicable_customer_types' => ['nullable', 'array'],
             'bill_level_discount' => ['nullable', 'numeric', 'min:0'],
+            'tier_percentages' => ['nullable', 'string'],
+            'flavour_alternatives' => ['nullable', 'string'],
         ];
 
-        $type = (int) $this->type;
-        if ($type === 1) {
-            $rules['item_id'] = ['required_if:scheme_basis,item,', 'integer'];
-            $rules['discount'] = ['required', 'string', 'max:55', 'regex:/^\d+(\.\d+)?%?$/'];
-            $rules['bill_level_discount'] = ['required_if:scheme_basis,bill', 'numeric'];
-        } elseif ($type === 2) {
-            $rules['discount'] = ['required', 'string', 'max:55', 'regex:/^\d+(\.\d+)?%?$/'];
-            $rules['coupon_code'] = ['required', 'string', 'max:50'];
-            $rules['bill_level_discount'] = ['nullable', 'numeric'];
-        } elseif ($type === 3) {
+        // Type can be integer (1,2,3) or string (Discount, Coupon Discount, Free Item)
+        $type = $this->type;
+        $typeInt = is_numeric($type) ? (int) $type : 0;
+        if (!$typeInt) {
+            // Map string type to integer
+            $typeInt = match(strtolower(trim($type ?? ''))) {
+                'discount' => 1,
+                'coupon discount', 'coupon discount (on entire sale)', 'coupon' => 2,
+                'free item', 'free_quantity', 'buy x get y' => 3,
+                default => 1,
+            };
+        }
+
+        if ($typeInt === 1) {
+            $rules['item_id'] = ['nullable', 'integer'];
+            $rules['discount'] = ['required', 'string', 'max:55'];
+        } elseif ($typeInt === 2) {
+            $rules['discount'] = ['required', 'string', 'max:55'];
+            $rules['coupon_code'] = ['nullable', 'string', 'max:50'];
+        } elseif ($typeInt === 3) {
             $rules['item_id'] = ['required', 'integer'];
             $rules['qty'] = ['required', 'integer'];
             $rules['get_item_id'] = ['required', 'integer'];

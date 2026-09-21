@@ -1,19 +1,20 @@
 /**
  * POS PWA Service Worker
- * Caches assets for offline support
+ * Caches POS pages and assets for full offline support
+ * Desktop POS = PWA POS (100% identical)
  */
-const CACHE_NAME = 'pos-cache-v3';
+const CACHE_NAME = 'pos-cache-v6';
 
-const ASSETS_TO_CACHE = [
+const PRECACHE_URLS = [
     '/',
     '/pwa/manifest.json',
 ];
 
-// Install event - cache static assets
+// Install event - pre-cache essential pages
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+            .then((cache) => cache.addAll(PRECACHE_URLS))
             .then(() => self.skipWaiting())
             .catch((err) => console.warn('PWA install cache failed:', err))
     );
@@ -42,25 +43,52 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Skip cross-origin requests (except for same-origin assets)
+    // Skip cross-origin requests
     if (url.origin !== location.origin) {
         return;
     }
 
-    // Bypass service worker for API/dynamic data - always fetch from network
-    // Fixes POS product loading and other AJAX requests that require fresh data
     const path = url.pathname;
-    const isApiRequest = path.startsWith('/pos/') ||
-        path.startsWith('/api/') ||
+
+    // ═══ API/DATA requests: always network (never cache) ═══
+    const isApiRequest = path.startsWith('/api/') ||
         path.startsWith('/sale/') ||
         path.startsWith('/register/') ||
         path.startsWith('/customer/') ||
         path.startsWith('/payment-gateway/') ||
         request.headers.get('Accept')?.includes('application/json');
     if (isApiRequest) {
-        return; // Let browser handle directly - no intercept
+        return;
     }
 
+    // ═══ POS page HTML requests: Network-first with cache fallback ═══
+    // This ensures POS pages work offline after first load
+    const isPosPage = path === '/pos' || path === '/pos/' ||
+        path.startsWith('/pos/') || path.startsWith('/pos?');
+    if (isPosPage && request.mode === 'navigate') {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Cache the POS page HTML for offline
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Offline: return cached POS page
+                    return caches.match(request).then((cached) => {
+                        return cached || caches.match('/pos');
+                    });
+                })
+        );
+        return;
+    }
+
+    // ═══ Static assets: Cache-first with network fallback ═══
     event.respondWith(
         caches.match(request)
             .then((cachedResponse) => {
@@ -68,7 +96,6 @@ self.addEventListener('fetch', (event) => {
                     return cachedResponse;
                 }
                 return fetch(request).then((response) => {
-                    // Cache CSS, JS, fonts, and images
                     const contentType = response.headers.get('content-type') || '';
                     const shouldCache = /\.(css|js|woff2?|ttf|eot|png|jpg|jpeg|gif|ico|svg|webp)$/i.test(url.pathname) ||
                         contentType.includes('text/css') ||
@@ -87,7 +114,9 @@ self.addEventListener('fetch', (event) => {
             .catch(() => {
                 // Return offline page for navigation requests
                 if (request.mode === 'navigate') {
-                    return caches.match('/');
+                    return caches.match('/pos').then((cached) => {
+                        return cached || caches.match('/');
+                    });
                 }
                 return new Response('Offline', {
                     status: 503,

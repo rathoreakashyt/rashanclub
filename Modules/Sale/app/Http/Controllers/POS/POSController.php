@@ -635,6 +635,12 @@ class POSController extends Controller
             $data['buy_qty'] = (int) ($promotion->qty ?? 1);
             $data['get_item_id'] = $promotion->get_item_id ? (int) $promotion->get_item_id : null;
             $data['get_qty'] = (int) ($promotion->get_qty ?? 1);
+            $data['tier_percentages'] = $promotion->tier_percentages
+                ? (is_array($promotion->tier_percentages) ? $promotion->tier_percentages : json_decode($promotion->tier_percentages, true))
+                : [];
+            $data['flavour_alternatives'] = $promotion->flavour_alternatives
+                ? (is_array($promotion->flavour_alternatives) ? $promotion->flavour_alternatives : json_decode($promotion->flavour_alternatives, true))
+                : [];
         }
         return $data;
     }
@@ -1009,21 +1015,27 @@ class POSController extends Controller
                     }
                 }
 
-                // Credit limit validation: block if customer has credit limit and due would exceed it
+                // Credit limit validation: credit_limit=0 means NO credit allowed, credit_limit>0 means allowed up to that limit
                 if ($dueAmount > 0 && ($validated['customer_id'] ?? null)) {
                     $customer = Customer::find($validated['customer_id']);
                     if ($customer && $customer->name !== 'Walk-in Customer') {
                         $creditLimit = (float) ($customer->credit_limit ?? 0);
-                        if ($creditLimit > 0) {
-                            $currentDue = $this->customerService->getCustomerDue($customer->id, $outletId);
-                            $currentDue = max(0, $currentDue);
-                            $availableCredit = max(0, $creditLimit - $currentDue);
-                            if ($dueAmount > $availableCredit) {
-                                return response()->json([
-                                    'status' => 'error',
-                                    'message' => 'Customer credit limit exceeded. Credit limit: ' . number_format($creditLimit, 2) . ', Current due: ' . number_format($currentDue, 2) . ', Available credit: ' . number_format($availableCredit, 2) . '. This sale would add ' . number_format($dueAmount, 2) . ' as due.',
-                                ], 422);
-                            }
+                        if ($creditLimit <= 0) {
+                            // No credit limit set = no credit/udhar allowed
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'This customer has no credit limit set. Due/credit (udhar) is not allowed. Please collect full payment.',
+                            ], 422);
+                        }
+                        // Credit limit > 0: check if due would exceed it
+                        $currentDue = $this->customerService->getCustomerDue($customer->id, $outletId);
+                        $currentDue = max(0, $currentDue);
+                        $availableCredit = max(0, $creditLimit - $currentDue);
+                        if ($dueAmount > $availableCredit) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Customer credit limit exceeded. Credit limit: ' . number_format($creditLimit, 2) . ', Current due: ' . number_format($currentDue, 2) . ', Available credit: ' . number_format($availableCredit, 2) . '. This sale would add ' . number_format($dueAmount, 2) . ' as due.',
+                            ], 422);
                         }
                     }
                 }
@@ -1044,6 +1056,21 @@ class POSController extends Controller
                         $saleVatObjectsJson = null;
                     }
                 }
+
+                // SAVINGS FEATURE: MRP total vs bill amount.
+                // mrp_total = sum(qty × items.mrp_price), savings = max(0, mrp_total - grand_total).
+                $mrpTotal = 0;
+                $productMap = Item::whereIn('id', collect($validated['cart_items'])->pluck('product_id')->unique())
+                    ->get(['id', 'mrp_price'])
+                    ->keyBy('id');
+                foreach ($validated['cart_items'] as $ci) {
+                    $mrpPrice = (float) ($productMap->get($ci['product_id'])->mrp_price ?? 0);
+                    if ($mrpPrice <= 0) {
+                        $mrpPrice = (float) ($ci['unit_price'] ?? 0); // mrp na ho to sale price hi base
+                    }
+                    $mrpTotal += (float) $ci['quantity'] * $mrpPrice;
+                }
+                $savings = max(0, $mrpTotal - $grandTotal);
 
                 // Create sale record (without sale_vat_objects to avoid Eloquent processing)
                 $sale = Sale::create([
@@ -1074,6 +1101,8 @@ class POSController extends Controller
                     'order_time' => now(),
                     'sale_vat_objects' => $saleVatObjectsJson,
                     'grand_total' => $grandTotal,
+                    'mrp_total' => round($mrpTotal, 3),
+                    'savings' => round($savings, 3),
                     'online_yes_no' => 'No',
                     'user_id' => $userId,
                     'outlet_id' => $outletId,
@@ -1449,34 +1478,36 @@ class POSController extends Controller
                 }
 
                 try {
-                    DB::statement("TRUNCATE TABLE view_stock_detail");
-                    DB::statement("INSERT INTO view_stock_detail SELECT item_id, 1 AS type, quantity_amount AS stock_quantity, outlet_id, company_id, del_status FROM purchase_details WHERE del_status = 'Live' AND quantity_amount > 0 UNION ALL SELECT item_id, 2 AS type, qty AS stock_quantity, outlet_id, company_id, del_status FROM sale_details WHERE del_status = 'Live' AND qty > 0 UNION ALL SELECT item_id, 1 AS type, stock_quantity, outlet_id, company_id, 'Live' AS del_status FROM set_opening_stocks WHERE stock_quantity > 0");
+                    DB::statement("DELETE FROM view_stock_detail");
+                    DB::statement("INSERT INTO view_stock_detail (item_id, type, stock_quantity, outlet_id, company_id, del_status)
+                        SELECT item_id, 1, quantity_amount, outlet_id, company_id, del_status FROM purchase_details WHERE del_status='Live' AND quantity_amount > 0
+                        UNION ALL SELECT item_id, 1, stock_quantity, outlet_id, company_id, 'Live' FROM set_opening_stocks WHERE stock_quantity > 0 OR item_description LIKE 'SYNC_ADJ%'
+                        UNION ALL SELECT item_id, 1, return_quantity_amount, outlet_id, company_id, del_status FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount > 0
+                        UNION ALL SELECT item_id, 2, qty, outlet_id, company_id, del_status FROM sale_details WHERE del_status='Live' AND qty > 0
+                        UNION ALL SELECT item_id, 2, return_quantity_amount, outlet_id, company_id, del_status FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount > 0
+                        UNION ALL SELECT item_id, 2, damage_quantity, outlet_id, company_id, del_status FROM damage_details WHERE del_status='Live' AND damage_quantity > 0
+                    ");
                 } catch (\Exception $e) {
                     \Log::error('Failed to refresh stock view after sale: ' . $e->getMessage());
                 }
 
+                // Business Club: Credit profit share to member's earned_balance
                 try {
                     if (!empty($request->customer_id) && $request->customer_id != 1) {
-                        $settings = \Modules\BusinessClub\Models\BusinessClubSetting::where('company_id', $companyId)->where('del_status', 'Live')->first();
-                        if ($settings && $settings->profit_percentage > 0 && $sale->grand_total >= $settings->minimum_bill_amount) {
+                        $bcService = app(\Modules\BusinessClub\Services\BusinessClubService::class);
+                        if ($bcService->isMember((int) $request->customer_id, $companyId)) {
                             $sale->load('saleDetails');
-                            $totalProfit = 0;
-                            foreach ($sale->saleDetails as $detail) {
-                                $profit = ($detail->menu_price_with_discount - $detail->purchase_price) * $detail->qty;
-                                if ($profit > 0) $totalProfit += $profit;
-                            }
-                            if ($totalProfit > 0) {
-                                $percentage = $settings->profit_percentage / 100;
-                                $creditAmount = round($totalProfit * $percentage, 2);
-                                if ($creditAmount > 0) {
-                                    $svc = app(\Modules\BusinessClub\Services\BusinessClubService::class);
-                                    $svc->creditWalletFromSale($request->customer_id, $totalProfit, $sale->id, $companyId);
-                                }
-                            }
+                            $bcService->creditProfitFromSale(
+                                (int) $request->customer_id,
+                                $sale->saleDetails,
+                                $sale->id,
+                                $companyId,
+                                (float) $grandTotal
+                            );
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::error('BusinessClub wallet credit failed: ' . $e->getMessage());
+                    \Log::error('BusinessClub profit credit failed: ' . $e->getMessage());
                 }
 
                 return response()->json([
@@ -2393,6 +2424,12 @@ class POSController extends Controller
             $promotionData['buy_qty'] = $promotion->qty;
             $promotionData['get_item_id'] = $promotion->get_item_id;
             $promotionData['get_qty'] = $promotion->get_qty;
+            $promotionData['tier_percentages'] = $promotion->tier_percentages
+                ? (is_array($promotion->tier_percentages) ? $promotion->tier_percentages : json_decode($promotion->tier_percentages, true))
+                : [];
+            $promotionData['flavour_alternatives'] = $promotion->flavour_alternatives
+                ? (is_array($promotion->flavour_alternatives) ? $promotion->flavour_alternatives : json_decode($promotion->flavour_alternatives, true))
+                : [];
         }
 
         return $promotionData;
@@ -3754,17 +3791,23 @@ class POSController extends Controller
                     $customer = Customer::find($validated['customer_id']);
                     if ($customer && $customer->name !== 'Walk-in Customer') {
                         $creditLimit = (float) ($customer->credit_limit ?? 0);
-                        if ($creditLimit > 0) {
-                            $currentDue = $this->customerService->getCustomerDue($customer->id, $outletId);
-                            $currentDue = max(0, $currentDue);
-                            $existingDue = (float) ($sale->due_amount ?? 0);
-                            $newTotalDue = $currentDue - $existingDue + $dueAmount;
-                            if ($newTotalDue > $creditLimit) {
-                                return response()->json([
-                                    'status' => 'error',
-                                    'message' => 'Customer credit limit exceeded. Credit limit: ' . number_format($creditLimit, 2) . ', New total due would be: ' . number_format($newTotalDue, 2) . '.',
-                                ], 422);
-                            }
+                        if ($creditLimit <= 0) {
+                            // No credit limit set = no credit/udhar allowed
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'This customer has no credit limit set. Due/credit (udhar) is not allowed. Please collect full payment.',
+                            ], 422);
+                        }
+                        // Credit limit > 0: check if new due would exceed it
+                        $currentDue = $this->customerService->getCustomerDue($customer->id, $outletId);
+                        $currentDue = max(0, $currentDue);
+                        $existingDue = (float) ($sale->due_amount ?? 0);
+                        $newTotalDue = $currentDue - $existingDue + $dueAmount;
+                        if ($newTotalDue > $creditLimit) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Customer credit limit exceeded. Credit limit: ' . number_format($creditLimit, 2) . ', New total due would be: ' . number_format($newTotalDue, 2) . '.',
+                            ], 422);
                         }
                     }
                 }
@@ -3779,6 +3822,20 @@ class POSController extends Controller
                 if ($saleVatObjectsJson === false) {
                     $saleVatObjectsJson = null;
                 }
+
+                // SAVINGS FEATURE: MRP total vs bill amount (sale update par bhi recalculate)
+                $mrpTotal = 0;
+                $productMap = Item::whereIn('id', collect($validated['cart_items'])->pluck('product_id')->unique())
+                    ->get(['id', 'mrp_price'])
+                    ->keyBy('id');
+                foreach ($validated['cart_items'] as $ci) {
+                    $mrpPrice = (float) ($productMap->get($ci['product_id'])->mrp_price ?? 0);
+                    if ($mrpPrice <= 0) {
+                        $mrpPrice = (float) ($ci['unit_price'] ?? 0);
+                    }
+                    $mrpTotal += (float) $ci['quantity'] * $mrpPrice;
+                }
+                $savings = max(0, $mrpTotal - $grandTotal);
 
                 $sale->update([
                     'customer_id' => $validated['customer_id'] ?? null,
@@ -3804,6 +3861,8 @@ class POSController extends Controller
                     'sub_total_discount_type' => $cartDiscountType,
                     'sale_vat_objects' => $saleVatObjectsJson,
                     'grand_total' => $grandTotal,
+                    'mrp_total' => round($mrpTotal, 3),
+                    'savings' => round($savings, 3),
                 ]);
 
                 $sale->saleDetails()->update(['del_status' => 'Deleted']);

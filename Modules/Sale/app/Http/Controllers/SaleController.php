@@ -206,16 +206,17 @@ class SaleController extends Controller
             // Render the view to HTML
             $html = view('sale::sale.a4-invoice-pdf', compact('sale'))->render();
 
-            // Configure mPDF
+            // Configure mPDF (80mm thermal width — same as desktop design)
             $mpdf = new \Mpdf\Mpdf([
                 'mode' => 'utf-8',
-                'format' => 'A4',
-                'margin_left' => 15,
-                'margin_right' => 15,
-                'margin_top' => 15,
-                'margin_bottom' => 15,
+                'format' => [80, 300],
+                'margin_left' => 2,
+                'margin_right' => 2,
+                'margin_top' => 3,
+                'margin_bottom' => 3,
                 'margin_header' => 0,
                 'margin_footer' => 0,
+                'auto_page_break' => true,
             ]);
 
             // Write HTML to PDF
