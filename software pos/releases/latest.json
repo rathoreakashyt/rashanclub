@@ -1,0 +1,13 @@
+{
+  "version": "1.2.2",
+  "minimum_version": "1.0.0",
+  "mandatory": false,
+  "download_url": "https://github.com/rathoreakashyt/rashanclub/releases/download/v1.2.2/RashanKiDukan-1.2.2.zip",
+  "sha256": "71a835c639074ed735cdbd05c3c3b887d6f39342565a45ebcc78a16381002306",
+  "release_date": "2026-09-25",
+  "release_notes": [
+    "Update system: latest.json ab cPanel se, download sirf GitHub se",
+    "Startup par update popup (pehle sirf badge dikhta tha)",
+    "Dedicated update log file — har step ka record"
+  ]
+}
