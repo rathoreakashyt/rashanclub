@@ -1,5 +1,5 @@
 CREATE TABLE `quotations` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
   `date` date DEFAULT NULL,
@@ -11,7 +11,8 @@ CREATE TABLE `quotations` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `discount` decimal(10,2) DEFAULT 0.00
+  `discount` decimal(10,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -21,7 +22,7 @@ CREATE TABLE `quotations` (
 --
 
 CREATE TABLE `quotation_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `quotation_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `unit_price` decimal(15,3) DEFAULT 0.000,
@@ -31,7 +32,8 @@ CREATE TABLE `quotation_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -41,7 +43,7 @@ CREATE TABLE `quotation_details` (
 --
 
 CREATE TABLE `racks` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
@@ -49,7 +51,8 @@ CREATE TABLE `racks` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -59,7 +62,7 @@ CREATE TABLE `racks` (
 --
 
 CREATE TABLE `registers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `opening_balance` decimal(15,2) DEFAULT 0.00,
   `opening_balance_date_time` datetime DEFAULT NULL,
   `closing_balance_date_time` datetime DEFAULT NULL,
@@ -84,7 +87,8 @@ CREATE TABLE `registers` (
   `counter_id` bigint(20) UNSIGNED DEFAULT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -94,11 +98,12 @@ CREATE TABLE `registers` (
 --
 
 CREATE TABLE `roles` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `guard_name` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

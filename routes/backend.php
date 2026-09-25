@@ -195,33 +195,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('refresh-stock-view', function () {
     try {
-        DB::statement("TRUNCATE TABLE view_stock_detail");
-        DB::statement("
-            INSERT INTO view_stock_detail (item_id, type, stock_quantity, outlet_id, company_id, del_status)
-            -- Purchases IN
-            SELECT item_id, 1, quantity_amount, outlet_id, company_id, del_status
-            FROM purchase_details WHERE del_status='Live' AND quantity_amount > 0
-            UNION ALL
-            -- Opening Stock IN
-            SELECT item_id, 1, stock_quantity, outlet_id, company_id, 'Live'
-            FROM set_opening_stocks WHERE stock_quantity > 0
-            UNION ALL
-            -- Sale Returns IN
-            SELECT item_id, 1, return_quantity_amount, outlet_id, company_id, del_status
-            FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-            UNION ALL
-            -- Sales OUT
-            SELECT item_id, 2, qty, outlet_id, company_id, del_status
-            FROM sale_details WHERE del_status='Live' AND qty > 0
-            UNION ALL
-            -- Purchase Returns OUT
-            SELECT item_id, 2, return_quantity_amount, outlet_id, company_id, del_status
-            FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-            UNION ALL
-            -- Damages OUT
-            SELECT item_id, 2, damage_quantity, outlet_id, company_id, del_status
-            FROM damage_details WHERE del_status='Live' AND damage_quantity > 0
-        ");
+        // Single canonical rebuild — atomic transaction ke andar (pehle wala
+        // TRUNCATE-then-INSERT fail hone par view khaali chhod jata tha).
+        // app/Services/StockLedgerService
+        \App\Services\StockLedgerService::rebuild();
         return response()->json(['status' => 'success', 'message' => 'Stock view refreshed successfully']);
     } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);

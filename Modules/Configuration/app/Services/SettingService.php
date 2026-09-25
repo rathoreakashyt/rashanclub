@@ -35,26 +35,30 @@ class SettingService
     public function updateBusinessSettings(array $data): array
     {
         $company = $this->companyRepository->getCurrentCompany();
+
+        if (!$company) {
+            throw new \Exception('Company not found. Please log out and log in again.');
+        }
         
         $updateData = [
-            'business_name' => $data['business_name'],
-            'address' => $data['address'],
-            'website' => $data['website'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
-            'date_format' => $data['date_format'],
-            'zone_name' => $data['zone_name'],
-            'currency' => $data['currency'],
-            'currency_position' => $data['currency_position'],
-            'precision' => $data['precision'],
-            'thousands_separator' => $data['thousands_separator'],
-            'decimals_separator' => $data['decimals_separator'],
-            'installment_days' => $data['installment_days'],
-            'e_commerce_checker' => $data['e_commerce_checker'],
-            'is_loyalty_enable' => $data['is_loyalty_enable'],
-            'minimum_point_to_redeem' => $data['minimum_point_to_redeem'],
-            'loyalty_rate' => $data['loyalty_rate'],
-            'product_code_start_from' => $data['product_code_start_from']
+            'business_name' => $data['business_name'] ?? null,
+            'address' => $data['address'] ?? null,
+            'website' => $data['website'] ?? null,
+            'email' => $data['email'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'date_format' => $data['date_format'] ?? null,
+            'zone_name' => $data['zone_name'] ?? null,
+            'currency' => $data['currency'] ?? null,
+            'currency_position' => $data['currency_position'] ?? null,
+            'precision' => $data['precision'] ?? 2,
+            'thousands_separator' => $data['thousands_separator'] ?? ',',
+            'decimals_separator' => $data['decimals_separator'] ?? '.',
+            'installment_days' => $data['installment_days'] ?? 3,
+            'e_commerce_checker' => $data['e_commerce_checker'] ?? 'No',
+            'is_loyalty_enable' => $data['is_loyalty_enable'] ?? 'Disable',
+            'minimum_point_to_redeem' => $data['minimum_point_to_redeem'] ?? 0,
+            'loyalty_rate' => $data['loyalty_rate'] ?? 0,
+            'product_code_start_from' => $data['product_code_start_from'] ?? 1,
         ];
 
         $this->companyRepository->update($company, $updateData);

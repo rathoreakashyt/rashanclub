@@ -1,5 +1,5 @@
 CREATE TABLE `pwa_settings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `app_name` varchar(255) DEFAULT NULL,
   `short_name` varchar(255) DEFAULT NULL,
@@ -8,7 +8,8 @@ CREATE TABLE `pwa_settings` (
   `logo` varchar(255) DEFAULT NULL,
   `start_url` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

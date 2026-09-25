@@ -1,5 +1,5 @@
 CREATE TABLE `companies` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `white_label` text DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE `companies` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `business_name` varchar(255) DEFAULT NULL,
   `short_name` varchar(50) DEFAULT NULL,
-  `currency_position` varchar(10) DEFAULT 'before',
+  `currency_position` varchar(50) DEFAULT 'before',
   `precision` int(11) DEFAULT 2,
   `zone_name` varchar(50) DEFAULT 'Asia/Kolkata',
   `default_customer` int(11) DEFAULT 1,
@@ -57,7 +57,7 @@ CREATE TABLE `companies` (
   `installment_days` int(11) DEFAULT 3,
   `minimum_point_to_redeem` decimal(15,2) DEFAULT 0.00,
   `loyalty_rate` decimal(5,2) DEFAULT 0.00,
-  `is_loyalty_enable` varchar(5) DEFAULT 'No',
+  `is_loyalty_enable` varchar(10) DEFAULT 'Disable',
   `website` varchar(255) DEFAULT NULL,
   `tax_registration_number` varchar(255) DEFAULT NULL,
   `company_name` varchar(255) DEFAULT NULL,
@@ -79,7 +79,8 @@ CREATE TABLE `companies` (
   `whatsapp_authkey` varchar(255) DEFAULT NULL,
   `payment_api_setting` text DEFAULT NULL,
   `zatca_configuration` text DEFAULT NULL,
-  `gst_api_key` varchar(255) DEFAULT NULL
+  `gst_api_key` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

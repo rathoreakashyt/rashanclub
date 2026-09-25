@@ -54,10 +54,14 @@ class CompanyRepository
     public function getCurrentCompany(): ?Company
     {
         $companyId = session('company.company_id');
-        if (!$companyId) {
-            return null;
+        if ($companyId) {
+            $company = $this->find($companyId);
+            if ($company) {
+                return $company;
+            }
         }
-        return $this->findOrFail($companyId);
+        // Fallback: get first company (for single-company setups)
+        return $this->model->where('del_status', 'Live')->first();
     }
 }
 

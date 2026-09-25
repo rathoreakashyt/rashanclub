@@ -1,5 +1,5 @@
 CREATE TABLE `salaries` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
   `month` int(11) DEFAULT NULL,
@@ -9,7 +9,8 @@ CREATE TABLE `salaries` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -19,7 +20,7 @@ CREATE TABLE `salaries` (
 --
 
 CREATE TABLE `salary_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `salary_id` bigint(20) UNSIGNED DEFAULT NULL,
   `employee_id` bigint(20) UNSIGNED DEFAULT NULL,
   `salary_amount` decimal(15,2) DEFAULT 0.00,
@@ -37,7 +38,8 @@ CREATE TABLE `salary_items` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -47,7 +49,7 @@ CREATE TABLE `salary_items` (
 --
 
 CREATE TABLE `salary_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `salary_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_method_id` bigint(20) UNSIGNED DEFAULT NULL,
   `amount` decimal(15,2) DEFAULT 0.00,
@@ -55,7 +57,8 @@ CREATE TABLE `salary_payments` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -65,7 +68,7 @@ CREATE TABLE `salary_payments` (
 --
 
 CREATE TABLE `sales` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `invoice_no` varchar(255) DEFAULT NULL,
   `sale_no` varchar(255) DEFAULT NULL,
   `total_items` int(11) DEFAULT NULL,
@@ -133,7 +136,8 @@ CREATE TABLE `sales` (
   `table_no` varchar(50) DEFAULT NULL,
   `booking_id` bigint(20) UNSIGNED DEFAULT NULL,
   `sub_total_discount_type` varchar(20) DEFAULT 'flat',
-  `delivery_status` varchar(50) DEFAULT NULL
+  `delivery_status` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -143,7 +147,7 @@ CREATE TABLE `sales` (
 --
 
 CREATE TABLE `sale_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sales_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `qty` decimal(15,3) DEFAULT 0.000,
@@ -168,7 +172,8 @@ CREATE TABLE `sale_details` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `discount_type` varchar(20) DEFAULT 'flat'
+  `discount_type` varchar(20) DEFAULT 'flat',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -178,7 +183,7 @@ CREATE TABLE `sale_details` (
 --
 
 CREATE TABLE `sale_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_id` bigint(20) UNSIGNED DEFAULT NULL,
   `date` date DEFAULT NULL,
@@ -193,7 +198,8 @@ CREATE TABLE `sale_payments` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `reference_no` varchar(255) DEFAULT NULL
+  `reference_no` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -203,7 +209,7 @@ CREATE TABLE `sale_payments` (
 --
 
 CREATE TABLE `sale_returns` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -219,7 +225,8 @@ CREATE TABLE `sale_returns` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `local_id` varchar(100) DEFAULT NULL
+  `local_id` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -229,7 +236,7 @@ CREATE TABLE `sale_returns` (
 --
 
 CREATE TABLE `sale_return_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sale_return_id` bigint(20) UNSIGNED DEFAULT NULL,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -242,7 +249,8 @@ CREATE TABLE `sale_return_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -252,7 +260,7 @@ CREATE TABLE `sale_return_details` (
 --
 
 CREATE TABLE `servicings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `product_name` varchar(255) DEFAULT NULL,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -272,7 +280,8 @@ CREATE TABLE `servicings` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `current_status` varchar(50) DEFAULT 'pending'
+  `current_status` varchar(50) DEFAULT 'pending',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -297,7 +306,7 @@ CREATE TABLE `sessions` (
 --
 
 CREATE TABLE `set_opening_stocks` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_type` varchar(50) DEFAULT NULL,
   `item_description` text DEFAULT NULL,
@@ -306,7 +315,8 @@ CREATE TABLE `set_opening_stocks` (
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -316,12 +326,13 @@ CREATE TABLE `set_opening_stocks` (
 --
 
 CREATE TABLE `states` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `state_code` varchar(10) DEFAULT NULL,
   `state_name` varchar(255) DEFAULT NULL,
   `type` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -331,7 +342,7 @@ CREATE TABLE `states` (
 --
 
 CREATE TABLE `suppliers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `company_name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -357,7 +368,8 @@ CREATE TABLE `suppliers` (
   `current_balance` decimal(15,2) DEFAULT 0.00,
   `tax_number` varchar(255) DEFAULT NULL,
   `contact_person` varchar(255) DEFAULT NULL,
-  `vat_number` varchar(100) DEFAULT NULL
+  `vat_number` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -367,7 +379,7 @@ CREATE TABLE `suppliers` (
 --
 
 CREATE TABLE `supplier_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_method_id` bigint(20) UNSIGNED DEFAULT NULL,
   `amount` decimal(15,3) DEFAULT 0.000,
@@ -379,7 +391,8 @@ CREATE TABLE `supplier_payments` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `reference_no` varchar(255) DEFAULT NULL,
-  `outlet_id` bigint(20) UNSIGNED DEFAULT NULL
+  `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -389,7 +402,7 @@ CREATE TABLE `supplier_payments` (
 --
 
 CREATE TABLE `sync_conflicts` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `outlet_id` bigint(20) UNSIGNED NOT NULL,
   `device_id` varchar(100) DEFAULT NULL,
@@ -402,7 +415,8 @@ CREATE TABLE `sync_conflicts` (
   `existing_updated_at` datetime DEFAULT NULL,
   `resolution` varchar(20) DEFAULT 'server_won',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -412,7 +426,7 @@ CREATE TABLE `sync_conflicts` (
 --
 
 CREATE TABLE `sync_dead_letters` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `device_id` varchar(100) DEFAULT '',
   `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
   `entity_type` varchar(60) DEFAULT '',
@@ -423,7 +437,8 @@ CREATE TABLE `sync_dead_letters` (
   `first_failed_at` timestamp NULL DEFAULT NULL,
   `last_failed_at` timestamp NULL DEFAULT NULL,
   `resolved` tinyint(1) DEFAULT 0,
-  `resolved_at` timestamp NULL DEFAULT NULL
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

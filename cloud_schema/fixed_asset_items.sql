@@ -1,5 +1,5 @@
 CREATE TABLE `fixed_asset_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
@@ -13,7 +13,8 @@ CREATE TABLE `fixed_asset_items` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `category` varchar(100) DEFAULT NULL,
-  `purchase_date` date DEFAULT NULL
+  `purchase_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -23,7 +24,7 @@ CREATE TABLE `fixed_asset_items` (
 --
 
 CREATE TABLE `fixed_asset_stock_ins` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `grand_total` decimal(15,3) DEFAULT 0.000,
@@ -33,7 +34,8 @@ CREATE TABLE `fixed_asset_stock_ins` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -43,7 +45,7 @@ CREATE TABLE `fixed_asset_stock_ins` (
 --
 
 CREATE TABLE `fixed_asset_stock_in_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `asset_stock_in_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `unit_price` decimal(15,3) DEFAULT 0.000,
@@ -54,7 +56,8 @@ CREATE TABLE `fixed_asset_stock_in_details` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `quantity` decimal(10,2) DEFAULT 0.00
+  `quantity` decimal(10,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -64,7 +67,7 @@ CREATE TABLE `fixed_asset_stock_in_details` (
 --
 
 CREATE TABLE `fixed_asset_stock_outs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `grand_total` decimal(15,3) DEFAULT 0.000,
@@ -74,7 +77,8 @@ CREATE TABLE `fixed_asset_stock_outs` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -84,7 +88,7 @@ CREATE TABLE `fixed_asset_stock_outs` (
 --
 
 CREATE TABLE `fixed_asset_stock_out_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `asset_stock_out_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `unit_price` decimal(15,3) DEFAULT 0.000,
@@ -96,7 +100,8 @@ CREATE TABLE `fixed_asset_stock_out_details` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `quantity` decimal(10,2) DEFAULT 0.00,
-  `reason` text DEFAULT NULL
+  `reason` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -106,13 +111,14 @@ CREATE TABLE `fixed_asset_stock_out_details` (
 --
 
 CREATE TABLE `gst_cache` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `gstin` varchar(15) NOT NULL,
   `legal_name` varchar(255) DEFAULT NULL,
   `trade_name` varchar(255) DEFAULT NULL,
   `status` varchar(50) DEFAULT NULL,
   `address` text DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT current_timestamp()
+  `updated_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -122,7 +128,7 @@ CREATE TABLE `gst_cache` (
 --
 
 CREATE TABLE `holds` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `invoice_no` varchar(255) DEFAULT NULL,
   `hold_no` varchar(255) DEFAULT NULL,
   `sale_date` date DEFAULT NULL,
@@ -152,7 +158,8 @@ CREATE TABLE `holds` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `counter_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `sub_total_discount_type` varchar(20) DEFAULT 'flat'
+  `sub_total_discount_type` varchar(20) DEFAULT 'flat',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -162,7 +169,7 @@ CREATE TABLE `holds` (
 --
 
 CREATE TABLE `hold_combo_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `combo_sale_item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `combo_item_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -175,7 +182,8 @@ CREATE TABLE `hold_combo_items` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -185,7 +193,7 @@ CREATE TABLE `hold_combo_items` (
 --
 
 CREATE TABLE `hold_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `holds_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `qty` decimal(15,3) DEFAULT 0.000,
@@ -205,7 +213,8 @@ CREATE TABLE `hold_details` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `discount_type` varchar(20) DEFAULT 'flat'
+  `discount_type` varchar(20) DEFAULT 'flat',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -215,12 +224,13 @@ CREATE TABLE `hold_details` (
 --
 
 CREATE TABLE `idempotency_keys` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
   `device_id` varchar(100) DEFAULT '',
   `response_snapshot` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`response_snapshot`)),
   `expires_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

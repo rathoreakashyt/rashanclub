@@ -1,5 +1,5 @@
 CREATE TABLE `variations` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `variation_name` varchar(255) DEFAULT NULL,
   `variation_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`variation_value`)),
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -7,7 +7,8 @@ CREATE TABLE `variations` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -32,7 +33,7 @@ CREATE TABLE `view_stock_detail` (
 --
 
 CREATE TABLE `wallet_transactions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `wallet_id` bigint(20) UNSIGNED NOT NULL,
   `customer_id` bigint(20) UNSIGNED NOT NULL,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -45,7 +46,8 @@ CREATE TABLE `wallet_transactions` (
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -55,7 +57,7 @@ CREATE TABLE `wallet_transactions` (
 --
 
 CREATE TABLE `warranties` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `product_name` varchar(255) DEFAULT NULL,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -73,7 +75,8 @@ CREATE TABLE `warranties` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `item_name` varchar(255) DEFAULT NULL,
   `item_model` varchar(255) DEFAULT NULL,
-  `serial_no` varchar(255) DEFAULT NULL
+  `serial_no` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -83,7 +86,7 @@ CREATE TABLE `warranties` (
 --
 
 CREATE TABLE `zatca_invoices` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT NULL,
   `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -106,7 +109,8 @@ CREATE TABLE `zatca_invoices` (
   `is_offline` tinyint(1) DEFAULT 0,
   `queued_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -116,7 +120,7 @@ CREATE TABLE `zatca_invoices` (
 --
 
 CREATE TABLE `zatca_requests` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `zatca_invoice_id` bigint(20) UNSIGNED DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT NULL,
   `request_type` varchar(50) DEFAULT NULL,
@@ -134,7 +138,8 @@ CREATE TABLE `zatca_requests` (
   `responded_at` datetime DEFAULT NULL,
   `response_time_ms` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

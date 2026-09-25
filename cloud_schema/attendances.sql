@@ -1,5 +1,5 @@
 CREATE TABLE `attendances` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `employee_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -10,7 +10,8 @@ CREATE TABLE `attendances` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -20,7 +21,7 @@ CREATE TABLE `attendances` (
 --
 
 CREATE TABLE `bookings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
   `service_seller_id` bigint(20) UNSIGNED DEFAULT NULL,
   `start_date` datetime DEFAULT NULL,
@@ -34,7 +35,8 @@ CREATE TABLE `bookings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `service_note` text DEFAULT NULL
+  `service_note` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -44,7 +46,7 @@ CREATE TABLE `bookings` (
 --
 
 CREATE TABLE `brands` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
@@ -52,7 +54,8 @@ CREATE TABLE `brands` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -62,7 +65,7 @@ CREATE TABLE `brands` (
 --
 
 CREATE TABLE `business_club_members` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `member_id` varchar(20) NOT NULL,
   `customer_id` bigint(20) UNSIGNED NOT NULL,
   `company_id` bigint(20) UNSIGNED NOT NULL,
@@ -75,7 +78,8 @@ CREATE TABLE `business_club_members` (
   `joined_at` datetime DEFAULT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -85,7 +89,7 @@ CREATE TABLE `business_club_members` (
 --
 
 CREATE TABLE `business_club_settings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_name` varchar(255) DEFAULT NULL,
   `business_partner_name` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
@@ -103,7 +107,8 @@ CREATE TABLE `business_club_settings` (
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -113,7 +118,7 @@ CREATE TABLE `business_club_settings` (
 --
 
 CREATE TABLE `business_club_transactions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `member_id` bigint(20) UNSIGNED NOT NULL,
   `customer_id` bigint(20) UNSIGNED NOT NULL,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -126,7 +131,8 @@ CREATE TABLE `business_club_transactions` (
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -160,7 +166,7 @@ CREATE TABLE `cache_locks` (
 --
 
 CREATE TABLE `combo_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `combo_item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `quantity` decimal(15,3) DEFAULT 0.000,
@@ -170,7 +176,8 @@ CREATE TABLE `combo_items` (
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -180,7 +187,7 @@ CREATE TABLE `combo_items` (
 --
 
 CREATE TABLE `combo_sales` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `combo_sale_item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `combo_item_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -193,7 +200,8 @@ CREATE TABLE `combo_sales` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -203,7 +211,7 @@ CREATE TABLE `combo_sales` (
 --
 
 CREATE TABLE `companies` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `white_label` text DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -283,7 +291,8 @@ CREATE TABLE `companies` (
   `whatsapp_authkey` varchar(255) DEFAULT NULL,
   `payment_api_setting` text DEFAULT NULL,
   `zatca_configuration` text DEFAULT NULL,
-  `gst_api_key` varchar(255) DEFAULT NULL
+  `gst_api_key` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

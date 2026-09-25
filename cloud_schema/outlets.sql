@@ -1,5 +1,5 @@
 CREATE TABLE `outlets` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `outlet_name` varchar(255) DEFAULT NULL,
   `outlet_code` varchar(20) DEFAULT NULL,
@@ -16,7 +16,8 @@ CREATE TABLE `outlets` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

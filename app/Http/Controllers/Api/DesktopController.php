@@ -3681,144 +3681,46 @@ class DesktopController extends Controller
         set_time_limit(300);
 
         try {
-            $service  = new \App\Services\BusyNotifyService();
-            $busyData = $service->getProducts(); // ~60s network fetch
-            $now      = now()->toDateTimeString();
-            $imported = 0; $updated = 0; $skipped = 0; $errors = [];
+            // EK HI CODE PATH: scheduler wali `busy:import` command chalao.
+            // Is endpoint me uska copy-paste tha jo diverge ho chuka tha — usme
+            // unit text ID ki jagah raw tha, category resolve nahi hota tha,
+            // stock ledger (view_stock_detail) sync hota hi nahi tha aur view
+            // rebuild non-atomic (TRUNCATE+INSERT) thi jisse fail par sab stock
+            // zero dikhta tha. Ab dono jagah wahi (hardened) logic chalti hai.
+            \Illuminate\Support\Facades\Artisan::call('busy:import', [
+                '--type'    => 'products',
+                '--company' => $this->companyId,
+                '--outlet'  => $this->outletId,
+                '--user'    => $this->userId,
+            ]);
+            $output = \Illuminate\Support\Facades\Artisan::output();
 
-            // 1. Pre-load lookup maps (fast in-memory dedup)
-            $byBusyId = DB::table('items')->where('company_id', $this->companyId)
-                ->whereNotNull('busy_id')->pluck('id', 'busy_id');
-            $byCode = DB::table('items')->where('company_id', $this->companyId)
-                ->where('del_status', 'Live')->whereNotNull('code')
-                ->where('code', '!=', DB::raw('`name`'))->pluck('id', 'code');
-            $byName = DB::table('items')->where('company_id', $this->companyId)
-                ->where('del_status', 'Live')->pluck('id', 'name');
-            $existingStocks = DB::table('set_opening_stocks')
-                ->where('company_id', $this->companyId)
-                ->where('item_description', 'BusyNotify Import')->pluck('id', 'item_id');
-
-            // 2. Build update/insert lists
-            $updateMap = []; $insertRows = []; $stockCase = []; $newStocks = [];
-
-            foreach ($busyData as $row) {
-                $mapped = \App\Services\BusyNotifyService::mapProduct($row);
-                if (empty($mapped['name'])) { $skipped++; continue; }
-                $mapped['company_id'] = $this->companyId;
-                $mapped['user_id']    = $this->userId;
-                $mapped['updated_at'] = $now;
-                $stock = (float)($row['product_stock'] ?? 0);
-
-                $existingId = null;
-                if (!empty($mapped['busy_id'])) $existingId = $byBusyId[$mapped['busy_id']] ?? null;
-                if (!$existingId && !empty($mapped['code']) && $mapped['code'] !== $mapped['name'])
-                    $existingId = $byCode[$mapped['code']] ?? null;
-                if (!$existingId && !empty($mapped['name']))
-                    $existingId = $byName[$mapped['name']] ?? null;
-
-                if ($existingId) {
-                    $updateMap[$existingId] = ['data' => $mapped, 'stock' => $stock];
-                    $stockCase[$existingId] = $stock;
-                    if (!isset($existingStocks[$existingId]) && $stock > 0) {
-                        $newStocks[] = ['item_id'=>$existingId,'item_type'=>'opening',
-                            'item_description'=>'BusyNotify Import','stock_quantity'=>$stock,
-                            'outlet_id'=>$this->outletId,'user_id'=>$this->userId,
-                            'company_id'=>$this->companyId,'created_at'=>$now,'updated_at'=>$now];
-                    }
-                    $updated++;
-                } else {
-                    $mapped['del_status']='Live'; $mapped['created_at']=$now;
-                    $mapped['enable_disable_status']=1; $mapped['stock_quantity']=$stock;
-                    $mapped['_stock']=$stock;
-                    $insertRows[] = $mapped; $imported++;
-                }
+            $imported = $updated = $totalRows = 0;
+            if (preg_match('/Items: (\d+) new, (\d+) updated/', $output, $m)) {
+                $imported = (int) $m[1];
+                $updated  = (int) $m[2];
+            }
+            if (preg_match('/Fetched: (\d+)/', $output, $m)) {
+                $totalRows = (int) $m[1];
             }
 
-            // 3. Batch UPDATE items via CASE (all 11k in ~2 queries)
-            foreach (array_chunk($updateMap, 2000, true) as $chunk) {
-                $ids = implode(',', array_keys($chunk));
-                $nameCases=$priceCases=$stockCases=$busyCases=$codeCases='';
-                foreach ($chunk as $id => $info) {
-                    $m = $info['data'];
-                    $nm = str_replace("'","''",$m['name']??'');
-                    $nameCases  .=" WHEN $id THEN '$nm'";
-                    $priceCases .=" WHEN $id THEN ".(float)($m['sale_price']??0);
-                    $ppCases    .=" WHEN $id THEN ".(float)($m['purchase_price']??0);
-                    $mrpCases   .=" WHEN $id THEN ".(float)($m['mrp_price']??0);
-                    $stockCases .=" WHEN $id THEN ".$info['stock'];
-                    $bid=(int)($m['busy_id']??0);
-                    $busyCases .=" WHEN $id THEN ".($bid>0?$bid:"busy_id");
-                    // Alias (barcode) se code backfill — sirf tab jab existing code
-                    // placeholder ho (empty ya name). User ka manual code na toote.
-                    if (!empty($m['code']) && $m['code'] !== $m['name']) {
-                        $cd = str_replace("'","''",$m['code']);
-                        $codeCases .=" WHEN $id THEN '$cd'";
-                    }
-                }
-                try {
-                    $codeSql = $codeCases !== ''
-                        ? "`code`=CASE WHEN (`code` IS NULL OR `code`='' OR `code`=`name`) THEN CASE `id`$codeCases ELSE `code` END ELSE `code` END,"
-                        : "";
-                    DB::statement("UPDATE `items` SET
-                        `name`=CASE `id`$nameCases ELSE `name` END,
-                        $codeSql
-                        `sale_price`=CASE `id`$priceCases ELSE `sale_price` END,
-                        `purchase_price`=CASE `id`$ppCases ELSE `purchase_price` END,
-                        `mrp_price`=CASE `id`$mrpCases ELSE `mrp_price` END,
-                        `stock_quantity`=CASE `id`$stockCases ELSE `stock_quantity` END,
-                        `busy_id`=CASE `id`$busyCases ELSE `busy_id` END,
-                        `updated_at`='$now'
-                        WHERE `id` IN($ids) AND `company_id`={$this->companyId}");
-                } catch (\Throwable $e) { $errors[]="item update: ".$e->getMessage(); }
-            }
-
-            // 4. Batch UPDATE set_opening_stocks via CASE
-            foreach (array_chunk($stockCase, 2000, true) as $chunk) {
-                $ids=implode(',',array_keys($chunk)); $case='';
-                foreach ($chunk as $id=>$qty) $case.=" WHEN $id THEN $qty";
-                try { DB::statement("UPDATE `set_opening_stocks` SET `stock_quantity`=CASE `item_id`$case ELSE `stock_quantity` END,`updated_at`='$now' WHERE `item_id` IN($ids) AND `company_id`={$this->companyId} AND `item_description`='BusyNotify Import'");
-                } catch (\Throwable $e) { $errors[]="stock update: ".$e->getMessage(); }
-            }
-
-            // 5. Batch INSERT new items
-            foreach (array_chunk($insertRows, 200) as $chunk) {
-                try {
-                    $rows=array_map(fn($r)=>['row'=>array_diff_key($r,['_stock'=>1]),'stock'=>$r['_stock']],$chunk);
-                    DB::table('items')->insert(array_column($rows,'row'));
-                    foreach ($rows as $r) {
-                        if ($r['stock']<=0) continue;
-                        $m=$r['row'];
-                        $newId=!empty($m['busy_id'])?DB::table('items')->where('busy_id',$m['busy_id'])->where('company_id',$this->companyId)->value('id'):null;
-                        if (!$newId&&!empty($m['code'])) $newId=DB::table('items')->where('code',$m['code'])->where('company_id',$this->companyId)->value('id');
-                        if ($newId) $newStocks[]=['item_id'=>$newId,'item_type'=>'opening','item_description'=>'BusyNotify Import','stock_quantity'=>$r['stock'],'outlet_id'=>$this->outletId,'user_id'=>$this->userId,'company_id'=>$this->companyId,'created_at'=>$now,'updated_at'=>$now];
-                    }
-                } catch (\Throwable $e) { $errors[]="item insert: ".$e->getMessage(); }
-            }
-
-            // 6. Batch INSERT new stock rows
-            foreach (array_chunk($newStocks,500) as $chunk) {
-                try { DB::table('set_opening_stocks')->insert($chunk); }
-                catch (\Throwable $e) { $errors[]="stock insert: ".$e->getMessage(); }
-            }
-
-            // 7. Stock view rebuild
-            try {
-                DB::statement('TRUNCATE TABLE view_stock_detail');
-                DB::statement("INSERT INTO view_stock_detail (item_id,type,stock_quantity,outlet_id,company_id,del_status)
-                    SELECT item_id,1,quantity_amount,outlet_id,company_id,del_status FROM purchase_details WHERE del_status='Live' AND quantity_amount>0
-                    UNION ALL SELECT item_id,1,stock_quantity,outlet_id,company_id,'Live' FROM set_opening_stocks WHERE stock_quantity>0
-                    UNION ALL SELECT item_id,1,return_quantity_amount,outlet_id,company_id,del_status FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount>0
-                    UNION ALL SELECT item_id,2,qty,outlet_id,company_id,del_status FROM sale_details WHERE del_status='Live' AND qty>0
-                    UNION ALL SELECT item_id,2,return_quantity_amount,outlet_id,company_id,del_status FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount>0
-                    UNION ALL SELECT item_id,2,damage_quantity,outlet_id,company_id,del_status FROM damage_details WHERE del_status='Live' AND damage_quantity>0");
-            } catch (\Throwable $e2) {}
-
-            return response()->json(['success'=>true,'imported'=>$imported,'updated'=>$updated,'skipped'=>$skipped,'total_rows'=>count($busyData),'errors'=>array_slice($errors,0,10),'message'=>"Items: {$imported} naye, {$updated} update"]);
+            return response()->json([
+                'success'    => true,
+                'imported'   => $imported,
+                'updated'    => $updated,
+                'skipped'    => 0,
+                'total_rows' => $totalRows,
+                'errors'     => [],
+                'message'    => "Items: {$imported} naye, {$updated} update",
+                'log'        => $output,
+            ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Desktop BusyNotify products import failed', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+
 
     /**
      * POST /api/desktop/busy-import/all
@@ -3835,7 +3737,12 @@ class DesktopController extends Controller
 
         try {
             // Run via Artisan (avoids FPM worker queue issue, uses CLI path)
-            \Illuminate\Support\Facades\Artisan::call('busy:import', ['--type' => 'all']);
+            \Illuminate\Support\Facades\Artisan::call('busy:import', [
+                '--type'    => 'all',
+                '--company' => $this->companyId,
+                '--outlet'  => $this->outletId,
+                '--user'    => $this->userId,
+            ]);
             $output = \Illuminate\Support\Facades\Artisan::output();
 
             // Parse counts from output
@@ -3922,8 +3829,13 @@ class DesktopController extends Controller
 
         try {
             // Background mein chalao — response wait nahi karega
-            dispatch(function () {
-                \Illuminate\Support\Facades\Artisan::call('busy:sync-stock');
+            $companyId = $this->companyId;
+            $outletId  = $this->outletId;
+            dispatch(function () use ($companyId, $outletId) {
+                \Illuminate\Support\Facades\Artisan::call('busy:sync-stock', [
+                    '--company' => $companyId,
+                    '--outlet'  => $outletId,
+                ]);
             })->afterResponse();
 
             return response()->json([

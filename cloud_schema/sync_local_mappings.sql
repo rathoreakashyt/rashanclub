@@ -1,5 +1,5 @@
 CREATE TABLE `sync_local_mappings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `entity_type` varchar(100) NOT NULL,
   `local_id` bigint(20) NOT NULL,
   `server_id` bigint(20) NOT NULL,
@@ -8,7 +8,8 @@ CREATE TABLE `sync_local_mappings` (
   `device_id` varchar(64) DEFAULT '',
   `local_ref` varchar(100) DEFAULT '',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

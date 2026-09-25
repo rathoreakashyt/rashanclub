@@ -1478,15 +1478,10 @@ class POSController extends Controller
                 }
 
                 try {
-                    DB::statement("DELETE FROM view_stock_detail");
-                    DB::statement("INSERT INTO view_stock_detail (item_id, type, stock_quantity, outlet_id, company_id, del_status)
-                        SELECT item_id, 1, quantity_amount, outlet_id, company_id, del_status FROM purchase_details WHERE del_status='Live' AND quantity_amount > 0
-                        UNION ALL SELECT item_id, 1, stock_quantity, outlet_id, company_id, 'Live' FROM set_opening_stocks WHERE stock_quantity > 0 OR item_description LIKE 'SYNC_ADJ%'
-                        UNION ALL SELECT item_id, 1, return_quantity_amount, outlet_id, company_id, del_status FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-                        UNION ALL SELECT item_id, 2, qty, outlet_id, company_id, del_status FROM sale_details WHERE del_status='Live' AND qty > 0
-                        UNION ALL SELECT item_id, 2, return_quantity_amount, outlet_id, company_id, del_status FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-                        UNION ALL SELECT item_id, 2, damage_quantity, outlet_id, company_id, del_status FROM damage_details WHERE del_status='Live' AND damage_quantity > 0
-                    ");
+                    // Single canonical rebuild (atomic) — app/Services/StockLedgerService.
+                    // Pehle yahan apni TRUNCATE+INSERT copy thi jo fail hone par
+                    // poora view khaali chhod jati thi (sab stock 0).
+                    \App\Services\StockLedgerService::rebuild();
                 } catch (\Exception $e) {
                     \Log::error('Failed to refresh stock view after sale: ' . $e->getMessage());
                 }

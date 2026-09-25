@@ -83,6 +83,10 @@ class SettingController extends Controller
             $result = $this->settingService->updateBusinessSettings($request->validated());
             return response()->json($result, 201);
         } catch (\Exception $e) {
+            \Log::error('businessSetting failed: ' . $e->getMessage(), [
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => collect($e->getTrace())->take(3)->toArray(),
+            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to save business settings',
@@ -100,6 +104,10 @@ class SettingController extends Controller
             $result = $this->settingService->updatePosSettings($request->all());
             return response()->json($result, 201);
         } catch (\Exception $e) {
+            \Log::error('posSetting failed: ' . $e->getMessage(), [
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => collect($e->getTrace())->take(3)->toArray(),
+            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to save POS settings',

@@ -1,5 +1,5 @@
 CREATE TABLE `payment_methods` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `account_type` varchar(50) DEFAULT NULL,
   `type` varchar(50) DEFAULT NULL,
@@ -14,7 +14,8 @@ CREATE TABLE `payment_methods` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `sync_version` bigint(20) UNSIGNED DEFAULT 1,
-  `current_balance` decimal(15,2) DEFAULT 0.00
+  `current_balance` decimal(15,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

@@ -1,5 +1,5 @@
 CREATE TABLE `price_lists` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` varchar(500) DEFAULT NULL,
   `customer_type` varchar(20) DEFAULT NULL,
@@ -9,7 +9,8 @@ CREATE TABLE `price_lists` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -19,7 +20,7 @@ CREATE TABLE `price_lists` (
 --
 
 CREATE TABLE `price_list_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `price_list_id` bigint(20) UNSIGNED NOT NULL,
   `item_id` bigint(20) UNSIGNED NOT NULL,
   `price` decimal(15,3) DEFAULT 0.000,
@@ -28,7 +29,8 @@ CREATE TABLE `price_list_items` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -38,7 +40,7 @@ CREATE TABLE `price_list_items` (
 --
 
 CREATE TABLE `printers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `type` varchar(50) DEFAULT NULL,
   `connection_type` varchar(50) DEFAULT NULL,
@@ -49,7 +51,8 @@ CREATE TABLE `printers` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -59,7 +62,7 @@ CREATE TABLE `printers` (
 --
 
 CREATE TABLE `promotions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `type` varchar(50) DEFAULT NULL,
   `scheme_basis` varchar(50) DEFAULT 'item',
@@ -107,7 +110,8 @@ CREATE TABLE `promotions` (
   `usage_count` int(11) DEFAULT 0,
   `description` text DEFAULT NULL,
   `applicable_brands` text DEFAULT NULL,
-  `applicable_days` varchar(100) DEFAULT NULL
+  `applicable_days` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -117,7 +121,7 @@ CREATE TABLE `promotions` (
 --
 
 CREATE TABLE `purchases` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `invoice_no` varchar(255) DEFAULT NULL,
   `supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -149,7 +153,8 @@ CREATE TABLE `purchases` (
   `due_date` date DEFAULT NULL,
   `reference` varchar(255) DEFAULT NULL,
   `discount_type` varchar(20) DEFAULT NULL,
-  `status` varchar(50) DEFAULT 'received'
+  `status` varchar(50) DEFAULT 'received',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -159,7 +164,7 @@ CREATE TABLE `purchases` (
 --
 
 CREATE TABLE `purchase_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `purchase_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_type` varchar(50) DEFAULT NULL,
@@ -172,7 +177,8 @@ CREATE TABLE `purchase_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -182,7 +188,7 @@ CREATE TABLE `purchase_details` (
 --
 
 CREATE TABLE `purchase_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `purchase_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_id` bigint(20) UNSIGNED DEFAULT NULL,
   `date` date DEFAULT NULL,
@@ -193,7 +199,8 @@ CREATE TABLE `purchase_payments` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `reference_no` varchar(255) DEFAULT NULL
+  `reference_no` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -203,7 +210,7 @@ CREATE TABLE `purchase_payments` (
 --
 
 CREATE TABLE `purchase_returns` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `pur_ref_no` varchar(255) DEFAULT NULL,
   `supplier_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -220,7 +227,8 @@ CREATE TABLE `purchase_returns` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -230,7 +238,7 @@ CREATE TABLE `purchase_returns` (
 --
 
 CREATE TABLE `purchase_return_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `pur_return_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_type` varchar(50) DEFAULT NULL,
@@ -246,7 +254,8 @@ CREATE TABLE `purchase_return_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -256,7 +265,7 @@ CREATE TABLE `purchase_return_details` (
 --
 
 CREATE TABLE `pwa_settings` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `app_name` varchar(255) DEFAULT NULL,
   `short_name` varchar(255) DEFAULT NULL,
@@ -265,7 +274,8 @@ CREATE TABLE `pwa_settings` (
   `logo` varchar(255) DEFAULT NULL,
   `start_url` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

@@ -1,5 +1,5 @@
 CREATE TABLE `installment_sales` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -24,7 +24,8 @@ CREATE TABLE `installment_sales` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `payment_method_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `discount` decimal(10,2) DEFAULT 0.00
+  `discount` decimal(10,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -34,7 +35,7 @@ CREATE TABLE `installment_sales` (
 --
 
 CREATE TABLE `installment_sale_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `installment_sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_date` date DEFAULT NULL,
   `paid_date` date DEFAULT NULL,
@@ -47,7 +48,8 @@ CREATE TABLE `installment_sale_details` (
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -57,7 +59,7 @@ CREATE TABLE `installment_sale_details` (
 --
 
 CREATE TABLE `installment_sale_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `installment_sale_id` bigint(20) UNSIGNED DEFAULT NULL,
   `installment_sale_detail_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_date` date DEFAULT NULL,
@@ -70,7 +72,8 @@ CREATE TABLE `installment_sale_payments` (
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -80,7 +83,7 @@ CREATE TABLE `installment_sale_payments` (
 --
 
 CREATE TABLE `invoice_hash_chain` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id` bigint(20) UNSIGNED DEFAULT NULL,
   `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
   `previous_hash` varchar(255) DEFAULT NULL,
@@ -88,7 +91,8 @@ CREATE TABLE `invoice_hash_chain` (
   `zatca_invoice_id` bigint(20) UNSIGNED DEFAULT NULL,
   `chain_index` int(11) DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -98,7 +102,7 @@ CREATE TABLE `invoice_hash_chain` (
 --
 
 CREATE TABLE `items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `busy_id` bigint(20) UNSIGNED DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
@@ -157,7 +161,8 @@ CREATE TABLE `items` (
   `is_imei` tinyint(1) DEFAULT 0,
   `barcode` varchar(255) DEFAULT NULL,
   `serial_number_needed` tinyint(1) DEFAULT 0,
-  `image` varchar(255) DEFAULT NULL
+  `image` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -167,7 +172,7 @@ CREATE TABLE `items` (
 --
 
 CREATE TABLE `item_categories` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `sort_id` int(11) DEFAULT 0,
@@ -177,7 +182,8 @@ CREATE TABLE `item_categories` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `sync_version` bigint(20) UNSIGNED DEFAULT 1,
-  `parent_id` bigint(20) UNSIGNED DEFAULT NULL
+  `parent_id` bigint(20) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -187,13 +193,14 @@ CREATE TABLE `item_categories` (
 --
 
 CREATE TABLE `local_id_map` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `entity_type` varchar(50) NOT NULL,
   `local_id` varchar(100) NOT NULL,
   `local_code` varchar(100) DEFAULT NULL,
   `server_id` bigint(20) UNSIGNED NOT NULL,
   `device_id` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp()
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -203,7 +210,7 @@ CREATE TABLE `local_id_map` (
 --
 
 CREATE TABLE `marketing_logs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `channel` varchar(20) NOT NULL,
@@ -213,7 +220,8 @@ CREATE TABLE `marketing_logs` (
   `status` varchar(20) DEFAULT 'pending',
   `error` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

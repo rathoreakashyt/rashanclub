@@ -28,6 +28,8 @@ class BusyNotifyService
     protected string $apiKey;
     protected ?int $companyId;
     private string $financialYear;
+    /** Last response ka metadata (rowCount etc.) — truncation check ke liye. */
+    private array $lastMeta = [];
 
     public function __construct(?string $tokenOverride = null)
     {
@@ -121,12 +123,22 @@ class BusyNotifyService
         }
 
         $json = $response->json();
+        $this->lastMeta = is_array($json['metadata'] ?? null) ? $json['metadata'] : [];
 
         if (isset($json['success']) && $json['success'] === false) {
             throw new \RuntimeException('BusyNotify API: ' . ($json['message'] ?? 'Unknown error'));
         }
 
         return $json;
+    }
+
+    /**
+     * Last /v1/* response ka metadata (e.g. rowCount).
+     * Caller isse verify kar sakta hai ki rows truncate/paginate to nahi hui.
+     */
+    public function getLastMeta(): array
+    {
+        return $this->lastMeta;
     }
 
     // ─── Companies ───────────────────────────────────────────
@@ -326,6 +338,10 @@ class BusyNotifyService
      * Fetch all products stock-only (lightweight).
      * Returns only product_id, product_alias (code), product_stock.
      * Used by stock-delta sync every 2 minutes.
+     *
+     * IMPORTANT: stock field missing/null ho to `null` return hota hai (0 nahi) —
+     * caller "pata nahi" samajh kar us product ko chhod deta hai, warna API me
+     * kisi bhi change (field rename/company mismatch) se sab stock zero ho jate.
      */
     public function getProductsStockOnly(): array
     {
@@ -337,7 +353,7 @@ class BusyNotifyService
             'product_id'    => $p['product_id'] ?? null,
             'product_alias' => $p['product_alias'] ?? null,
             'product_name'  => $p['product_name'] ?? null,
-            'product_stock' => $p['product_stock'] ?? 0,
+            'product_stock' => ($p['product_stock'] ?? null) === null ? null : $p['product_stock'],
         ], $data);
     }
 

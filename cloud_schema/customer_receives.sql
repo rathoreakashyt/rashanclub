@@ -1,5 +1,5 @@
 CREATE TABLE `customer_receives` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
   `payment_method_id` bigint(20) UNSIGNED DEFAULT NULL,
   `amount` decimal(15,3) DEFAULT 0.000,
@@ -11,7 +11,8 @@ CREATE TABLE `customer_receives` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `reference_no` varchar(255) DEFAULT NULL
+  `reference_no` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -21,7 +22,7 @@ CREATE TABLE `customer_receives` (
 --
 
 CREATE TABLE `customer_wallets` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `customer_id` bigint(20) UNSIGNED NOT NULL,
   `company_id` bigint(20) UNSIGNED NOT NULL,
   `total_earned` decimal(15,2) DEFAULT 0.00,
@@ -29,7 +30,8 @@ CREATE TABLE `customer_wallets` (
   `total_redeemed` decimal(15,2) DEFAULT 0.00,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -39,7 +41,7 @@ CREATE TABLE `customer_wallets` (
 --
 
 CREATE TABLE `damages` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `total_loss` decimal(15,3) DEFAULT 0.000,
@@ -51,7 +53,8 @@ CREATE TABLE `damages` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `damage_type` varchar(50) DEFAULT 'expired'
+  `damage_type` varchar(50) DEFAULT 'expired',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -61,7 +64,7 @@ CREATE TABLE `damages` (
 --
 
 CREATE TABLE `damage_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `damage_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `date` date DEFAULT NULL,
@@ -74,7 +77,8 @@ CREATE TABLE `damage_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -84,7 +88,7 @@ CREATE TABLE `damage_details` (
 --
 
 CREATE TABLE `delivery_partners` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `address` text DEFAULT NULL,
@@ -93,7 +97,8 @@ CREATE TABLE `delivery_partners` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -103,7 +108,7 @@ CREATE TABLE `delivery_partners` (
 --
 
 CREATE TABLE `denominations` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `value` decimal(15,2) DEFAULT 0.00,
   `type` varchar(50) DEFAULT NULL,
@@ -111,7 +116,8 @@ CREATE TABLE `denominations` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -121,7 +127,7 @@ CREATE TABLE `denominations` (
 --
 
 CREATE TABLE `deposit_withdraws` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `type` enum('Deposit','Withdraw') DEFAULT NULL,
@@ -133,7 +139,8 @@ CREATE TABLE `deposit_withdraws` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -143,7 +150,7 @@ CREATE TABLE `deposit_withdraws` (
 --
 
 CREATE TABLE `employee_advance_payments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `amount` decimal(15,2) DEFAULT 0.00,
@@ -155,7 +162,8 @@ CREATE TABLE `employee_advance_payments` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -165,7 +173,7 @@ CREATE TABLE `employee_advance_payments` (
 --
 
 CREATE TABLE `expenses` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `category_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -179,7 +187,8 @@ CREATE TABLE `expenses` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -189,7 +198,7 @@ CREATE TABLE `expenses` (
 --
 
 CREATE TABLE `expense_categories` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -197,7 +206,8 @@ CREATE TABLE `expense_categories` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `sync_version` bigint(20) UNSIGNED DEFAULT 1
+  `sync_version` bigint(20) UNSIGNED DEFAULT 1,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -207,13 +217,14 @@ CREATE TABLE `expense_categories` (
 --
 
 CREATE TABLE `failed_jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) NOT NULL,
   `connection` text NOT NULL,
   `queue` text NOT NULL,
   `payload` longtext NOT NULL,
   `exception` longtext NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -223,14 +234,15 @@ CREATE TABLE `failed_jobs` (
 --
 
 CREATE TABLE `feature_activations` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `feature_key` varchar(255) NOT NULL,
   `feature_name` varchar(255) NOT NULL,
   `group` varchar(255) DEFAULT 'general',
   `is_active` tinyint(1) DEFAULT 1,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

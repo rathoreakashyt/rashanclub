@@ -1,5 +1,5 @@
 CREATE TABLE `sync_dead_letters` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `device_id` varchar(100) DEFAULT '',
   `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
   `entity_type` varchar(60) DEFAULT '',
@@ -10,7 +10,8 @@ CREATE TABLE `sync_dead_letters` (
   `first_failed_at` timestamp NULL DEFAULT NULL,
   `last_failed_at` timestamp NULL DEFAULT NULL,
   `resolved` tinyint(1) DEFAULT 0,
-  `resolved_at` timestamp NULL DEFAULT NULL
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

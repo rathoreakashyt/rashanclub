@@ -1,12 +1,13 @@
 CREATE TABLE `feature_activations` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `feature_key` varchar(255) NOT NULL,
   `feature_name` varchar(255) NOT NULL,
   `group` varchar(255) DEFAULT 'general',
   `is_active` tinyint(1) DEFAULT 1,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

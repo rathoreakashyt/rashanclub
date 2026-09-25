@@ -1659,67 +1659,15 @@ class SyncController extends Controller
      */
     private function reconcileManualStock(?string $code): void
     {
-        if (empty($code)) {
-            return;
-        }
-        try {
-            $item = DB::table('items')
-                ->where('code', $code)
-                ->where('company_id', $this->companyId)
-                ->where('del_status', 'Live')
-                ->first();
-            if (! $item) {
-                return;
-            }
-
-            $in  = (float) DB::table('purchase_details')->where('item_id', $item->id)->where('del_status', 'Live')->sum('quantity_amount');
-            $out = (float) DB::table('sale_details')->where('item_id', $item->id)->where('del_status', 'Live')->sum('qty');
-            // User-created opening stock rows feed the ledger too (rebuild UNION).
-            $userOpening = (float) DB::table('set_opening_stocks')
-                ->where('item_id', $item->id)
-                ->where('item_description', 'NOT LIKE', 'SYNC_ADJ%')
-                ->sum('stock_quantity');
-            $desired = (float) $item->stock_quantity;
-
-            // The SYNC_ADJ row is ABSOLUTE: ledger(purchase - sale + user opening)
-            // plus SYNC_ADJ must equal the manually-set items.stock_quantity.
-            $adj = round($desired - ($in - $out + $userOpening), 3);
-
-            if (abs($adj) < 0.001) {
-                DB::table('set_opening_stocks')
-                    ->where('item_id', $item->id)
-                    ->where('item_description', 'LIKE', 'SYNC_ADJ%')
-                    ->delete();
-                return;
-            }
-
-            $existing = DB::table('set_opening_stocks')
-                ->where('item_id', $item->id)
-                ->where('item_description', 'LIKE', 'SYNC_ADJ%')
-                ->first();
-
-            $now = now()->toDateTimeString();
-            if ($existing) {
-                DB::table('set_opening_stocks')->where('id', $existing->id)->update([
-                    'stock_quantity' => $adj,
-                    'updated_at' => $now,
-                ]);
-            } else {
-                DB::table('set_opening_stocks')->insert([
-                    'item_id' => $item->id,
-                    'item_type' => 'opening',
-                    'item_description' => 'SYNC_ADJ',
-                    'stock_quantity' => $adj,
-                    'outlet_id' => $this->outletId,
-                    'user_id' => $this->userId,
-                    'company_id' => $this->companyId,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            }
-        } catch (\Throwable $e) {
-            \Log::error('reconcileManualStock failed: ' . $e->getMessage());
-        }
+        // Ab app/Services/StockLedgerService me hai (busy:import / busy:sync-stock
+        // bhi wahi use karte hain) — ledger hamesha items.stock_quantity ke
+        // barabar rakha jata hai (SYNC_ADJ delta row se).
+        \App\Services\StockLedgerService::reconcileByCode(
+            $code,
+            $this->companyId,
+            $this->outletId,
+            $this->userId
+        );
     }
 
     /**
@@ -1729,36 +1677,11 @@ class SyncController extends Controller
      */
     private function refreshStockView(): void
     {
-        try {
-            DB::statement('TRUNCATE TABLE view_stock_detail');
-            DB::statement("INSERT INTO view_stock_detail (item_id, type, stock_quantity, outlet_id, company_id, del_status)
-                -- Purchases IN
-                SELECT item_id, 1, quantity_amount, outlet_id, company_id, del_status
-                FROM purchase_details WHERE del_status='Live' AND quantity_amount > 0
-                UNION ALL
-                -- Opening Stock IN
-                SELECT item_id, 1, stock_quantity, outlet_id, company_id, 'Live'
-                FROM set_opening_stocks WHERE stock_quantity > 0 OR item_description LIKE 'SYNC_ADJ%'
-                UNION ALL
-                -- Sale Returns IN
-                SELECT item_id, 1, return_quantity_amount, outlet_id, company_id, del_status
-                FROM sale_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-                UNION ALL
-                -- Sales OUT
-                SELECT item_id, 2, qty, outlet_id, company_id, del_status
-                FROM sale_details WHERE del_status='Live' AND qty > 0
-                UNION ALL
-                -- Purchase Returns OUT
-                SELECT item_id, 2, return_quantity_amount, outlet_id, company_id, del_status
-                FROM purchase_return_details WHERE del_status='Live' AND return_quantity_amount > 0
-                UNION ALL
-                -- Damages OUT
-                SELECT item_id, 2, damage_quantity, outlet_id, company_id, del_status
-                FROM damage_details WHERE del_status='Live' AND damage_quantity > 0
-            ");
-        } catch (\Throwable $e) {
-            \Log::error('refreshStockView failed: ' . $e->getMessage());
-        }
+        // Single canonical rebuild — app/Services/StockLedgerService.
+        // Atomic (DELETE+INSERT ek transaction me): pehle wala TRUNCATE-then-
+        // INSERT non-atomic tha — INSERT fail = poora view khaali = har screen
+        // par 0 stock. Ab fail hone par purana view safe rehta hai.
+        \App\Services\StockLedgerService::rebuildQuietly();
     }
 
     private function pullItems(?string $since): array
@@ -2340,7 +2263,9 @@ class SyncController extends Controller
             'purchase_price' => $item['purchase_price'] ?? 0,
             'profit_margin' => $item['profit_margin'] ?? 0,
             'alert_quantity' => $item['alert_quantity'] ?? 0,
-            'stock_quantity' => $item['stock_quantity'] ?? 0,
+            // Stock key missing/NULL ho to 0 MAT likho — purana cloud value
+            // rehne do (partial payload cloud ka stock zero nahi kar sakta).
+            // Naye item ke liye insert-branch me 0 set hota hai.
             'loyalty_point' => $item['loyalty_point'] ?? 0,
             'warranty' => $item['warranty'] ?? null,
             'warranty_date' => $item['warranty_date'] ?? null,
@@ -2352,6 +2277,13 @@ class SyncController extends Controller
             'enable_disable_status' => $item['enable_disable_status'] ?? 1,
             'updated_at' => $now,
         ];
+
+        // Stock: sirf tab update karo jab payload me `stock_quantity` ho.
+        // Missing key = "pata nahi" — 0 likhne se cloud ka stock zero hota
+        // tha aur SYNC_ADJ reconcile ledger ko bhi zero kar deta tha.
+        if (array_key_exists('stock_quantity', $item) && $item['stock_quantity'] !== null) {
+            $data['stock_quantity'] = $item['stock_quantity'];
+        }
 
         if ($existing) {
             // ═══ TWO-WAY DELETE (E2): incoming tombstone → mark existing deleted ═══
@@ -2372,6 +2304,7 @@ class SyncController extends Controller
         }
 
         $data['code'] = $item['code'] ?? (string) random_int(100000, 999999);
+        $data['stock_quantity'] = $item['stock_quantity'] ?? 0;
         $data['user_id'] = $this->userId;
         $data['company_id'] = $this->companyId;
         $data['del_status'] = 'Live';

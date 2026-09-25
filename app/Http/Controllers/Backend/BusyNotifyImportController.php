@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Services\BusyNotifyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Sale\Models\Customer;
@@ -183,81 +184,45 @@ class BusyNotifyImportController extends Controller
 
     /**
      * Import products/items from BusyNotify API.
+     *
+     * EK HI CODE PATH: scheduler wali `busy:import` command chalao.
+     * Is method me uska copy-paste tha jo stock/ledger/view-rebuild bilkul
+     * chhod deta tha — isliye web se import kiye products ka stock cloud aur
+     * software me ZERO aa raha tha (zero-stock bug ka ek bada reason).
+     * Command me: unit/category resolve, stock + ledger (SYNC_ADJ) reconcile,
+     * atomic view rebuild aur mass-zero guard — sab shamil hai.
      */
     public function importProducts(Request $request)
     {
-        $companyId = session('company.company_id');
-        $userId    = auth()->id();
+        $companyId = (int) session('company.company_id', 1);
+        $userId    = (int) (auth()->id() ?? 1);
+        $outletId  = (int) (session('outlet.outlet_id') ?? 1);
+
+        if (!BusyNotifyService::isEnabled()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'BusyNotify API key not configured.',
+            ], 400);
+        }
 
         try {
-            $service  = new BusyNotifyService();
-            $busyData = $service->getProducts();
-            $imported = 0;
-            $updated  = 0;
-            $skipped  = 0;
-            $errors   = [];
-            $now      = now()->toDateTimeString();
+            set_time_limit(300);
 
-            foreach ($busyData as $row) {
-                try {
-                    $mapped = BusyNotifyService::mapProduct($row);
-                    $mapped['company_id'] = $companyId;
-                    $mapped['user_id']    = $userId;
+            Artisan::call('busy:import', [
+                '--type'    => 'products',
+                '--company' => $companyId,
+                '--outlet'  => $outletId,
+                '--user'    => $userId,
+            ]);
+            $output = Artisan::output();
 
-                    // Skip if no name
-                    if (empty($mapped['name'])) {
-                        $skipped++;
-                        continue;
-                    }
-
-                    // product_group → item_categories (lookup/auto-create)
-                    $catId = $this->resolveCategory($companyId, $userId, $now, $row['product_group_name'] ?? null);
-                    if ($catId) {
-                        $mapped['category_id'] = $catId;
-                    }
-
-                    // unit text ("Pcs.") → units table ID (desktop compat)
-                    $unitId = $this->resolveUnit($companyId, $userId, $now, $row['product_unit'] ?? null);
-                    if ($unitId) {
-                        $mapped['unit_type'] = (string) $unitId;
-                        $mapped['sale_unit_id'] = $unitId;
-                    }
-
-                    // Check for existing item by busy_id first
-                    $existing = null;
-                    if (!empty($mapped['busy_id'])) {
-                        $existing = Item::where('busy_id', $mapped['busy_id'])
-                            ->where('company_id', $companyId)
-                            ->where('del_status', 'Live')
-                            ->first();
-                    }
-
-                    // Fallback: match by code (barcode/alias)
-                    if (!$existing && !empty($mapped['code']) && $mapped['code'] !== $mapped['name']) {
-                        $existing = Item::where('code', $mapped['code'])
-                            ->where('company_id', $companyId)
-                            ->where('del_status', 'Live')
-                            ->first();
-                    }
-
-                    // Fallback: match by name
-                    if (!$existing && !empty($mapped['name'])) {
-                        $existing = Item::where('name', $mapped['name'])
-                            ->where('company_id', $companyId)
-                            ->where('del_status', 'Live')
-                            ->first();
-                    }
-
-                    if ($existing) {
-                        $existing->update(array_filter($mapped, fn($v) => $v !== null));
-                        $updated++;
-                    } else {
-                        Item::create($mapped);
-                        $imported++;
-                    }
-                } catch (\Exception $e) {
-                    $errors[] = "Row error: " . $e->getMessage();
-                }
+            $imported = $updated = $totalRows = 0;
+            if (preg_match('/Items: (\d+) new, (\d+) updated/', $output, $m)) {
+                $imported = (int) $m[1];
+                $updated  = (int) $m[2];
+            }
+            if (preg_match('/Fetched: (\d+)/', $output, $m)) {
+                $totalRows = (int) $m[1];
             }
 
             return response()->json([
@@ -265,9 +230,10 @@ class BusyNotifyImportController extends Controller
                 'message'    => "Products imported successfully!",
                 'imported'   => $imported,
                 'updated'    => $updated,
-                'skipped'    => $skipped,
-                'total_rows' => count($busyData),
-                'errors'     => array_slice($errors, 0, 10),
+                'skipped'    => 0,
+                'total_rows' => $totalRows,
+                'errors'     => [],
+                'log'        => $output,
             ]);
         } catch (\Exception $e) {
             Log::error('BusyNotify product import failed', ['error' => $e->getMessage()]);

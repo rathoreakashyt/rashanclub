@@ -1,5 +1,5 @@
 CREATE TABLE `installed_modules` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `version` varchar(255) DEFAULT NULL,
@@ -9,7 +9,8 @@ CREATE TABLE `installed_modules` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(255) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

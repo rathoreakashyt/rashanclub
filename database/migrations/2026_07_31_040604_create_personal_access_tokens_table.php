@@ -11,7 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('personal_access_tokens')) return;
+        if (Schema::hasTable('personal_access_tokens'))
+        {
+            // Fix: ensure id column is auto-increment (older installs may have broken table)
+            if (Schema::hasColumn('personal_access_tokens', 'id'))
+            {
+                $engine = DB::getDriverName();
+                if ($engine === 'mysql')
+                {
+                    DB::statement('ALTER TABLE `personal_access_tokens` MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT');
+                }
+            }
+            return;
+        }
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
             $table->morphs('tokenable');

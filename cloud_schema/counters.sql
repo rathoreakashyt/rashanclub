@@ -1,5 +1,5 @@
 CREATE TABLE `counters` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
   `printer_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -10,7 +10,8 @@ CREATE TABLE `counters` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `sync_version` bigint(20) UNSIGNED DEFAULT 1,
   `status` varchar(20) DEFAULT 'Enable',
-  `description` varchar(255) DEFAULT NULL
+  `description` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

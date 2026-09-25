@@ -88,7 +88,9 @@ $(async function () {
                     showValidationErrors('#business_setting_form', xhr.responseJSON.errors);
                     showErrorNotification('Please check the form for errors');
                 } else {
-                    showErrorNotification('An unexpected error occurred');
+                    let msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'An unexpected error occurred';
+                    showErrorNotification(msg);
+                    console.error('[business-setting] Server error:', xhr.status, xhr.responseJSON);
                 }
             }
         });
@@ -124,7 +126,9 @@ $(async function () {
                     showValidationErrors('#pos_setting_form', xhr.responseJSON.errors);
                     showErrorNotification('Please check the form for errors');
                 } else {
-                    showErrorNotification('An unexpected error occurred');
+                    let msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'An unexpected error occurred';
+                    showErrorNotification(msg);
+                    console.error('[pos-setting] Server error:', xhr.status, xhr.responseJSON);
                 }
             }
         });

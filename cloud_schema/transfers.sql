@@ -1,5 +1,5 @@
 CREATE TABLE `transfers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `reference_no` varchar(255) DEFAULT NULL,
   `date` date DEFAULT NULL,
   `from_outlet_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -11,7 +11,8 @@ CREATE TABLE `transfers` (
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `status` varchar(50) DEFAULT 'pending'
+  `status` varchar(50) DEFAULT 'pending',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -21,7 +22,7 @@ CREATE TABLE `transfers` (
 --
 
 CREATE TABLE `transfer_details` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `transfer_id` bigint(20) UNSIGNED DEFAULT NULL,
   `item_id` bigint(20) UNSIGNED DEFAULT NULL,
   `quantity` decimal(15,3) DEFAULT 0.000,
@@ -32,7 +33,8 @@ CREATE TABLE `transfer_details` (
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
   `del_status` varchar(20) DEFAULT 'Live',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -42,7 +44,7 @@ CREATE TABLE `transfer_details` (
 --
 
 CREATE TABLE `units` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `unit_name` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `company_id` bigint(20) UNSIGNED DEFAULT 1,
@@ -54,7 +56,8 @@ CREATE TABLE `units` (
   `name` varchar(255) DEFAULT NULL,
   `short_name` varchar(255) DEFAULT NULL,
   `base_unit_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `conversion_rate` decimal(10,4) DEFAULT 1.0000
+  `conversion_rate` decimal(10,4) DEFAULT 1.0000,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -64,7 +67,7 @@ CREATE TABLE `units` (
 --
 
 CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -91,7 +94,8 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `is_saas` varchar(20) DEFAULT NULL,
-  `active_status` varchar(20) DEFAULT 'Active'
+  `active_status` varchar(20) DEFAULT 'Active',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

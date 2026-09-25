@@ -1,5 +1,5 @@
 CREATE TABLE `customers` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `busy_id` bigint(20) UNSIGNED DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -39,7 +39,8 @@ CREATE TABLE `customers` (
   `customer_type` varchar(50) DEFAULT 'Regular',
   `same_or_diff_state` varchar(20) DEFAULT NULL,
   `business_type` varchar(50) DEFAULT NULL,
-  `sync_version` int(11) DEFAULT 0
+  `sync_version` int(11) DEFAULT 0,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
