@@ -471,15 +471,26 @@ public class UpdateService
 
         string appExePath = Path.Combine(installDir, "RashanKiDukan.exe");
 
-        Log($"Launching updater: {UpdaterExePath}");
-        Log($"  Install dir: {installDir}");
-        Log($"  ZIP: {zipPath}");
+        // ── 8.3 SHORT PATHS: "Rashan Ki Dukan" / "Program Files" me space hai —
+        // UseShellExecute+runas quoting kabhi-kabhi args tod deta hai (updater ko "Ki"
+        // jaisa tukra milta tha). Short paths me space nahi hota, to quotes ki
+        // zaroorat hi nahi — purane updater ke saath bhi kaam karta hai.
+        string sInstallDir = GetShortPath(installDir);
+        string sZipPath = GetShortPath(zipPath);
+        string sAppExe = GetShortPath(appExePath);
+        string sBackupDir = GetShortPath(BackupDir);
+        string sUpdaterExe = GetShortPath(UpdaterExePath);
+
+        Log($"Launching updater: {sUpdaterExe}");
+        Log($"  Install dir: {sInstallDir}");
+        Log($"  ZIP: {sZipPath}");
         Log($"  SHA256: {info.Sha256}");
 
         var psi = new ProcessStartInfo
         {
-            FileName = UpdaterExePath,
-            Arguments = $"\"{installDir}\" \"{zipPath}\" \"{info.Sha256}\" \"{appExePath}\" \"{BackupDir}\"",
+            FileName = sUpdaterExe,
+            // Short paths — koi space nahi, koi quotes nahi, args kabhi nahi todenge
+            Arguments = $"{sInstallDir} {sZipPath} {info.Sha256} {sAppExe} {sBackupDir}",
             // UAC elevation: updater ka manifest requireAdministrator hai — runas verb se
             // UAC prompt aayega. CreateNoWindow true mat karo warna prompt suppress ho jata hai
             // (updater silently fail hota tha — download 100% ke baad bhi install nahi hota tha).
@@ -504,6 +515,27 @@ public class UpdateService
 
         // Close the main application
         System.Windows.Application.Current.Shutdown();
+    }
+
+    /// <summary>
+    /// Windows 8.3 short path nikaalo (space-free). Fail hone par original path
+    /// wapas — updater phir quoted-style handle kar lega.
+    /// </summary>
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern uint GetShortPathName(string lpszLongPath, System.Text.StringBuilder lpszShortPath, uint cchBuffer);
+
+    private static string GetShortPath(string longPath)
+    {
+        try
+        {
+            if (!File.Exists(longPath) && !Directory.Exists(longPath)) return longPath;
+            var sb = new System.Text.StringBuilder(1024);
+            uint len = GetShortPathName(longPath, sb, (uint)sb.Capacity);
+            if (len > 0 && len < sb.Capacity && !sb.ToString().Contains(' '))
+                return sb.ToString();
+        }
+        catch { }
+        return longPath;
     }
 
     /// <summary>

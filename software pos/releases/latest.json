@@ -1,12 +1,12 @@
 {
-  "version": "1.2.5",
+  "version": "1.2.6",
   "minimum_version": "1.0.0",
   "mandatory": false,
-  "download_url": "https://github.com/rathoreakashyt/rashanclub/releases/download/v1.2.5/RashanKiDukan-1.2.5.zip",
-  "sha256": "1af2b62cf0cb5f87f69db14cdbab31d3cf7b7110419704a86e4842f145fc7f0c",
+  "download_url": "https://github.com/rathoreakashyt/rashanclub/releases/download/v1.2.6/RashanKiDukan-1.2.6.zip",
+  "sha256": "901976df06cbe254318a41d01c567455db896199d5b8a147838d21fde5fc2e3b",
   "release_date": "2026-09-25",
   "release_notes": [
-    "Update system test release",
-    "Stability improvements"
+    "FIX: Updater launch arguments ka quoting bug — ab short paths se args kabhi nahi todenge",
+    "Restart & Update ab pakka install karega (pehle 'ZIP not found' aata tha)"
   ]
 }
