@@ -1,13 +1,13 @@
 {
-  "version": "1.2.3",
+  "version": "1.2.4",
   "minimum_version": "1.0.0",
   "mandatory": false,
-  "download_url": "https://github.com/rathoreakashyt/rashanclub/releases/download/v1.2.3/RashanKiDukan-1.2.3.zip",
-  "sha256": "2eae257fd3148595f6680371ba984ed42763916c9d8ac46b18c51e79613f2b91",
+  "download_url": "https://github.com/rathoreakashyt/rashanclub/releases/download/v1.2.4/RashanKiDukan-1.2.4.zip",
+  "sha256": "de86888a3152fc80fa297bc53baf5a10d4983261b0216fe9053b48d2cf0ef095",
   "release_date": "2026-09-25",
   "release_notes": [
-    "Update system fix — updater ko ab sahi quoted arguments milte hain",
-    "v1.2.2 se update ab fully automatic kaam karega",
-    "Performance improvements"
+    "FIX: Download 100% ke baad Restart & Update dialog ab pakka dikhega",
+    "Progress dialog close hone par galti se 'cancel' flag na lage — update flow fix",
+    "Teeno update flows (startup popup, icon, menu) me fix"
   ]
 }
