@@ -1,0 +1,667 @@
+<UserControl x:Class="RashanKiDukan.Views.CreateCustomerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F0F2F5">
+    <UserControl.Resources>
+        <Style x:Key="FL" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="95"/>
+        </Style>
+        <Style x:Key="FI" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#3B82F6"/>
+                                <Setter TargetName="bd" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="FC" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Width="20" Background="Transparent">
+                                    <TextBlock Text="&#xE0D7;" FontFamily="Segoe MDL2 Assets" FontSize="10" 
+                                               Foreground="#9CA3AF" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CB" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                        Background="Transparent" Foreground="#6B7280" BorderThickness="0"
+                        Cursor="Hand" VerticalAlignment="Center" Click="BtnBack_Click" Padding="6,4"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <TextBlock Text="Create Customer" FontSize="17" FontWeight="SemiBold" 
+                               Foreground="#111827" FontFamily="Segoe UI"/>
+                    <TextBlock Text="☆" FontSize="14" Foreground="#F59E0B" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#F0F2F5">
+            <StackPanel Margin="24,18,24,20">
+
+                <!-- ===== ROW 1: GSTIN + Validate | NAME ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: GSTIN + Validate -->
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="GSTIN"/>
+                            <TextBox Grid.Column="1" x:Name="txtGSTIN" Style="{StaticResource FI}" 
+                                     Margin="8,0,8,0" Tag="Enter GSTIN"/>
+                            <Button Grid.Column="2" Content="Validate" Style="{StaticResource CB}" 
+                                    Background="#F3F4F6" Foreground="#374151" Click="BtnValidateGSTIN_Click"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Right: NAME -->
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="NAME *"/>
+                            <TextBox Grid.Column="1" x:Name="txtName" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter name"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 2: GROUP ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="GROUP *"/>
+                            <ComboBox Grid.Column="1" x:Name="cmbGroup" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="Sundry Debtors" IsSelected="True"/>
+                                <ComboBoxItem Content="Sundry Creditors"/>
+                                <ComboBoxItem Content="Bank Accounts"/>
+                                <ComboBoxItem Content="Cash In Hand"/>
+                                <ComboBoxItem Content="Duties &amp; Taxes"/>
+                                <ComboBoxItem Content="Expenses"/>
+                                <ComboBoxItem Content="Income"/>
+                                <ComboBoxItem Content="Capital Account"/>
+                                <ComboBoxItem Content="Loans &amp; Advances"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 3: ALIAS | PRINT NAME ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="ALIAS"/>
+                            <TextBox Grid.Column="1" x:Name="txtAlias" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter alias"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="PRINT NAME"/>
+                            <TextBox Grid.Column="1" x:Name="txtPrintName" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter print name"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 4: ADDRESS + MOBILE + WHATSAPP ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="ADDRESS"/>
+                            <TextBox Grid.Column="1" x:Name="txtAddress" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Height="56" TextWrapping="Wrap" AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto" Tag="Enter complete address"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="MOBILE"/>
+                            <TextBox Grid.Column="1" x:Name="txtMobile" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter mobile"/>
+                            <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="WHATSAPP"/>
+                            <TextBox Grid.Column="4" x:Name="txtWhatsApp" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter WhatsApp"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="EMAIL"/>
+                            <TextBox Grid.Column="1" x:Name="txtEmail" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter email"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 5: PIN CODE + COUNTRY | STATE + STATION ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="PIN CODE"/>
+                            <TextBox Grid.Column="1" x:Name="txtPinCode" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter pin code"/>
+                            <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="COUNTRY"/>
+                            <ComboBox Grid.Column="4" x:Name="cmbCountry" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="India" IsSelected="True"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="STATE"/>
+                            <ComboBox Grid.Column="1" x:Name="cmbState" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="Delhi" IsSelected="True"/>
+                                <ComboBoxItem Content="Maharashtra"/>
+                                <ComboBoxItem Content="Uttar Pradesh"/>
+                                <ComboBoxItem Content="Gujarat"/>
+                                <ComboBoxItem Content="Rajasthan"/>
+                                <ComboBoxItem Content="Karnataka"/>
+                                <ComboBoxItem Content="Tamil Nadu"/>
+                                <ComboBoxItem Content="West Bengal"/>
+                                <ComboBoxItem Content="Madhya Pradesh"/>
+                                <ComboBoxItem Content="Bihar"/>
+                            </ComboBox>
+                            <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="STATION"/>
+                            <TextBox Grid.Column="4" x:Name="txtStation" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter station"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 6: TYPE OF DEALER | FILLING FREQ ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="TYPE OF DEALER"/>
+                            <ComboBox Grid.Column="1" x:Name="cmbDealerType" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="Registered" IsSelected="True"/>
+                                <ComboBoxItem Content="Unregistered"/>
+                                <ComboBoxItem Content="Composition"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="FILLING FREQ."/>
+                            <ComboBox Grid.Column="1" x:Name="cmbFillingFreq" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="Not Known" IsSelected="True"/>
+                                <ComboBoxItem Content="Monthly"/>
+                                <ComboBoxItem Content="Quarterly"/>
+                                <ComboBoxItem Content="Yearly"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 7: TRANSPORT | DISTANCE + Check ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="TRANSPORT"/>
+                            <ComboBox Grid.Column="1" x:Name="cmbTransport" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="By Road" IsSelected="True"/>
+                                <ComboBoxItem Content="By Rail"/>
+                                <ComboBoxItem Content="By Air"/>
+                                <ComboBoxItem Content="By Sea"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="DISTANCE"/>
+                            <TextBox Grid.Column="1" x:Name="txtDistance" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter distance"/>
+                            <Button Grid.Column="3" Content="Check Distance" Style="{StaticResource CB}" 
+                                    Background="#EFF6FF" Foreground="#3B82F6"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 8: BILL BY BILL + CREDIT DAYS (SALE) | CREDIT DAYS (PURC.) ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="44"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="BILL BY BILL"/>
+                            <Border Grid.Column="1" Width="40" Height="22" CornerRadius="11" 
+                                    Background="#22C55E" Cursor="Hand" VerticalAlignment="Center"
+                                    MouseLeftButtonDown="ToggleBillByBill">
+                                <Border x:Name="billByBillKnob" Width="18" Height="18" CornerRadius="9" 
+                                        Background="White" HorizontalAlignment="Right" Margin="0,0,2,0"/>
+                            </Border>
+                            <TextBlock Grid.Column="2" Style="{StaticResource FL}" Text="CREDIT DAYS" 
+                                       TextWrapping="Wrap" MinWidth="0" Width="Auto" Margin="10,0,0,0"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource FL}" Text="(SALE)" 
+                                       TextWrapping="Wrap" MinWidth="0" Width="Auto" Margin="10,14,0,0"/>
+                            <TextBox Grid.Column="3" x:Name="txtCreditDaysSale" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter Credit Days"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="CREDIT DAYS"/>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="(PURC.)" 
+                                       Margin="0,14,0,0"/>
+                            <TextBox Grid.Column="1" x:Name="txtCreditDaysPurc" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter Credit Days"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 9: BANK NAME | IFSC + SWIFT ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="BANK NAME"/>
+                            <TextBox Grid.Column="1" x:Name="txtBankName" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter bank name"/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="IFSC CODE"/>
+                            <TextBox Grid.Column="1" x:Name="txtIFSC" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter IFSC Code"/>
+                            <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="SWIFT CODE"/>
+                            <TextBox Grid.Column="4" x:Name="txtSwift" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter Swift code"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== ROW 10: A/C NO. | OP. BAL. + DR./CR. ===== -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="A/C NO."/>
+                            <TextBox Grid.Column="1" x:Name="txtAcNo" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Tag="Enter A/c No."/>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="OP. BAL."/>
+                            <TextBox Grid.Column="1" x:Name="txtOpBal" Style="{StaticResource FI}" 
+                                     Margin="8,0,0,0" Text="0.00"/>
+                            <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="DR./CR."/>
+                            <ComboBox Grid.Column="4" x:Name="cmbDrCr" Style="{StaticResource FC}" Margin="8,0,0,0">
+                                <ComboBoxItem Content="D" IsSelected="True"/>
+                                <ComboBoxItem Content="CR"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== REGULATORY SECTION ===== -->
+                <Border Background="Transparent" BorderThickness="0" Padding="4,10" Margin="0,6,0,4"
+                        Cursor="Hand" MouseLeftButtonDown="ToggleRegulatory">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="REGULATORY" FontSize="13" FontWeight="Bold" 
+                                   Foreground="#3B82F6" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="arrowReg" Text="&#xE096;" FontFamily="Segoe MDL2 Assets" 
+                                   FontSize="11" Foreground="#3B82F6" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel x:Name="pnlRegulatory" Visibility="Collapsed">
+                    <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="18,14" Margin="0,0,0,10">
+                        <StackPanel>
+                            <!-- Row 1: AADHAAR | TIN | IT PAN | WARD -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="AADHAAR NO." TextWrapping="Wrap"/>
+                                <TextBox Grid.Column="1" x:Name="txtAadhaar" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter Aadhaar"/>
+                                <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="TIN"/>
+                                <TextBox Grid.Column="4" x:Name="txtTIN" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter TIN"/>
+                                <TextBlock Grid.Column="6" Style="{StaticResource FL}" Text="IT PAN"/>
+                                <TextBox Grid.Column="7" x:Name="txtPAN" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter PAN"/>
+                                <TextBlock Grid.Column="9" Style="{StaticResource FL}" Text="WARD"/>
+                                <TextBox Grid.Column="10" x:Name="txtWard" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter ward"/>
+                            </Grid>
+                            <!-- Row 2: CST NO. | LST NO. | IE CODE -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="CST NO."/>
+                                <TextBox Grid.Column="1" x:Name="txtCST" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter CST"/>
+                                <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="LST NO."/>
+                                <TextBox Grid.Column="4" x:Name="txtLST" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter LST"/>
+                                <TextBlock Grid.Column="6" Style="{StaticResource FL}" Text="IE CODE"/>
+                                <TextBox Grid.Column="7" x:Name="txtIECode" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter IE Code"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- ===== MORE SECTION ===== -->
+                <Border Background="Transparent" BorderThickness="0" Padding="4,10" Margin="0,6,0,4"
+                        Cursor="Hand" MouseLeftButtonDown="ToggleMoreSection">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="MORE" FontSize="13" FontWeight="Bold" 
+                                   Foreground="#3B82F6" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="arrowMore" Text="&#xE096;" FontFamily="Segoe MDL2 Assets" 
+                                   FontSize="11" Foreground="#3B82F6" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel x:Name="pnlMore" Visibility="Collapsed">
+                    <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="18,14" Margin="0,0,0,10">
+                        <StackPanel>
+                            <!-- DEFAULT SALE TYPE -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="DEFAULT SALE TYPE" TextWrapping="Wrap"/>
+                                <Border Grid.Column="1" Width="40" Height="22" CornerRadius="11" 
+                                        Background="#D1D5DB" Cursor="Hand" VerticalAlignment="Center"
+                                        MouseLeftButtonDown="ToggleDefSaleType">
+                                    <Border x:Name="defSaleTypeKnob" Width="16" Height="16" CornerRadius="8" 
+                                            Background="White" HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                </Border>
+                            </Grid>
+                            <!-- DEFAULT PURC. TYPE -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="DEFAULT PURC. TYPE" TextWrapping="Wrap"/>
+                                <Border Grid.Column="1" Width="40" Height="22" CornerRadius="11" 
+                                        Background="#D1D5DB" Cursor="Hand" VerticalAlignment="Center"
+                                        MouseLeftButtonDown="ToggleDefPurcType">
+                                    <Border x:Name="defPurcTypeKnob" Width="16" Height="16" CornerRadius="8" 
+                                            Background="White" HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                </Border>
+                            </Grid>
+                            <!-- CONTACT PERSON | TEL. NO. | FAX -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource FL}" Text="CONTACT PERSON" TextWrapping="Wrap"/>
+                                <TextBox Grid.Column="1" x:Name="txtContactPerson" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter Contact Person"/>
+                                <TextBlock Grid.Column="3" Style="{StaticResource FL}" Text="TEL. NO."/>
+                                <TextBox Grid.Column="4" x:Name="txtTel" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter Tel."/>
+                                <TextBlock Grid.Column="6" Style="{StaticResource FL}" Text="FAX"/>
+                                <TextBox Grid.Column="7" x:Name="txtFax" Style="{StaticResource FI}" Margin="8,0,0,0" Tag="Enter fax"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- SAVE BUTTON -->
+                <StackPanel HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Save →" Style="{StaticResource CB}" Background="#2563EB" Foreground="White" 
+                            Padding="32,0" Click="BtnSave_Click"/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

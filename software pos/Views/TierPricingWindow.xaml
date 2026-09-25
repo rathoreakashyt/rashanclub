@@ -1,0 +1,103 @@
+<Window x:Class="RashanKiDukan.Views.TierPricingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tier Pricing" WindowStartupLocation="CenterOwner"
+        Width="420" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Border Background="White" CornerRadius="16" BorderBrush="#E2E8F0" BorderThickness="1"
+            Margin="16">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="24" Opacity="0.18" ShadowDepth="4" Direction="270"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER -->
+            <Border Grid.Row="0" Background="#4F46E5" CornerRadius="16,16,0,0" Padding="20,16">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="🏷️ Tier Pricing" FontSize="16" FontWeight="Bold"
+                                   Foreground="White" FontFamily="Segoe UI"/>
+                        <TextBlock x:Name="lblSchemeTitle" Text="Combo Offer" FontSize="12"
+                                   Foreground="#C7D2FE" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Background="Transparent" Foreground="White" BorderThickness="0"
+                            FontSize="16" FontWeight="Bold" Cursor="Hand" Padding="6,2"
+                            Click="BtnClose_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- ITEM INFO -->
+            <Border Grid.Row="1" Background="#F8FAFC" Padding="20,14" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                <StackPanel>
+                    <TextBlock x:Name="lblItemName" Text="Amul Butter 500g" FontSize="14"
+                               FontWeight="SemiBold" Foreground="#1E293B" FontFamily="Segoe UI"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Original Price:" FontSize="12" Foreground="#64748B" FontFamily="Segoe UI"/>
+                        <TextBlock x:Name="lblOriginalPrice" Text="₹250.00" FontSize="12"
+                                   FontWeight="Bold" Foreground="#DC2626" FontFamily="Segoe UI"
+                                   TextDecorations="Strikethrough" Margin="6,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- TIER OPTIONS -->
+            <Border Grid.Row="2" Padding="20,16">
+                <StackPanel>
+                    <TextBlock Text="Customer kitne items le raha hai?" FontSize="13"
+                               FontWeight="SemiBold" Foreground="#374151" FontFamily="Segoe UI"
+                               Margin="0,0,0,12"/>
+                    <StackPanel x:Name="tierOptionsPanel" Margin="0,0,0,4"/>
+                </StackPanel>
+            </Border>
+
+            <!-- SELECTED SUMMARY -->
+            <Border Grid.Row="3" x:Name="summaryBorder" Background="#F0FDF4" Padding="16,12"
+                    Margin="20,0,20,12" CornerRadius="10" BorderBrush="#86EFAC" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock x:Name="lblSummary" Text="" FontSize="13" FontWeight="SemiBold"
+                               Foreground="#166534" FontFamily="Segoe UI"/>
+                    <TextBlock x:Name="lblSaving" Text="" FontSize="11.5"
+                               Foreground="#16A34A" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- FOOTER BUTTONS -->
+            <Border Grid.Row="4" Padding="20,12,20,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" x:Name="btnApply" Background="#4F46E5" CornerRadius="10"
+                            Padding="0,12" Cursor="Hand" MouseLeftButtonDown="BtnApply_Click">
+                        <TextBlock Text="✔ Apply" FontSize="13.5" FontWeight="Bold"
+                                   Foreground="White" FontFamily="Segoe UI"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <Border Grid.Column="2" x:Name="btnCancel" Background="#F1F5F9" CornerRadius="10"
+                            Padding="0,12" Cursor="Hand" BorderBrush="#CBD5E1" BorderThickness="1"
+                            MouseLeftButtonDown="BtnCancel_Click">
+                        <TextBlock Text="Cancel" FontSize="13.5" FontWeight="SemiBold"
+                                   Foreground="#475569" FontFamily="Segoe UI"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

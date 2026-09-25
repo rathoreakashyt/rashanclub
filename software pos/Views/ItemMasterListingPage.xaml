@@ -1,0 +1,355 @@
+<UserControl x:Class="RashanKiDukan.Views.ItemMasterListingPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers"
+             Background="{StaticResource BgPageBrush}">
+    <UserControl.Resources>
+        <!-- Row style: low stock → warning tint, out of stock → danger tint -->
+        <Style x:Key="ItemRow" TargetType="DataGridRow" BasedOn="{StaticResource TableRow}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StockStatus}" Value="Low">
+                    <Setter Property="Background" Value="{StaticResource WarningLightBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StockStatus}" Value="Out">
+                    <Setter Property="Background" Value="{StaticResource DangerLightBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════ PAGE HEADER (Sneat) ══════════ -->
+        <Border Grid.Row="0" Style="{StaticResource PageHeader}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="&#xE72B;" Style="{StaticResource BtnIcon}" Click="BtnBack_Click"
+                                ToolTip="Back to Dashboard" Margin="0,0,10,0"/>
+                        <TextBlock Text="Item Master" Style="{StaticResource PageTitle}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Home" Style="{StaticResource BreadcrumbText}"/>
+                        <TextBlock Text=" / " Style="{StaticResource BreadcrumbText}"/>
+                        <TextBlock Text="Item &amp; Stock / List" Style="{StaticResource BreadcrumbText}" Foreground="{StaticResource PrimaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Search -->
+                    <Border Style="{StaticResource SearchBox}" Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="{StaticResource Mdl2}" FontSize="13"
+                                       Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox Grid.Column="1" x:Name="txtSearch" Style="{StaticResource SearchInput}" Width="200"
+                                     VerticalContentAlignment="Center" TextChanged="TxtSearch_TextChanged"/>
+                        </Grid>
+                    </Border>
+                    <Button Content="+ Add Item" Style="{StaticResource BtnPrimary}" Click="BtnAddItem_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════ CONTENT ══════════ -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,20,24,28">
+
+                <!-- STATUS TABS -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16" Padding="16,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <RadioButton x:Name="tabAll" Content="All (0)" IsChecked="True" Click="Tab_Click" VerticalAlignment="Center"/>
+                            <RadioButton x:Name="tabActive" Content="Active (0)" Margin="16,0,0,0" Click="Tab_Click" VerticalAlignment="Center"/>
+                            <RadioButton x:Name="tabInactive" Content="Inactive (0)" Margin="16,0,0,0" Click="Tab_Click" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" x:Name="lblTotal" Text="Total: 0 items" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- FILTER CARD (collapsible) -->
+                <Border x:Name="filterCard" Visibility="Collapsed" Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardHeader}">
+                            <TextBlock Text="Filters" Style="{StaticResource CardTitle}"/>
+                        </Border>
+                        <StackPanel Margin="20,16,20,20">
+                            <WrapPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Group" Style="{StaticResource FormLabel}"/>
+                                    <ComboBox x:Name="cmbCategory" Width="180" Height="34" FontSize="12.5" FontFamily="Inter, Segoe UI"
+                                              Padding="10,4" BorderBrush="#CBD5E1" BorderThickness="1"
+                                              DisplayMemberPath="Name" SelectionChanged="FilterCombo_SelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Brand" Style="{StaticResource FormLabel}"/>
+                                    <ComboBox x:Name="cmbBrand" Width="180" Height="34" FontSize="12.5" FontFamily="Inter, Segoe UI"
+                                              Padding="10,4" BorderBrush="#CBD5E1" BorderThickness="1"
+                                              DisplayMemberPath="Name" SelectionChanged="FilterCombo_SelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Supplier" Style="{StaticResource FormLabel}"/>
+                                    <ComboBox x:Name="cmbSupplier" Width="180" Height="34" FontSize="12.5" FontFamily="Inter, Segoe UI"
+                                              Padding="10,4" BorderBrush="#CBD5E1" BorderThickness="1"
+                                              DisplayMemberPath="Name" SelectionChanged="FilterCombo_SelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Stock Status" Style="{StaticResource FormLabel}"/>
+                                    <ComboBox x:Name="cmbStock" Width="160" Height="34" FontSize="12.5" FontFamily="Inter, Segoe UI"
+                                              Padding="10,4" BorderBrush="#CBD5E1" BorderThickness="1"
+                                              SelectionChanged="FilterCombo_SelectionChanged"/>
+                                </StackPanel>
+                            </WrapPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Apply Filter" Style="{StaticResource BtnPrimary}" Click="BtnApplyFilter_Click"/>
+                                <Button Content="Clear" Style="{StaticResource BtnSecondary}" Margin="10,0,0,0" Click="BtnClearFilter_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- MAIN CARD with table -->
+                <Border Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Card header -->
+                        <Border Grid.Row="0" Style="{StaticResource CardHeader}">
+                            <Grid>
+                                <TextBlock Text="Item List" Style="{StaticResource CardTitle}"/>
+                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <!-- Show per page: 10/20/50/100/500 — jitna chune utne items screen par
+                                         aur export bhi utne hi items karta hai -->
+                                    <TextBlock Text="Show" Style="{StaticResource SubText}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <ComboBox x:Name="cmbPageSize" Width="76" Height="30" FontSize="12.5" FontFamily="Inter, Segoe UI"
+                                              Padding="8,2" BorderBrush="#CBD5E1" BorderThickness="1"
+                                              VerticalContentAlignment="Center" Margin="0,0,10,0"
+                                              SelectionChanged="CmbPageSize_SelectionChanged"/>
+                                    <Button x:Name="btnExport" Content="&#xE74E;  Export" Style="{StaticResource BtnSecondary}" Margin="0,0,8,0" Click="BtnExport_Click">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Export CSV" Click="BtnExportCsv_Click"/>
+                                                <MenuItem Header="Export PDF" Click="BtnExportPdf_Click"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                    <Button Content="&#xE71C;  Filter" Style="{StaticResource BtnPrimary}" Click="BtnToggleFilter_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Table — Clean Excel Style -->
+                        <DataGrid Grid.Row="1" x:Name="dgItems" Style="{StaticResource Table}" RowStyle="{StaticResource ItemRow}"
+                                  MinHeight="360" RowHeaderWidth="0"
+                                  GridLinesVisibility="All"
+                                  HorizontalGridLinesBrush="#E2E8F0"
+                                  VerticalGridLinesBrush="#E2E8F0"
+                                  AlternatingRowBackground="#F8FAFC"
+                                  RowHeight="48"
+                                  FontSize="13" FontFamily="Segoe UI, Inter">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding SN}" Width="45">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="#64748B"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- ITEM: avatar + name + code -->
+                                <DataGridTemplateColumn Header="Item" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Border Width="34" Height="34" CornerRadius="17"
+                                                        Background="{Binding AvatarBg}" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding AvatarInitials}" Foreground="White"
+                                                               FontWeight="Bold" FontSize="12"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ItemName}" FontWeight="SemiBold" Foreground="#1E293B"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Code}" FontSize="11" Foreground="#64748B"
+                                                               TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Group" Binding="{Binding Category}" Width="130">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="Foreground" Value="#475569"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- STOCK: qty + status badge -->
+                                <DataGridTemplateColumn Header="Stock" Width="130">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding StockQtyDisplay}" FontWeight="SemiBold" FontSize="13"
+                                                           Foreground="#1E293B" VerticalAlignment="Center"/>
+                                                <Border CornerRadius="9" Padding="8,2" Margin="8,0,0,0"
+                                                        Background="{Binding StockBg}" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding StockLabel}" FontSize="10.5" FontWeight="SemiBold"
+                                                               Foreground="{Binding StockFg}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Purchase ₹" Binding="{Binding PurchasePrice}" Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="#475569"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Sale ₹" Binding="{Binding SalePrice}" Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="Foreground" Value="#059669"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="MRP ₹" Binding="{Binding MrpPrice}" Width="90">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="#475569"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- STATUS badge -->
+                                <DataGridTemplateColumn Header="Status" Width="95">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="9" Padding="10,3"
+                                                    Background="{Binding StatusBg}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{Binding StatusFg}"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- ACTIONS — compact -->
+                                <DataGridTemplateColumn Header="Actions" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Button Content="&#xE94A;" Style="{StaticResource BtnIcon}" ToolTip="Barcode"
+                                                        Click="BtnBarcode_Click" Tag="{Binding Id}" FontSize="12" Padding="4,2"/>
+                                                <Button Content="&#xE70F;" Style="{StaticResource BtnIconPrimary}" ToolTip="Edit"
+                                                        Click="BtnEdit_Click" Tag="{Binding Id}" FontSize="12" Padding="4,2"/>
+                                                <Button Content="&#xE74D;" Style="{StaticResource BtnIconDanger}" ToolTip="Delete"
+                                                        Click="BtnDelete_Click" Tag="{Binding Id}" FontSize="12" Padding="4,2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- EMPTY STATE -->
+                        <StackPanel x:Name="emptyState" Grid.Row="1" Visibility="Collapsed"
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,40">
+                            <TextBlock Text="&#xE894;" FontFamily="{StaticResource Mdl2}" FontSize="40"
+                                       Foreground="{StaticResource TextFaintBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="No items found" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create your first item by clicking + Add Item" FontSize="13"
+                                       Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- TOTALS FOOTER -->
+                        <Border Grid.Row="2" Style="{StaticResource CardFooter}">
+                            <Grid>
+                                <TextBlock x:Name="lblShowing" Text="Showing 0 entries" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <Border Style="{StaticResource BadgeWarning}" Margin="0,0,8,0" Padding="14,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Low Stock: " Style="{StaticResource BadgeTextWarning}"/>
+                                            <TextBlock x:Name="lblLowCount" Text="0" Style="{StaticResource BadgeTextWarning}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource BadgeDanger}" Padding="14,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Out of Stock: " Style="{StaticResource BadgeTextDanger}"/>
+                                            <TextBlock x:Name="lblOutCount" Text="0" Style="{StaticResource BadgeTextDanger}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- PAGINATION -->
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="lblPageInfo" Text="" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button x:Name="btnPrev" Content="&#xE76B;  Previous" Style="{StaticResource BtnSecondary}" Margin="0,0,8,0" Click="BtnPagePrev"/>
+                        <ItemsControl x:Name="pageButtons" Margin="4,0" VerticalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <Button x:Name="btnNext" Content="Next  &#xE76C;" Style="{StaticResource BtnSecondary}" Margin="8,0,0,0" Click="BtnPageNext"/>
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

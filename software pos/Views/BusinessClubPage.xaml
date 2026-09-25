@@ -1,0 +1,567 @@
+<UserControl x:Class="RashanKiDukan.Views.BusinessClubPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers" d:DesignHeight="800" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <!-- Rounded Button Template -->
+        <ControlTemplate x:Key="RoundedButton" TargetType="Button">
+            <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+        </ControlTemplate>
+        <!-- Tab Button Style -->
+        <Style x:Key="TabBtn" TargetType="RadioButton">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="bd" Background="Transparent" CornerRadius="6" Padding="14,8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#EEF2FF"/>
+                                <Setter Property="Foreground" Value="#6366F1"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="#F3F4F6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="16,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                        Background="Transparent" Foreground="#6B7280" BorderThickness="0" Cursor="Hand"
+                        VerticalAlignment="Center" Padding="6,4" Click="BtnBack_Click"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="Business Club" FontSize="17" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Tabs -->
+        <Border Grid.Row="1" Background="White" Padding="16,8" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="tabDashboard" Content="Dashboard" GroupName="bc" IsChecked="True" Style="{StaticResource TabBtn}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="tabSettings" Content="Settings" GroupName="bc" Style="{StaticResource TabBtn}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="tabWallets" Content="Customer Wallets" GroupName="bc" Style="{StaticResource TabBtn}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="tabRegister" Content="Register Member" GroupName="bc" Style="{StaticResource TabBtn}" Checked="Tab_Checked"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="2">
+            <!-- ==================== DASHBOARD TAB ==================== -->
+            <ScrollViewer x:Name="panelDashboard" VerticalScrollBarVisibility="Auto" Padding="16">
+                <StackPanel Margin="0,0,0,16">
+                    <!-- 4 Stat Cards -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Total Wallets Active -->
+                        <Border Grid.Column="0" Background="White" CornerRadius="10" Margin="0,0,10,0" Padding="0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <Grid>
+                                <Border Background="#6366F1" CornerRadius="10,0,0,10" Width="5" HorizontalAlignment="Left"/>
+                                <StackPanel Margin="18,14,14,14">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#6366F1" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Total Wallets Active" FontSize="11.5" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="lblTotalWallets" Text="0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,4"/>
+                                    <TextBlock x:Name="lblWalletsChange" Text="0% from last month" FontSize="10.5" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Total Balance Held -->
+                        <Border Grid.Column="1" Background="White" CornerRadius="10" Margin="0,0,10,0" Padding="0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <Grid>
+                                <Border Background="#F59E0B" CornerRadius="10,0,0,10" Width="5" HorizontalAlignment="Left"/>
+                                <StackPanel Margin="18,14,14,14">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#F59E0B" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Total Balance Held (₹)" FontSize="11.5" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="lblTotalBalance" Text="₹0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,4"/>
+                                    <TextBlock x:Name="lblBalanceChange" Text="0% from last month" FontSize="10.5" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Total Rewarded -->
+                        <Border Grid.Column="2" Background="White" CornerRadius="10" Margin="0,0,10,0" Padding="0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <Grid>
+                                <Border Background="#10B981" CornerRadius="10,0,0,10" Width="5" HorizontalAlignment="Left"/>
+                                <StackPanel Margin="18,14,14,14">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8AB;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#10B981" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Total Rewarded (₹)" FontSize="11.5" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="lblTotalRewarded" Text="₹0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,4"/>
+                                    <TextBlock x:Name="lblRewardedChange" Text="0% from last month" FontSize="10.5" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Total Redeemed -->
+                        <Border Grid.Column="3" Background="White" CornerRadius="10" Padding="0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <Grid>
+                                <Border Background="#EF4444" CornerRadius="10,0,0,10" Width="5" HorizontalAlignment="Left"/>
+                                <StackPanel Margin="18,14,14,14">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE7A7;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#EF4444" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Total Redeemed (₹)" FontSize="11.5" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="lblTotalRedeemed" Text="₹0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,4"/>
+                                    <TextBlock x:Name="lblRedeemedChange" Text="0% from last month" FontSize="10.5" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Row 2: Settings Preview + Top 5 Earners + Membership Growth -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.8*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Admin Settings Preview -->
+                        <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,10,0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Admin Settings" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,12"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Profit %" FontSize="12" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="lblSettingsProfit" Grid.Column="1" Text="-" FontSize="12" FontWeight="SemiBold" Foreground="#111827"/>
+                                </Grid>
+                                <Border Height="1" Background="#F3F4F6" Margin="0,0,0,8"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Redemption Date" FontSize="12" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="lblSettingsRedemption" Grid.Column="1" Text="-" FontSize="12" FontWeight="SemiBold" Foreground="#111827"/>
+                                </Grid>
+                                <Border Height="1" Background="#F3F4F6" Margin="0,0,0,8"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Min Purchase" FontSize="12" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="lblSettingsMinPurchase" Grid.Column="1" Text="-" FontSize="12" FontWeight="SemiBold" Foreground="#111827"/>
+                                </Grid>
+                                <Border Height="1" Background="#F3F4F6" Margin="0,0,0,8"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Min Bill Amount" FontSize="12" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="lblSettingsMinBill" Grid.Column="1" Text="-" FontSize="12" FontWeight="SemiBold" Foreground="#111827"/>
+                                </Grid>
+                                <Border Height="1" Background="#F3F4F6" Margin="0,0,0,8"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Club Name" FontSize="12" Foreground="#6B7280"/>
+                                    <TextBlock x:Name="lblSettingsClubName" Grid.Column="1" Text="-" FontSize="12" FontWeight="SemiBold" Foreground="#6366F1"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Top 5 Earning Business Partners -->
+                        <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="16" Margin="0,0,10,0" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Top 5 Earning Partners" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,12"/>
+                                <StackPanel x:Name="panelTopEarners"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Club Membership Growth -->
+                        <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Membership Growth" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,12"/>
+                                <TextBlock x:Name="lblGrowthPercent" Text="0%" FontSize="28" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center" Margin="0,10,0,4"/>
+                                <TextBlock x:Name="lblGrowthText" Text="0 new joins this month" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <Border Background="#F0FDF4" CornerRadius="8" Padding="12" Margin="0,8,0,0">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="&#xE8FA;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#10B981" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="lblGrowthTotal" Text="Total: 0 members" FontSize="11" Foreground="#166534" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Recent Club Transactions -->
+                    <Border Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Recent Club Transactions" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,12"/>
+                            <DataGrid x:Name="gridRecentTransactions" AutoGenerateColumns="False" IsReadOnly="True"
+                                      HeadersVisibility="Column" GridLinesVisibility="None" RowHeight="38"
+                                      Background="White" BorderThickness="0" AlternatingRowBackground="#F9FAFB"
+                                      FontFamily="Segoe UI" FontSize="12" CanUserAddRows="False"
+                                      CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F9FAFB"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="FontSize" Value="11.5"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="100"/>
+                                    <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Type" Width="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Left"
+                                                        Background="{Binding TypeBg}">
+                                                    <TextBlock Text="{Binding Type}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding TypeFg}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Sale Amount" Binding="{Binding SaleAmount}" Width="110"/>
+                                    <DataGridTextColumn Header="Reward/Redeem" Binding="{Binding Amount}" Width="120"/>
+                                    <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ==================== SETTINGS TAB ==================== -->
+            <Border x:Name="panelSettings" Background="White" CornerRadius="10" Padding="24" Margin="16"
+                    BorderBrush="#E5E7EB" BorderThickness="1" Visibility="Collapsed">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="480" HorizontalAlignment="Left">
+                        <TextBlock Text="Profit &amp; Redemption Settings" FontSize="15" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,18"/>
+
+                        <TextBlock Text="Profit Percentage (%)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtPointValue" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Text="50" PreviewTextInput="DecimalOnly_PreviewTextInput" TextChanged="DecimalOnly_TextChanged"/>
+                        <TextBlock Text="Percentage of profit credited to customer wallet after billing" FontSize="11" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Redemption Date (Day of month)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtRedemptionDate" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Text="1" PreviewTextInput="DecimalOnly_PreviewTextInput" TextChanged="DecimalOnly_TextChanged"/>
+                        <TextBlock Text="Customers can redeem wallet on this date each month" FontSize="11" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Min Purchase Amount (₹)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtMinAmount" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Text="10000" PreviewTextInput="DecimalOnly_PreviewTextInput" TextChanged="DecimalOnly_TextChanged"/>
+                        <TextBlock Text="Minimum monthly purchase to qualify for wallet credit" FontSize="11" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Minimum Bill Amount (₹)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtMinBillAmount" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Text="0" PreviewTextInput="DecimalOnly_PreviewTextInput" TextChanged="DecimalOnly_TextChanged"/>
+                        <TextBlock Text="Minimum bill amount required for customer to be eligible for wallet credit" FontSize="11" Foreground="#9CA3AF" Margin="0,2,0,0"/>
+
+                        <TextBlock Text="Club / Company Name" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtClubName" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                        <TextBlock Text="Business Partner Name" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtPartnerName" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                        <TextBlock Text="Phone" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtPhone" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                        <TextBlock Text="Email" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtEmail" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1"/>
+
+                        <TextBlock Text="Address" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,14,0,4"/>
+                        <TextBox x:Name="txtAddress" Height="60" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+                        <Button Content="Save Settings" FontSize="12" FontWeight="SemiBold" Background="#2563EB" Foreground="White"
+                                BorderThickness="0" Cursor="Hand" Padding="18,9" Margin="0,20,0,0" HorizontalAlignment="Left"
+                                Click="BtnSaveSettings_Click" Template="{StaticResource RoundedButton}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- ==================== WALLETS TAB ==================== -->
+            <Border x:Name="panelWallets" Background="White" CornerRadius="10" Padding="16" Margin="16"
+                    BorderBrush="#E5E7EB" BorderThickness="1" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Search Box -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border CornerRadius="6" BorderBrush="#D1D5DB" BorderThickness="1" Padding="8,0" MaxWidth="350" HorizontalAlignment="Left">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#9CA3AF" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox x:Name="txtWalletSearch" Grid.Column="1" BorderThickness="0" FontSize="12.5" Padding="0,6"
+                                         VerticalAlignment="Center" TextChanged="TxtWalletSearch_TextChanged">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="Foreground" Value="#374151"/>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Grid>
+                        </Border>
+                        <TextBlock Grid.Column="1" x:Name="lblWalletCount" Text="0 wallets" FontSize="12" Foreground="#6B7280" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Wallets DataGrid -->
+                    <DataGrid Grid.Row="1" x:Name="gridWallets" AutoGenerateColumns="False" IsReadOnly="True"
+                              HeadersVisibility="Column" GridLinesVisibility="None" RowHeight="40"
+                              Background="White" BorderThickness="0" AlternatingRowBackground="#F9FAFB"
+                              FontFamily="Segoe UI" FontSize="12.5" CanUserAddRows="False"
+                              CanUserDeleteRows="False" CanUserResizeRows="False">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F9FAFB"/>
+                                <Setter Property="Foreground" Value="#6B7280"/>
+                                <Setter Property="FontSize" Value="11.5"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="SN" Binding="{Binding SN}" Width="50"/>
+                            <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="*"/>
+                            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="120"/>
+                            <DataGridTextColumn Header="Total Earned" Binding="{Binding TotalEarned}" Width="110"/>
+                            <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="100"/>
+                            <DataGridTextColumn Header="Total Redeemed" Binding="{Binding TotalRedeemed}" Width="120"/>
+                            <DataGridTemplateColumn Header="Action" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="View Profile" FontSize="11" FontWeight="SemiBold"
+                                                Background="#EEF2FF" Foreground="#6366F1" BorderThickness="0"
+                                                Cursor="Hand" Padding="10,4" Tag="{Binding CustomerId}"
+                                                Click="BtnViewProfile_Click" Template="{StaticResource RoundedButton}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!-- ==================== REGISTER MEMBER TAB ==================== -->
+            <Border x:Name="panelRegister" Background="White" CornerRadius="10" Padding="24" Margin="16"
+                    BorderBrush="#E5E7EB" BorderThickness="1" Visibility="Collapsed" MaxWidth="560" HorizontalAlignment="Left">
+                <StackPanel>
+                    <TextBlock Text="Register New Member" FontSize="16" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,4"/>
+                    <TextBlock Text="Mobile number daalein — agar customer pehle se hai to auto-detect hoga, warna naya customer + member dono ban jayega." FontSize="11.5" Foreground="#6B7280" Margin="0,0,0,16" TextWrapping="Wrap"/>
+                    <TextBlock Text="Mobile Number" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtRegMobile" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Margin="0,0,0,12" TextChanged="TxtRegMobile_TextChanged" PreviewTextInput="MobileOnly_PreviewTextInput" PreviewKeyDown="MobileOnly_PreviewKeyDown"/>
+                    <TextBlock Text="Name" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtRegName" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Margin="0,0,0,12"/>
+                    <TextBlock Text="Email (optional)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtRegEmail" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Margin="0,0,0,12"/>
+                    <TextBlock Text="Membership Amount (₹)" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtRegisterAmount" Height="34" FontSize="12.5" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" Margin="0,0,0,4" Text="0" PreviewTextInput="DecimalOnly_PreviewTextInput" TextChanged="DecimalOnly_TextChanged"/>
+                    <TextBlock x:Name="lblRegCustomerFound" Text="" FontSize="11.5" Foreground="#10B981" Margin="0,2,0,12" Visibility="Collapsed"/>
+                    <Button x:Name="btnRegisterMember" Content="Register Member" FontSize="12" FontWeight="SemiBold"
+                            Background="#2563EB" Foreground="White" BorderThickness="0" Cursor="Hand" Padding="18,9"
+                            HorizontalAlignment="Left" Click="BtnRegisterMember_Click" Template="{StaticResource RoundedButton}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== CUSTOMER WALLET PROFILE (inline panel) ==================== -->
+            <Border x:Name="panelProfile" Background="#F3F4F6" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Profile Header -->
+                    <Border Grid.Row="0" Background="White" Padding="16,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                    Background="Transparent" Foreground="#6B7280" BorderThickness="0" Cursor="Hand"
+                                    Padding="6,4" Click="BtnBackToWallets_Click"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                                <!-- Avatar circle -->
+                                <Border Width="36" Height="36" CornerRadius="18" Background="#EEF2FF" Margin="0,0,10,0">
+                                    <TextBlock x:Name="lblProfileAvatar" Text="A" FontSize="15" FontWeight="Bold" Foreground="#6366F1"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock x:Name="lblProfileName" Text="Customer Name" FontSize="14" FontWeight="SemiBold" Foreground="#111827"/>
+                                    <TextBlock x:Name="lblProfilePhone" Text="Phone" FontSize="11.5" Foreground="#6B7280"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Profile Content -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16">
+                        <StackPanel>
+                            <!-- Top Cards Row: Spend Tracker + Wallet Balance -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Spend Tracker -->
+                                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,10,0" BorderBrush="#E5E7EB" BorderThickness="1">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Monthly Spend Tracker" FontSize="13" FontWeight="SemiBold" Foreground="#111827" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                        <!-- Circular progress ring -->
+                                        <Grid Width="120" Height="120" HorizontalAlignment="Center">
+                                            <!-- Background circle -->
+                                            <Ellipse Width="120" Height="120" Stroke="#E5E7EB" StrokeThickness="10" Fill="Transparent"/>
+                                            <!-- Progress arc (simulated with a border) -->
+                                            <Ellipse x:Name="progressRing" Width="120" Height="120" Stroke="#6366F1" StrokeThickness="10"
+                                                     Fill="Transparent" StrokeDashArray="0 100" StrokeDashCap="Round"
+                                                     RenderTransformOrigin="0.5,0.5">
+                                                <Ellipse.RenderTransform>
+                                                    <RotateTransform Angle="-90"/>
+                                                </Ellipse.RenderTransform>
+                                            </Ellipse>
+                                            <!-- Center text -->
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <TextBlock x:Name="lblSpendPercent" Text="0%" FontSize="18" FontWeight="Bold" Foreground="#6366F1" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock x:Name="lblSpendInfo" Text="₹0 / ₹0 target" FontSize="11.5" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Wallet Balance -->
+                                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="20" BorderBrush="#E5E7EB" BorderThickness="1">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="Wallet Balance" FontSize="13" FontWeight="SemiBold" Foreground="#111827" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                        <TextBlock x:Name="lblProfileBalance" Text="₹0.00" FontSize="32" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,12">
+                                            <Border Background="#F0FDF4" CornerRadius="4" Padding="8,3" Margin="0,0,6,0">
+                                                <TextBlock x:Name="lblProfileEarned" Text="Earned: ₹0" FontSize="11" Foreground="#166534"/>
+                                            </Border>
+                                            <Border Background="#FEF2F2" CornerRadius="4" Padding="8,3">
+                                                <TextBlock x:Name="lblProfileRedeemed" Text="Redeemed: ₹0" FontSize="11" Foreground="#991B1B"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <!-- Partial Redemption Amount Input -->
+                                        <TextBlock Text="Amount to Redeem (₹)" FontSize="11" Foreground="#6B7280" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                        <TextBox x:Name="txtRedeemAmount" FontSize="14" FontWeight="SemiBold"
+                                                 HorizontalAlignment="Center" Width="140" Padding="8,6"
+                                                 TextAlignment="Center" BorderBrush="#D1D5DB" BorderThickness="1"
+                                                 Background="White" Foreground="#111827"
+                                                 PreviewTextInput="RedeemAmount_PreviewTextInput"
+                                                 ToolTip="Partial amount enter karo, ya blank chhhod do full redeem ke liye"/>
+                                        <TextBlock x:Name="lblRedeemHint" Text="Blank = full balance redeem" FontSize="10"
+                                                   Foreground="#9CA3AF" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+                                        <Button x:Name="btnRedeem" Content="Redeem Balance" FontSize="12" FontWeight="SemiBold"
+                                                Background="#EF4444" Foreground="White" BorderThickness="0" Cursor="Hand"
+                                                Padding="16,8" Click="BtnRedeem_Click" Template="{StaticResource RoundedButton}"/>
+                                        <Button x:Name="btnPrintIdCard" Content="Print ID Card" FontSize="12" FontWeight="SemiBold"
+                                                Background="#2563EB" Foreground="White" BorderThickness="0" Cursor="Hand"
+                                                Padding="16,8" Margin="0,8,0,0" Click="BtnPrintIdCard_Click" Template="{StaticResource RoundedButton}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Recent Profit Shares + Recent Sales -->
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Recent Profit Shares -->
+                                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,10,0" BorderBrush="#E5E7EB" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="Recent Profit Shares" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,10"/>
+                                        <StackPanel x:Name="panelProfitShares"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Recent Sales -->
+                                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="Recent Sales" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,10"/>
+                                        <StackPanel x:Name="panelRecentSales"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Full Transaction History -->
+                            <Border Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Full Transaction History" FontSize="13" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,10"/>
+                                    <DataGrid x:Name="gridProfileTransactions" AutoGenerateColumns="False" IsReadOnly="True"
+                                              HeadersVisibility="Column" GridLinesVisibility="None" RowHeight="36"
+                                              Background="White" BorderThickness="0" AlternatingRowBackground="#F9FAFB"
+                                              FontFamily="Segoe UI" FontSize="12" CanUserAddRows="False"
+                                              CanUserDeleteRows="False" CanUserResizeRows="False"
+                                              MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                        <DataGrid.ColumnHeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="Background" Value="#F9FAFB"/>
+                                                <Setter Property="Foreground" Value="#6B7280"/>
+                                                <Setter Property="FontSize" Value="11.5"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                <Setter Property="Padding" Value="10,8"/>
+                                                <Setter Property="BorderBrush" Value="#E5E7EB"/>
+                                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                            </Style>
+                                        </DataGrid.ColumnHeaderStyle>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="100"/>
+                                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="80"/>
+                                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="100"/>
+                                            <DataGridTextColumn Header="Balance After" Binding="{Binding BalanceAfter}" Width="110"/>
+                                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

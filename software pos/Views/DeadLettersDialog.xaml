@@ -1,0 +1,412 @@
+<Window x:Class="RashanKiDukan.Views.DeadLettersDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sync Monitor"
+        Width="980" Height="560"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize">
+    <Border Background="White" CornerRadius="10" BorderBrush="#CBD5E1" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="46"/>
+            </Grid.RowDefinitions>
+
+            <!-- ── Title Bar ── -->
+            <Border Grid.Row="0" Background="#1E293B" CornerRadius="10,10,0,0" Padding="16,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Sync Monitor" FontSize="15" FontWeight="Bold"
+                                   Foreground="White" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <Border Background="#334155" CornerRadius="10" Padding="8,3" Margin="12,0,0,0">
+                            <TextBlock x:Name="lblHistoryCount" Text="0 cycles" FontSize="12"
+                                       Foreground="#CBD5E1" FontFamily="Segoe UI"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="Har sync cycle ka start · complete time · status — overlap-free"
+                               FontSize="11" Foreground="#94A3B8" FontFamily="Segoe UI"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Grid.Column="2" Background="#334155" CornerRadius="6" Padding="10,5"
+                            Cursor="Hand" MouseLeftButtonDown="BtnClose_Click" VerticalAlignment="Center">
+                        <TextBlock Text="✕  Esc" FontSize="12" Foreground="White" FontFamily="Segoe UI"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ── Info Bar ── -->
+            <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="16,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="lblLocalInfo" Text="Local: 0" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="#B91C1C" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock Text="  ·  " FontSize="12" Foreground="#CBD5E1" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblServerInfo" Text="Server: 0" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblServerNote" Text="" FontSize="11" Foreground="#9CA3AF"
+                                   Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="Overlap protection ON — busy sync par aayi request agle cycle mein queue hoti hai"
+                               FontSize="11" Foreground="#059669" FontFamily="Segoe UI" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- ── Tabs ── -->
+            <TabControl Grid.Row="2" Background="White" BorderThickness="0" Padding="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Foreground" Value="#334155"/>
+                        <Setter Property="FontFamily" Value="Segoe UI"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Padding" Value="14,6"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border x:Name="bd" Background="#F1F5F9" BorderBrush="#E2E8F0"
+                                            BorderThickness="0,0,1,1" CornerRadius="8,8,0,0" Margin="2,4,0,0"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="bd" Property="Background" Value="White"/>
+                                            <Setter TargetName="bd" Property="BorderThickness" Value="0"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- ═══ TAB 1: DEAD LETTERS ═══ -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠" Margin="0,0,6,0"/>
+                            <TextBlock x:Name="lblCount" Text="Dead Letters — 0 records" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="34"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Border Grid.Row="0" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="16,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="64"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="110"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="SOURCE" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="ENTITY" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="ID" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="OP" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="ERROR" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="RETRIES" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="6" Text="WHEN" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- List -->
+                        <ListView x:Name="lstDead" Grid.Row="1"
+                                  Background="White" BorderThickness="0"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#F1F5F9"/>
+                                    <Setter Property="MinHeight" Value="34"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListViewItem">
+                                                <Border x:Name="bd"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Padding="16,0">
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Background" Value="#FFF7ED"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.View>
+                                <GridView>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style TargetType="GridViewColumnHeader">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                    <GridViewColumn Header="SOURCE" Width="64">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Source}" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{Binding SourceBrush}" FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="ENTITY" Width="120">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Entity}" FontSize="12" Foreground="#334155"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="ID" Width="70">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding LocalId}" FontSize="12" Foreground="#334155"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="OP" Width="80">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Operation}" FontSize="11" Foreground="#64748B"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="ERROR" Width="420">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Error}" FontSize="11" Foreground="#B91C1C"
+                                                           FontFamily="Segoe UI" TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding Error}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="RETRIES" Width="70">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Retries}" FontSize="11" Foreground="#64748B"
+                                                           FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="WHEN" Width="110">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding When}" FontSize="11" Foreground="#9CA3AF"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </TabItem>
+
+                <!-- ═══ TAB 2: SYNC HISTORY ═══ -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🕘" Margin="0,0,6,0"/>
+                            <TextBlock Text="Sync History" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="34"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Border Grid.Row="0" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="16,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="90"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="SYNC STARTED" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="SYNC COMPLETED" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="DURATION" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="PUSHED" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="PULLED" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="STATUS" FontSize="11" FontWeight="Bold" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- List -->
+                        <ListView x:Name="lstHistory" Grid.Row="1"
+                                  Background="White" BorderThickness="0"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#F1F5F9"/>
+                                    <Setter Property="MinHeight" Value="34"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListViewItem">
+                                                <Border x:Name="bd"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Padding="16,0">
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Background" Value="#F0FDF4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.View>
+                                <GridView>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style TargetType="GridViewColumnHeader">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                    <GridViewColumn Header="SYNC STARTED" Width="180">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StartTime}" FontSize="12" Foreground="#334155"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="SYNC COMPLETED" Width="180">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding EndTime}" FontSize="12" Foreground="#334155"
+                                                           FontFamily="Segoe UI"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="DURATION" Width="80">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Duration}" FontSize="11" Foreground="#64748B"
+                                                           FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="PUSHED" Width="80">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Pushed}" FontSize="11" Foreground="#64748B"
+                                                           FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="PULLED" Width="80">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Pulled}" FontSize="11" Foreground="#64748B"
+                                                           FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="STATUS" Width="90">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{Binding StatusBrush}" FontFamily="Segoe UI"
+                                                           HorizontalAlignment="Center" ToolTip="{Binding Error}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <!-- ── Footer ── -->
+            <Border Grid.Row="3" Background="#F8FAFC" CornerRadius="0,0,10,10"
+                    BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="16,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" x:Name="lblNote"
+                               Text="Stuck records har sync cycle mein apne aap retry hote hain — Dismiss sirf log list se hataata hai"
+                               FontSize="11" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                    <Border Grid.Column="1" Background="#FEE2E2" CornerRadius="6"
+                            Padding="14,6" Margin="0,0,8,0" Cursor="Hand"
+                            MouseLeftButtonDown="BtnDismiss_Click" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="✓ " FontSize="11" FontWeight="Bold"
+                                       Foreground="#991B1B" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Dismiss All" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#DC2626" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Background="#DBEAFE" CornerRadius="6"
+                            Padding="14,6" Margin="0,0,8,0" Cursor="Hand"
+                            MouseLeftButtonDown="BtnRefresh_Click" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="↻ " FontSize="11" FontWeight="Bold"
+                                       Foreground="#1E40AF" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Refresh" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#1D4ED8" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Background="#E2E8F0" CornerRadius="6"
+                            Padding="14,6" Cursor="Hand"
+                            MouseLeftButtonDown="BtnClose_Click" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Esc " FontSize="11" FontWeight="Bold"
+                                       Foreground="#334155" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Close" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

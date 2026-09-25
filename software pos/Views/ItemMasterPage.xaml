@@ -1,0 +1,657 @@
+<UserControl x:Class="RashanKiDukan.Views.ItemMasterPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F1F5F9">
+    <UserControl.Resources>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="ModernInput" TargetType="TextBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"
+                                          Margin="14,4"
+                                          VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#A5B4FC"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#6366F1"/>
+                                <Setter TargetName="bd" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernCombo" TargetType="ComboBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="bd" Background="Transparent" CornerRadius="6"
+                                            Padding="{TemplateBinding Padding}" Margin="4,1">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter TargetName="bd" Property="Background" Value="#EEF2FF"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="bd" Property="Background" Value="#E0E7FF"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton" Focusable="False" ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter Margin="12,6" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                                  Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"
+                                                                  ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"/>
+                                                <TextBlock Grid.Column="1" Text="&#xE0E5;" FontFamily="Segoe MDL2 Assets"
+                                                           FontSize="10" Foreground="#94A3B8" VerticalAlignment="Center" Margin="8,0,10,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <TextBlock x:Name="Placeholder" IsHitTestVisible="False" VerticalAlignment="Center"
+                                       Margin="12,0,0,0" Foreground="#94A3B8" FontSize="13.5" FontFamily="Inter, Segoe UI"
+                                       Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Visibility="Collapsed"/>
+                            <Popup x:Name="PART_Popup" AllowsTransparency="True"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom" PlacementTarget="{Binding ElementName=ToggleButton}"
+                                   PopupAnimation="Fade" StaysOpen="False">
+                                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10"
+                                        Margin="0,4,0,0" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <ScrollViewer MaxHeight="280" VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#A5B4FC"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#6366F1"/>
+                            </Trigger>
+                            <Trigger Property="SelectionBoxItem" Value="{x:Null}">
+                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="26,22"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+        </Style>
+
+        <Style x:Key="ModernBtn" TargetType="Button">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ========== HEADER ========== -->
+        <Border Grid.Row="0" Background="White" Padding="28,18" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                            Background="Transparent" Foreground="#64748B" BorderThickness="0"
+                            Cursor="Hand" VerticalAlignment="Center" Click="BtnBack_Click" Padding="6,4"/>
+                    <TextBlock Text="Add Item" FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}" FontFamily="Inter, Segoe UI" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🏠" FontSize="14" Foreground="#6366F1" VerticalAlignment="Center"/>
+                    <TextBlock Text=" / " FontSize="14" Foreground="#9CA3AF" VerticalAlignment="Center" FontFamily="Inter, Segoe UI"/>
+                    <TextBlock Text="Items" FontSize="14" Foreground="#6366F1" VerticalAlignment="Center" FontFamily="Inter, Segoe UI"/>
+                    <TextBlock Text=" / " FontSize="14" Foreground="#9CA3AF" VerticalAlignment="Center" FontFamily="Inter, Segoe UI"/>
+                    <TextBlock Text="Add Item" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" FontFamily="Inter, Segoe UI"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ========== FORM ========== -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="28,20">
+            <StackPanel MaxWidth="1200" HorizontalAlignment="Stretch">
+
+                <!-- ══════════ ITEM BASIC INFORMATION ══════════ -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Item Basic Information"/>
+
+                        <!-- Item Type -->
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Item Type *"/>
+                            <ComboBox x:Name="cmbType" Style="{StaticResource ModernCombo}" SelectionChanged="CmbType_SelectionChanged">
+                                <ComboBoxItem Content="General Product" Tag="General_Product" IsSelected="True"/>
+                                <ComboBoxItem Content="Variation Product" Tag="Variation_Product"/>
+                                <ComboBoxItem Content="IMEI Product" Tag="IMEI_Product"/>
+                                <ComboBoxItem Content="Serial Product" Tag="Serial_Product"/>
+                                <ComboBoxItem Content="Medicine Product" Tag="Medicine_Product"/>
+                                <ComboBoxItem Content="Installment Product" Tag="Installment_Product"/>
+                                <ComboBoxItem Content="Service Product" Tag="Service_Product"/>
+                                <ComboBoxItem Content="Combo Product" Tag="Combo_Product"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Row: Name | Alt Name | Code -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Item Name *"/>
+                                <TextBox x:Name="txtName" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Alternative Name"/>
+                                <TextBox x:Name="txtAltName" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Item Code *"/>
+                                <TextBox x:Name="txtCode" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row: Category | Brand | Supplier -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Group *"/>
+                                <ComboBox x:Name="cmbCategory" Style="{StaticResource ModernCombo}" Tag="Select Category"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Brand"/>
+                                <ComboBox x:Name="cmbBrand" Style="{StaticResource ModernCombo}" Tag="Select Brand"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Supplier"/>
+                                <ComboBox x:Name="cmbSupplier" Style="{StaticResource ModernCombo}" Tag="Select Supplier"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row: Loyalty Point | Description -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Loyalty Point"/>
+                                <TextBox x:Name="txtLoyalty" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Description"/>
+                                <TextBox x:Name="txtDesc" Style="{StaticResource ModernInput}"
+                                         Height="80" TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ PHARMACY INFORMATION (Medicine) ══════════ -->
+                <Border x:Name="pnlPharmacy" Style="{StaticResource SectionCard}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Pharmacy Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Expiry Date Maintain"/>
+                                <ComboBox x:Name="cmbExpiry" Style="{StaticResource ModernCombo}">
+                                    <ComboBoxItem Content="Yes" IsSelected="True"/>
+                                    <ComboBoxItem Content="No"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Generic Name"/>
+                                <TextBox x:Name="txtGeneric" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Rack"/>
+                                <ComboBox x:Name="cmbRack" Style="{StaticResource ModernCombo}" Tag="Select Rack"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ UNIT INFORMATION ══════════ -->
+                <Border x:Name="pnlUnit" Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Unit Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition x:Name="colPurchase" Width="0"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition x:Name="colConversion" Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Unit Type *"/>
+                                <ComboBox x:Name="cmbUnitType" Style="{StaticResource ModernCombo}" SelectionChanged="CmbUnitType_SelectionChanged">
+                                    <ComboBoxItem Content="Single Unit" Tag="1" IsSelected="True"/>
+                                    <ComboBoxItem Content="Double Unit" Tag="2"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" x:Name="pnlPurchaseUnit">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Purchase Unit *"/>
+                                <ComboBox x:Name="cmbPurchaseUnit" Style="{StaticResource ModernCombo}" Tag="Select Purchase Unit"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock x:Name="lblSaleUnit" Style="{StaticResource FieldLabel}" Text="Unit *"/>
+                                <ComboBox x:Name="cmbSaleUnit" Style="{StaticResource ModernCombo}" Tag="Select Unit"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="6" x:Name="pnlConversion">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Conversion Rate *"/>
+                                <TextBox x:Name="txtConversion" Style="{StaticResource ModernInput}" PreviewTextInput="TxtDecimal_PreviewTextInput"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ PRICE INFORMATION ══════════ -->
+                <Border x:Name="priceSection" Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Price Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Purchase Price"/>
+                                <TextBox x:Name="txtPurchasePrice" Style="{StaticResource ModernInput}" TextChanged="Price_TextChanged"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Profit Margin"/>
+                                <TextBox x:Name="txtProfitMargin" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="MRP Price"/>
+                                <TextBox x:Name="txtMRP" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="6">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Sale Price *"/>
+                                <TextBox x:Name="txtSalePrice" Style="{StaticResource ModernInput}" TextChanged="Price_TextChanged"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="8">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Whole Sale Price"/>
+                                <TextBox x:Name="txtWholeSale" Style="{StaticResource ModernInput}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ STOCK INFORMATION ══════════ -->
+                <Border x:Name="pnlStock" Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Stock Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Opening Stock"/>
+                                <TextBox x:Name="txtOpeningStock" Style="{StaticResource ModernInput}" PreviewTextInput="TxtInteger_PreviewTextInput"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Alert Stock"/>
+                                <TextBox x:Name="txtAlertQty" Style="{StaticResource ModernInput}" PreviewTextInput="TxtInteger_PreviewTextInput"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ WARRANTY INFORMATION ══════════ -->
+                <Border x:Name="pnlWarranty" Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Warranty Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Warranty"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="txtWarranty" Style="{StaticResource ModernInput}"/>
+                                    <ComboBox Grid.Column="2" x:Name="cmbWarrantyDate" Style="{StaticResource ModernCombo}">
+                                        <ComboBoxItem Content="Day" IsSelected="True"/>
+                                        <ComboBoxItem Content="Month"/>
+                                        <ComboBoxItem Content="Year"/>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Guarantee"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="txtGuarantee" Style="{StaticResource ModernInput}"/>
+                                    <ComboBox Grid.Column="2" x:Name="cmbGuaranteeDate" Style="{StaticResource ModernCombo}">
+                                        <ComboBoxItem Content="Day" IsSelected="True"/>
+                                        <ComboBoxItem Content="Month"/>
+                                        <ComboBoxItem Content="Year"/>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ TAX INFORMATION ══════════ -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Tax Information"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Applicable Tax"/>
+                                <ComboBox x:Name="cmbTax" Style="{StaticResource ModernCombo}" Tag="Select Tax"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="Tax Type"/>
+                                <ComboBox x:Name="cmbTaxType" Style="{StaticResource ModernCombo}">
+                                    <ComboBoxItem Content="Exclusive" IsSelected="True"/>
+                                    <ComboBoxItem Content="Inclusive"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="HSN Code"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="txtHSN" Style="{StaticResource ModernInput}"/>
+                                    <Button Grid.Column="1" Content="Validate" Click="BtnValidateHSN_Click"
+                                            Margin="6,0,0,0" Padding="10,7" FontSize="11.5" FontWeight="SemiBold"
+                                            Background="#4F46E5" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                                </Grid>
+                                <TextBlock x:Name="lblHsnStatus" Text="" FontSize="11"
+                                           Foreground="#9CA3AF" FontFamily="Segoe UI" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ VARIATION INFORMATION ══════════ -->
+                <Border x:Name="pnlVariation" Style="{StaticResource SectionCard}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionTitle}" Text="Variation Information" Margin="0,0,0,14"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="50"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="VARIATION OPTION" FontSize="11" FontWeight="Bold" Foreground="#475569" FontFamily="Segoe UI"/>
+                            <TextBlock Grid.Column="2" Text="VARIATION VALUES" FontSize="11" FontWeight="Bold" Foreground="#475569" FontFamily="Segoe UI"/>
+                            <TextBlock Grid.Column="4" Text="ACTION" FontSize="11" FontWeight="Bold" Foreground="#475569" FontFamily="Segoe UI"/>
+                        </Grid>
+                        <StackPanel x:Name="variationRows"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <Button Content="+ Add Variation Row" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                                    Background="White" Foreground="#6366F1" BorderBrush="#6366F1" BorderThickness="1.5"
+                                    Cursor="Hand" Height="34" Padding="14,0" Margin="0,0,10,0" Click="BtnAddVariationRow_Click"/>
+                            <Button Content="⟳ Generate Variations" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                                    Background="#6366F1" Foreground="White" BorderThickness="0"
+                                    Cursor="Hand" Height="34" Padding="14,0" Click="BtnGenerateVariations_Click"/>
+                        </StackPanel>
+                        <StackPanel x:Name="generatedVariationsPanel" Margin="0,14,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ COMBO ITEMS ══════════ -->
+                <Border x:Name="pnlCombo" Style="{StaticResource SectionCard}" Visibility="Collapsed">
+                    <StackPanel>
+                        <!-- Header with dotted line -->
+                        <TextBlock Text="Combo Items" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                        <Border Height="1.5" Margin="0,10,0,16" SnapsToDevicePixels="True">
+                            <Border.Background>
+                                <DrawingBrush Viewport="0,0,8,2" ViewportUnits="Absolute" TileMode="Tile">
+                                    <DrawingBrush.Drawing>
+                                        <GeometryDrawing Brush="#6366F1">
+                                            <GeometryDrawing.Geometry>
+                                                <RectangleGeometry Rect="0,0,4,2"/>
+                                            </GeometryDrawing.Geometry>
+                                        </GeometryDrawing>
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Border.Background>
+                        </Border>
+
+                        <!-- Select Item Dropdown -->
+                        <TextBlock Text="Select Item" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,6"/>
+                        <ComboBox x:Name="cmbComboSelect" IsEditable="True" FontSize="13" FontFamily="Segoe UI"
+                                  Width="320" HorizontalAlignment="Left" Padding="10,8"
+                                  SelectionChanged="CmbComboSelect_Changed"/>
+
+                        <!-- Table Header -->
+                        <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6,6,0,0" Padding="12,10" Margin="0,16,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="75"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="60"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="SN" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="SHOW IN&#x000a;INVOICE" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="ITEM NAME - CODE" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="UNIT" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="QUANTITY" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="AMOUNT" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="6" Text="TOTAL" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="7" Text="ACTION" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#6B7280" TextAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Combo Rows Container -->
+                        <Border BorderBrush="#E5E7EB" BorderThickness="1,0,1,1" CornerRadius="0,0,6,6">
+                            <StackPanel x:Name="comboItemRows"/>
+                        </Border>
+
+                        <!-- Sale Price at bottom right -->
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="Sale Price:" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBox x:Name="txtComboPrice" Grid.Column="2" Style="{StaticResource ModernInput}" Text="0.00" TextAlignment="Right"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════ STATUS MESSAGE ══════════ -->
+                <TextBlock x:Name="lblStatus" FontSize="13" FontFamily="Inter, Segoe UI"
+                           Margin="4,0,0,16" Visibility="Collapsed"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ========== FOOTER ========== -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+            <Grid Margin="28,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="12.5" Foreground="#94A3B8" FontFamily="Inter, Segoe UI">
+                    <Run Text="Fields marked "/><Run Text="*" FontWeight="Bold" Foreground="#EF4444"/><Run Text=" are mandatory"/>
+                </TextBlock>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="btnBack" Content="↩ Back" Style="{StaticResource ModernBtn}"
+                            Background="#F1F5F9" Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="#CBD5E1" BorderThickness="1"
+                            Margin="0,0,12,0" Click="BtnBack_Click"/>
+                    <Button x:Name="btnSave" Content="✓ Submit" Style="{StaticResource ModernBtn}"
+                            Background="#6366F1" Foreground="White" Padding="34,0" Click="BtnSave_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

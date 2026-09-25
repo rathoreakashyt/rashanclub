@@ -1,0 +1,75 @@
+<UserControl x:Class="RashanKiDukan.Views.GSTPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18" Background="Transparent" Foreground="#6B7280" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center" Click="BtnBack_Click" Padding="6,4"/>
+                <TextBlock Grid.Column="1" Text="GST" FontSize="17" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI" VerticalAlignment="Center" Margin="12,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="{StaticResource BgLightBrush}">
+            <StackPanel Margin="25,20,25,30">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- GSTR-1 -->
+                    <Border Grid.Row="0" Grid.Column="0" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="6" Padding="20,16" Cursor="Hand">
+                        <StackPanel>
+                            <TextBlock Text="&#x1F4C4;" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="GSTR-1" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Outward supplies return" FontSize="12" Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- GSTR-3B -->
+                    <Border Grid.Row="0" Grid.Column="1" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="6" Padding="20,16" Cursor="Hand">
+                        <StackPanel>
+                            <TextBlock Text="&#x1F4CB;" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="GSTR-3B" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource SkyBrush}" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Summary return" FontSize="12" Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- E-Invoice -->
+                    <Border Grid.Row="1" Grid.Column="0" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="6" Padding="20,16" Cursor="Hand">
+                        <StackPanel>
+                            <TextBlock Text="&#x1F4F1;" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="E-Invoice" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource WarningBrush}" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Generate e-invoices" FontSize="12" Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- E-Way Bill -->
+                    <Border Grid.Row="1" Grid.Column="1" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="6" Padding="20,16" Cursor="Hand">
+                        <StackPanel>
+                            <TextBlock Text="&#x1F69A;" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="E-Way Bill" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" FontFamily="Segoe UI"/>
+                            <TextBlock Text="Generate e-way bills" FontSize="12" Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

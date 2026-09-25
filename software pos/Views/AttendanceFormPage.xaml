@@ -1,0 +1,186 @@
+<UserControl x:Class="RashanKiDukan.Views.AttendanceFormPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers" d:DesignHeight="700" d:DesignWidth="1100">
+    <Grid Background="#F8FAFC">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════ HEADER ══════════ -->
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="28,16">
+            <Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="lblTitle" Text="Add Attendance" FontSize="18" FontWeight="Bold" Foreground="#111827" FontFamily="Inter, Segoe UI"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Human Resource Management" FontSize="12" Foreground="#6B7280" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock Text=" > " FontSize="12" Foreground="#9CA3AF" VerticalAlignment="Center"/>
+                        <TextBlock Text="Attendance" FontSize="12" Foreground="#6B7280" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock Text=" > " FontSize="12" Foreground="#9CA3AF" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="lblBreadcrumb" Text="Add Attendance" FontSize="12" Foreground="#6B7280" FontFamily="Inter, Segoe UI" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" Content="&#xE72B;  Back" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="#4F46E5" Background="#EEF2FF" BorderThickness="0" Padding="16,9" Cursor="Hand" Click="BtnBack_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="bd" Background="#EEF2FF" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="#E0E7FF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ══════════ STATUS ══════════ -->
+        <Border x:Name="statusBanner" Grid.Row="1" Margin="28,16,28,0" CornerRadius="8" Padding="14,10" Visibility="Collapsed">
+            <TextBlock x:Name="txtStatus" FontSize="13" FontFamily="Inter, Segoe UI"/>
+        </Border>
+
+        <!-- ══════════ FORM CARD ══════════ -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <Border Margin="28,16,28,28" Background="White" CornerRadius="12" BorderBrush="#E5E7EB" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Form body -->
+                    <StackPanel Grid.Row="0" Margin="24,24,24,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Reference No -->
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="Reference No" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI"/>
+                                    <TextBlock Text="*" FontSize="13" Foreground="#EF4444" FontFamily="Inter, Segoe UI" Margin="2,0,0,0"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtReferenceNo" Height="36" FontSize="13" Padding="12,6" BorderBrush="#CBD5E1" BorderThickness="1" FontFamily="Inter, Segoe UI" IsReadOnly="True" Background="#F1F5F9"/>
+                            </StackPanel>
+
+                            <!-- Date -->
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="Date" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI"/>
+                                    <TextBlock Text="*" FontSize="13" Foreground="#EF4444" FontFamily="Inter, Segoe UI" Margin="2,0,0,0"/>
+                                </StackPanel>
+                                <DatePicker x:Name="dpDate" Height="36" FontSize="13" FontFamily="Inter, Segoe UI"/>
+                            </StackPanel>
+
+                            <!-- Employee -->
+                            <StackPanel Grid.Row="0" Grid.Column="4">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="Employee" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI"/>
+                                    <TextBlock Text="*" FontSize="13" Foreground="#EF4444" FontFamily="Inter, Segoe UI" Margin="2,0,0,0"/>
+                                </StackPanel>
+                                <ComboBox x:Name="cmbEmployee" Height="36" FontSize="13" FontFamily="Inter, Segoe UI"/>
+                            </StackPanel>
+
+                            <!-- In Time -->
+                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,18,0,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="In Time" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI"/>
+                                    <TextBlock Text="*" FontSize="13" Foreground="#EF4444" FontFamily="Inter, Segoe UI" Margin="2,0,0,0"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtInTime" Height="36" FontSize="13" Padding="12,6" BorderBrush="#CBD5E1" BorderThickness="1" FontFamily="Inter, Segoe UI"/>
+                                <TextBlock Text="Format: HH:MM" FontSize="11" Foreground="#9CA3AF" FontFamily="Inter, Segoe UI" Margin="2,4,0,0"/>
+                            </StackPanel>
+
+                            <!-- Out Time -->
+                            <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,18,0,0">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="Out Time" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtOutTime" Height="36" FontSize="13" Padding="12,6" BorderBrush="#CBD5E1" BorderThickness="1" FontFamily="Inter, Segoe UI"/>
+                                <TextBlock Text="Format: HH:MM (must be after In Time)" FontSize="11" Foreground="#9CA3AF" FontFamily="Inter, Segoe UI" Margin="2,4,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Note -->
+                        <StackPanel Margin="0,18,0,0">
+                            <TextBlock Text="Note" FontSize="12.5" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI" Margin="0,0,0,5"/>
+                            <TextBox x:Name="txtNote" Height="80" FontSize="13" Padding="12,8" BorderBrush="#CBD5E1" BorderThickness="1" FontFamily="Inter, Segoe UI" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Footer -->
+                    <Border Grid.Row="1" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0" Background="#F8FAFC" Padding="24,14" CornerRadius="0,0,12,12">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Button x:Name="btnSubmit" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="24,10" Margin="0,0,12,0" Cursor="Hand" Click="BtnSubmit_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="bd" Background="#4F46E5" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="bd" Property="Background" Value="#4338CA"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed" Value="True">
+                                                            <Setter TargetName="bd" Property="Background" Value="#3730A3"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="&#xE72B;  Back" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="#4F46E5" Background="#EEF2FF" BorderThickness="0" Padding="22,10" Cursor="Hand" Click="BtnBack_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="bd" Background="#EEF2FF" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="bd" Property="Background" Value="#E0E7FF"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

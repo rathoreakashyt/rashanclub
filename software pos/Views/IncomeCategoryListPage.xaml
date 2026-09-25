@@ -1,0 +1,154 @@
+<UserControl x:Class="RashanKiDukan.Views.IncomeCategoryListPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <UserControl.Resources>
+        <Style x:Key="HeaderCell" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="DataCell" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- ════ TOP BAR ════ -->
+        <Border DockPanel.Dock="Top" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="0">
+            <Grid Margin="24,12,24,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="List Income Category"
+                           FontSize="18" FontWeight="SemiBold" Foreground="#111827"
+                           FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" x:Name="btnAdd"
+                        FontSize="13" FontWeight="SemiBold"
+                        Background="#6366F1" Foreground="White" BorderThickness="0"
+                        Cursor="Hand" Padding="14,7" Click="BtnAdd_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                    CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#4F46E5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="Add Category" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ════ SEARCH ════ -->
+        <Border DockPanel.Dock="Top" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="24,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <TextBox x:Name="txtSearch" Height="34" FontFamily="Segoe UI" FontSize="13"
+                             Background="White" BorderBrush="#D1D5DB" BorderThickness="1"
+                             Padding="30,0,8,0" VerticalContentAlignment="Center"
+                             TextChanged="TxtSearch_TextChanged"/>
+                    <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                               Foreground="#9CA3AF" VerticalAlignment="Center" Margin="10,0,0,0"
+                               IsHitTestVisible="False"/>
+                </Grid>
+                <TextBlock Grid.Column="2" x:Name="lblTotal" Text="0 categories"
+                           FontSize="13" Foreground="#6B7280" FontFamily="Segoe UI"
+                           VerticalAlignment="Center" Margin="16,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- ════ FOOTER ════ -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0"
+                Background="#F9FAFB" Padding="24,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="lblFooter" Text="Showing 0 entries"
+                           FontSize="12" Foreground="#6B7280" FontFamily="Segoe UI"
+                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="btnPrev" Content="Previous" FontFamily="Segoe UI" FontSize="12"
+                            Foreground="#374151" Background="White" BorderBrush="#D1D5DB"
+                            BorderThickness="1" Padding="12,5" Cursor="Hand"
+                            IsEnabled="False" Click="BtnPrev_Click"/>
+                    <ItemsControl x:Name="pageButtons" Margin="6,0,0,0" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <Button x:Name="btnNext" Content="Next" FontFamily="Segoe UI" FontSize="12"
+                            Foreground="#374151" Background="White" BorderBrush="#D1D5DB"
+                            BorderThickness="1" Padding="12,5" Cursor="Hand"
+                            IsEnabled="False" Click="BtnNext_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ════ TABLE (fills remaining space) ════ -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Grid x:Name="tableContainer" Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                    <Grid Height="42">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="SN"      Style="{StaticResource HeaderCell}" Margin="16,0,0,0"/>
+                        <TextBlock Grid.Column="1" Text="NAME"    Style="{StaticResource HeaderCell}"/>
+                        <TextBlock Grid.Column="2" Text="DESCRIPTION" Style="{StaticResource HeaderCell}"/>
+                        <TextBlock Grid.Column="3" Text="ACTION"  Style="{StaticResource HeaderCell}" Margin="0,0,16,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Data rows -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="rowsContainer">
+                        <TextBlock x:Name="emptyState"
+                                   Text="No income categories found"
+                                   FontSize="14" Foreground="#9CA3AF" FontFamily="Segoe UI"
+                                   HorizontalAlignment="Center" Margin="0,40,0,40"
+                                   Visibility="Visible"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
+
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,186 @@
+<Window x:Class="RashanKiDukan.Views.SchemePercentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Scheme % — Custom Price" Width="440" Height="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F2F2F2" KeyDown="Window_KeyDown" ShowInTaskbar="False"
+        WindowStyle="None" Focusable="True">
+    <Window.Resources>
+        <Style x:Key="ExcelGreenButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#217346"/>
+            <Setter Property="Padding" Value="26,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                BorderThickness="1" BorderBrush="#1B5E38" CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1B5E38"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExcelGrayButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Background" Value="#F2F2F2"/>
+            <Setter Property="Padding" Value="26,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                BorderThickness="1" BorderBrush="#C9CDD3" CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#E4E6E9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="QuickPctButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0F766E"/>
+            <Setter Property="Background" Value="#F0FDFA"/>
+            <Setter Property="BorderBrush" Value="#99F6E4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#CCFBF1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header strip -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#D6D9DE" BorderThickness="0,0,0,1" Padding="18,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="SCHEME % — CUSTOM PRICE" FontSize="16" FontWeight="Bold"
+                           Foreground="#1F1F1F" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="Esc = Cancel" FontSize="12" Foreground="#6B7280"
+                           FontFamily="Segoe UI" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Item info -->
+        <StackPanel Grid.Row="1" Margin="28,16,28,0">
+            <TextBlock x:Name="lblItemName" FontSize="17" FontWeight="Bold" Foreground="#1F1F1F"
+                       FontFamily="Segoe UI" TextTrimming="CharacterEllipsis"/>
+            <TextBlock x:Name="lblItemMeta" FontSize="12.5" Foreground="#6B7280" FontFamily="Segoe UI"
+                       Margin="0,5,0,0" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+
+        <!-- Explanation -->
+        <Border Grid.Row="2" Margin="28,14,28,0" Background="#FFFBEB" BorderBrush="#FDE68A"
+                BorderThickness="1" CornerRadius="6" Padding="12,8">
+            <TextBlock Text="Buy X Get Y scheme par custom % lagayein — sirf ek item liya ho to aap apne hisaab se % price set kar sakte hain. Price = List Price × % ÷ 100."
+                       FontSize="12" Foreground="#92400E" FontFamily="Segoe UI" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Percentage input -->
+        <StackPanel Grid.Row="3" Margin="28,16,28,0" VerticalAlignment="Top">
+            <TextBlock Text="Percentage of List Price (%)" FontSize="12" FontWeight="SemiBold" Foreground="#6B7280"
+                       FontFamily="Segoe UI" Margin="2,0,0,6"/>
+            <Border x:Name="pctBox" Background="White" BorderBrush="#8A8A8A" BorderThickness="1" CornerRadius="6">
+                <TextBlock x:Name="txtPct" Text="60" FontSize="34" FontWeight="Bold" Foreground="#1F1F1F"
+                           FontFamily="Segoe UI" HorizontalAlignment="Center" Padding="0,4"/>
+            </Border>
+
+            <!-- Quick presets -->
+            <UniformGrid Columns="5" Margin="0,10,0,0">
+                <Button Content="50%" Style="{StaticResource QuickPctButton}" Tag="50" Click="QuickPct_Click" Margin="0,0,6,0"/>
+                <Button Content="60%" Style="{StaticResource QuickPctButton}" Tag="60" Click="QuickPct_Click" Margin="0,0,6,0"/>
+                <Button Content="70%" Style="{StaticResource QuickPctButton}" Tag="70" Click="QuickPct_Click" Margin="0,0,6,0"/>
+                <Button Content="80%" Style="{StaticResource QuickPctButton}" Tag="80" Click="QuickPct_Click" Margin="0,0,6,0"/>
+                <Button Content="100%" Style="{StaticResource QuickPctButton}" Tag="100" Click="QuickPct_Click"/>
+            </UniformGrid>
+
+            <TextBlock x:Name="lblPreview" Text="" FontSize="14" FontWeight="Bold" Foreground="#217346"
+                       FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+            <TextBlock x:Name="lblWarn" Text="" FontSize="12.5" FontWeight="Bold" Foreground="#B91C1C"
+                       FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,4,0,0"
+                       Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Footer buttons -->
+        <Grid Grid.Row="4" Margin="28,14,28,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Enter = Apply" FontSize="12" Foreground="#9CA3AF"
+                       FontFamily="Segoe UI" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="CANCEL" Style="{StaticResource ExcelGrayButton}"
+                    Click="BtnCancel_Click" Margin="0,0,10,0"/>
+            <Button Grid.Column="2" Content="APPLY %" Style="{StaticResource ExcelGreenButton}"
+                    Click="BtnOk_Click"/>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="5" Background="#F2F2F2" BorderBrush="#D6D9DE" BorderThickness="0,1,0,0" Padding="12,0">
+            <Grid Height="32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#x2190; &#x2192; + / - 1" FontSize="11" Foreground="#6B7280"
+                               FontFamily="Consolas" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                    <TextBlock Text="123 = set %" FontSize="11" Foreground="#6B7280"
+                               FontFamily="Consolas" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="0 – 100 allowed" FontSize="11" FontWeight="SemiBold" Foreground="#217346"
+                               FontFamily="Consolas" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,172 @@
+<UserControl x:Class="RashanKiDukan.Views.PurchaseReturnCreatePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F5F6FA">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Views/FormStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="66"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Style="{StaticResource IconButton}" Content="&#xE72B;" Click="BtnBack_Click"/>
+                <Border Grid.Column="1" Width="40" Height="40" CornerRadius="10" Background="{StaticResource AccentSoftBrush}" Margin="10,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel Grid.Column="2" Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="lblTitle" Text="Add Purchase Return" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" FontFamily="Segoe UI"/>
+                    <TextBlock x:Name="lblSubtitle" Text="Return items to a supplier" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI"/>
+                </StackPanel>
+                <Button Grid.Column="3" Style="{StaticResource PrimaryButton}" Content="Save Return" Click="BtnSave_Click"/>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#F5F6FA">
+            <StackPanel Margin="28,20,28,28">
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,10">
+                    <Border Width="4" Height="16" CornerRadius="2" Background="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="RETURN DETAILS" Margin="10,0,0,0"/>
+                </StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="220"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="SUPPLIER *"/>
+                                <ComboBox x:Name="cmbSupplier" Style="{StaticResource FormCombo}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="DATE *"/>
+                                <DatePicker x:Name="dpDate" Style="{StaticResource FormDate}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="PURCHASE DATE"/>
+                                <DatePicker x:Name="dpPurchaseDate" Style="{StaticResource FormDate}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="PURCHASE REFERENCE NO"/>
+                                <TextBox x:Name="txtPurRef" Style="{StaticResource FormInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="REFERENCE NO"/>
+                                <TextBox x:Name="txtReference" Style="{StaticResource FormInput}" IsReadOnly="True"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="PAYMENT METHOD"/>
+                                <ComboBox x:Name="cmbPayment" Style="{StaticResource FormCombo}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="NOTE"/>
+                                <TextBox x:Name="txtNote" Style="{StaticResource FormInput}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="RETURN STATUS"/>
+                                <ComboBox x:Name="cmbStatus" Style="{StaticResource FormCombo}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Margin="2,22,0,10">
+                    <Border Width="4" Height="16" CornerRadius="2" Background="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Style="{StaticResource SectionTitle}" Text="ITEMS *" Margin="10,0,0,0"/>
+                </StackPanel>
+                <Border Style="{StaticResource Card}" Padding="0,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="42"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" CornerRadius="12,12,0,0">
+                            <Grid Margin="16,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="46"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Style="{StaticResource HeaderCell}" Text="ITEM"/>
+                                <TextBlock Grid.Column="1" Style="{StaticResource HeaderCell}" Text="QTY"/>
+                                <TextBlock Grid.Column="2" Style="{StaticResource HeaderCell}" Text="UNIT PRICE"/>
+                                <TextBlock Grid.Column="3" Style="{StaticResource HeaderCell}" Text="TOTAL"/>
+                            </Grid>
+                        </Border>
+                        <ItemsControl x:Name="itemsPanel" Grid.Row="1" Margin="16,12,16,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="46"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox Grid.Column="0" Style="{StaticResource FormCombo}" MinHeight="36" ItemsSource="{Binding Items}" DisplayMemberPath="Name"
+                                                  SelectedValuePath="Id" SelectedValue="{Binding ItemId, Mode=TwoWay}" SelectionChanged="Item_SelectionChanged" Tag="{Binding}"/>
+                                        <TextBox Grid.Column="1" Style="{StaticResource FormInput}" MinHeight="36" Margin="8,0" Text="{Binding Qty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="Qty_TextChanged" Tag="{Binding}"/>
+                                        <TextBox Grid.Column="2" Style="{StaticResource FormInput}" MinHeight="36" Margin="8,0" Text="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="Price_TextChanged" Tag="{Binding}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Total, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" FontFamily="Segoe UI" VerticalAlignment="Center" Margin="8,0"/>
+                                        <Button Grid.Column="4" Style="{StaticResource DangerIconButton}" Content="&#xE74D;" Click="BtnRemoveItem_Click" Tag="{Binding}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+                <Button Style="{StaticResource GhostButton}" Content="+ Add Item" HorizontalAlignment="Left" Margin="2,12,0,0" Click="BtnAddItem_Click"/>
+
+                <Border Width="300" CornerRadius="12" HorizontalAlignment="Right" Margin="0,22,0,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#4F46E5" Offset="0"/>
+                            <GradientStop Color="#7C3AED" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid Margin="24,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Total Return Amount" FontSize="13" Foreground="#E0E7FF" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" x:Name="lblTotal" Text="0.00" FontSize="22" FontWeight="Bold" Foreground="White" FontFamily="Segoe UI"/>
+                    </Grid>
+                </Border>
+
+                <TextBlock x:Name="lblMsg" Style="{StaticResource SuccessText}" Margin="2,12,0,0" Text=""/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

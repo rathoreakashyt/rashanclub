@@ -1,0 +1,220 @@
+<UserControl x:Class="RashanKiDukan.Views.GstReportPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers" d:DesignHeight="900" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="#696cff" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#5f61e6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="BtnSecondary" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="#F3F4F6" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#E5E7EB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="#F8F7FA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#EAEAEC" BorderThickness="0,0,0,1" Padding="24,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="GST Reports" FontSize="20" FontWeight="SemiBold" Foreground="#23232E" FontFamily="Inter, Segoe UI"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="&#x1F3E0;" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock Text=" / " FontSize="12" Foreground="#8E8EA1" VerticalAlignment="Center"/>
+                        <Button Content="Report" Background="Transparent" BorderThickness="0"
+                                FontSize="12" Foreground="#696cff" FontFamily="Inter, Segoe UI"
+                                Cursor="Hand" Padding="0" Click="BtnBack_Click"/>
+                        <TextBlock Text=" / GST Reports" FontSize="12" Foreground="#8E8EA1"
+                                   FontFamily="Inter, Segoe UI" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+                <Button Grid.Column="1" Click="BtnBack_Click" Cursor="Hand"
+                        FontSize="12.5" FontWeight="SemiBold" FontFamily="Inter, Segoe UI"
+                        Foreground="#6B7280" BorderThickness="0" Padding="14,8"
+                        Style="{StaticResource BtnSecondary}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x2190; Back" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#F8F7FA">
+            <StackPanel Margin="24,20,24,28">
+
+                <!-- FILTER SECTION -->
+                <Border Background="White" CornerRadius="10" BorderBrush="#EAEAEC" BorderThickness="1" Margin="0,0,0,16">
+                    <StackPanel>
+                        <Border BorderBrush="#EAEAEC" BorderThickness="0,0,0,1" Padding="20,14">
+                            <TextBlock Text="Filters" FontSize="14" FontWeight="SemiBold" Foreground="#23232E" FontFamily="Inter, Segoe UI"/>
+                        </Border>
+                        <StackPanel Margin="20,16,20,16">
+                            <WrapPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Report Type" FontSize="12" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI" Margin="0,0,0,5"/>
+                                    <ComboBox x:Name="cmbReportType" Width="220" Height="36" FontSize="13" FontFamily="Inter, Segoe UI" SelectionChanged="CmbReportType_Changed"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Date From" FontSize="12" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI" Margin="0,0,0,5"/>
+                                    <DatePicker x:Name="dpDateFrom" helpers:DateRangeGuard.To="{Binding ElementName=dpDateTo}" Width="170" Height="36" FontSize="13" FontFamily="Inter, Segoe UI"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Date To" FontSize="12" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI" Margin="0,0,0,5"/>
+                                    <DatePicker x:Name="dpDateTo" helpers:DateRangeGuard.From="{Binding ElementName=dpDateFrom}" Width="170" Height="36" FontSize="13" FontFamily="Inter, Segoe UI"/>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,16,12">
+                                    <TextBlock Text="Outlet" FontSize="12" FontWeight="SemiBold" Foreground="#374151" FontFamily="Inter, Segoe UI" Margin="0,0,0,5"/>
+                                    <ComboBox x:Name="cmbOutlet" Width="190" Height="36" FontSize="13" FontFamily="Inter, Segoe UI"/>
+                                </StackPanel>
+                                <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,12">
+                                    <Button Content="Apply Filter" Click="BtnApplyFilter_Click" Cursor="Hand"
+                                            FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI"
+                                            Foreground="White" BorderThickness="0" Padding="18,9"
+                                            Style="{StaticResource BtnPrimary}"/>
+                                </StackPanel>
+                            </WrapPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- REPORT TABLE CARD -->
+                <Border Background="White" CornerRadius="10" BorderBrush="#EAEAEC" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Report Title -->
+                        <Border Grid.Row="0" BorderBrush="#EAEAEC" BorderThickness="0,0,0,1" Padding="20,14">
+                            <Grid>
+                                <TextBlock x:Name="lblReportTitle" Text="GST Tax Summary Report" FontSize="14.5" FontWeight="SemiBold" Foreground="#23232E"
+                                           FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Grid Margin="0,0,8,0">
+                                        <Button x:Name="btnExport" Click="BtnExport_Click" Cursor="Hand"
+                                                FontSize="12.5" FontWeight="SemiBold" FontFamily="Inter, Segoe UI"
+                                                Foreground="#696cff" BorderThickness="0" Padding="14,7"
+                                                Style="{StaticResource BtnSecondary}">
+                                            <TextBlock Text="&#x2B06; Export &#x25BE;"/>
+                                        </Button>
+                                        <Popup x:Name="exportPopup" StaysOpen="False"
+                                               PlacementTarget="{Binding ElementName=btnExport}" Placement="Bottom"
+                                               AllowsTransparency="True">
+                                            <Border Background="White" BorderBrush="#DCDCEC" BorderThickness="1"
+                                                    CornerRadius="8" Padding="4">
+                                                <StackPanel>
+                                                    <Button Content="&#x1F5A8;  Print" Click="BtnPrint_Click" Cursor="Hand"
+                                                            Background="Transparent" BorderThickness="0"
+                                                            FontSize="13" FontFamily="Inter, Segoe UI" Foreground="#374151"
+                                                            Padding="14,9" HorizontalContentAlignment="Left"/>
+                                                    <Button Content="&#x1F4C4;  Export CSV" Click="BtnExportCsv_Click" Cursor="Hand"
+                                                            Background="Transparent" BorderThickness="0"
+                                                            FontSize="13" FontFamily="Inter, Segoe UI" Foreground="#374151"
+                                                            Padding="14,9" HorizontalContentAlignment="Left"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Filter info bar -->
+                        <Border x:Name="filterInfoBar" Grid.Row="1"
+                                Background="#F0FDF4" BorderBrush="#BBF7D0" BorderThickness="0,0,0,1"
+                                Padding="20,12" Visibility="Collapsed">
+                            <StackPanel x:Name="filterInfoPanel"/>
+                        </Border>
+
+                        <!-- Empty state -->
+                        <StackPanel x:Name="emptyState" Grid.Row="2"
+                                    HorizontalAlignment="Center" Margin="0,50,0,50">
+                            <TextBlock Text="&#x1F4CB;" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock Text="Select report type and click Apply Filter" FontSize="13.5"
+                                       Foreground="#8E8EA1" FontFamily="Inter, Segoe UI" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Dynamic DataGrid -->
+                        <DataGrid x:Name="dataGrid" Grid.Row="2"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  CanUserAddRows="False" CanUserDeleteRows="False"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#F0F0F5"
+                                  Background="White" BorderThickness="0"
+                                  RowBackground="White" AlternatingRowBackground="#FAFAFA"
+                                  FontFamily="Inter, Segoe UI" FontSize="13"
+                                  Visibility="Collapsed"
+                                  SelectionMode="Single" SelectionUnit="FullRow"
+                                  HeadersVisibility="Column">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F5F5FA"/>
+                                    <Setter Property="Foreground" Value="#374151"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="12,10"/>
+                                    <Setter Property="BorderBrush" Value="#E5E5F0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,1,0"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Padding" Value="12,9"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="#374151"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#EEF2FF"/>
+                                            <Setter Property="Foreground" Value="#374151"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

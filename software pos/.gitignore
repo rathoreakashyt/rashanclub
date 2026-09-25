@@ -1,0 +1,32 @@
+# Build output
+bin/
+obj/
+build.log
+
+# Visual Studio / IDE
+.vs/
+*.user
+*.suo
+
+# Local runtime data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Secrets & credentials — NEVER commit
+settings.json
+login_details.txt
+*.secret
+*.env
+
+# Logs
+*.log
+logs/
+
+# Local tooling
+.atomcode/
+
+# Temp / misc
+publish/
+*.publishprofile

@@ -1,0 +1,130 @@
+<UserControl x:Class="RashanKiDukan.Views.DepositWithdrawFormPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="#F8F9FB" BorderBrush="#E3E8EF" BorderThickness="0,0,0,1" Padding="24,14">
+            <Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Add Deposit/Withdraw" FontSize="16" FontWeight="Bold" Foreground="#384551" FontFamily="Inter, Segoe UI"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                        <TextBlock Text="Accounting" FontSize="12" Foreground="#696cff" FontFamily="Inter, Segoe UI"/>
+                        <TextBlock Text=" / " FontSize="12" Foreground="#8F9BB3" FontFamily="Inter, Segoe UI"/>
+                        <TextBlock Text="Add Deposit/Withdraw" FontSize="12" Foreground="#8F9BB3" FontFamily="Inter, Segoe UI"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- FORM CARD -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="28,24" Margin="24,16">
+                <StackPanel>
+                    <!-- ROW 1: Reference No, Date, Type -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Reference No -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Reference No"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <TextBox x:Name="txtRef" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551" FontFamily="Inter, Segoe UI" IsReadOnly="True" Background="#FAFBFC"/>
+                        </StackPanel>
+
+                        <!-- Date -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Date"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <DatePicker x:Name="dpDate" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551"/>
+                        </StackPanel>
+
+                        <!-- Type -->
+                        <StackPanel Grid.Column="4">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Type"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <ComboBox x:Name="cmbType" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551" FontFamily="Inter, Segoe UI">
+                                <ComboBoxItem Content="Select Type" Tag="" IsSelected="True"/>
+                                <ComboBoxItem Content="Deposit" Tag="Deposit"/>
+                                <ComboBoxItem Content="Withdraw" Tag="Withdraw"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- ROW 2: Amount, Payment Method, Note -->
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Amount -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Amount"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <TextBox x:Name="txtAmount" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551" FontFamily="Inter, Segoe UI"/>
+                        </StackPanel>
+
+                        <!-- Payment Method -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Payment Method"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <ComboBox x:Name="cmbPaymentMethod" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551" FontFamily="Inter, Segoe UI" DisplayMemberPath="Name"/>
+                        </StackPanel>
+
+                        <!-- Note -->
+                        <StackPanel Grid.Column="4">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,6">
+                                <Run Text="Note"/>
+                                <Run Text=" *" Foreground="#FF4C6B"/>
+                            </TextBlock>
+                            <TextBox x:Name="txtNote" FontSize="14" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Foreground="#384551" FontFamily="Inter, Segoe UI" TextWrapping="Wrap" AcceptsReturn="True" Height="70" VerticalContentAlignment="Top"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- BUTTONS -->
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Submit" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="20,10" Cursor="Hand" Click="BtnSubmit_Click">
+                            <Button.Background>
+                                <SolidColorBrush Color="#696cff"/>
+                            </Button.Background>
+                        </Button>
+                        <Button FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="20,10" Cursor="Hand" Margin="10,0,0,0" Click="BtnBack_Click">
+                            <Button.Background>
+                                <SolidColorBrush Color="#696cff"/>
+                            </Button.Background>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="← " FontSize="13" Foreground="White" FontFamily="Inter, Segoe UI"/>
+                                <TextBlock Text="Back" FontSize="13" Foreground="White" FontFamily="Inter, Segoe UI"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

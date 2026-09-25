@@ -1,0 +1,161 @@
+<UserControl x:Class="RashanKiDukan.Views.DamageCreatePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HERO HEADER -->
+        <Border Grid.Row="0" CornerRadius="0" Background="#F8F9FB" BorderBrush="#E3E8EF" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="headerTitle" Text="Add Damage" FontSize="20" FontWeight="Bold" Foreground="#384551" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="16" Background="Transparent" Foreground="#6B7C91" BorderThickness="0" Width="40" Height="40" Cursor="Hand" Click="BtnBack_Click" ToolTip="Back"/>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="24,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- LEFT: Form fields + Items table -->
+                <StackPanel Grid.Column="0">
+                    <!-- REF + DATE + EMPLOYEE ROW -->
+                    <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,18" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Reference No -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Reference No *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                                <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                    <TextBox x:Name="txtRef" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Date -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Date *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                                <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                    <TextBox x:Name="txtDate" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Employee -->
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Employee *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                                <Border Background="#F5F7FB" CornerRadius="8" Padding="2,2" BorderBrush="#E3E8EF" BorderThickness="1">
+                                    <ComboBox x:Name="cmbEmployee" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" Background="Transparent" DisplayMemberPath="Name" Padding="10,8"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- ITEMS SELECT -->
+                    <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,18" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Items" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="2,2" BorderBrush="#E3E8EF" BorderThickness="1">
+                                <ComboBox x:Name="cmbItem" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" Background="Transparent" DisplayMemberPath="Name" Padding="10,8"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ITEMS TABLE -->
+                    <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Margin="0,0,0,16">
+                        <Grid>
+                            <!-- Header -->
+                            <Border Background="#F5F7FB" BorderBrush="#E3E8EF" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0" Padding="16,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="1.2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="SN" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="ITEM NAME" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="IMEI/SERIAL/MEDICINE" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="DAMAGE QTY" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="4" Text="DAMAGE AMOUNT" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="5" Text="TOTAL" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="6" Text="ACTION" FontSize="11.5" FontWeight="SemiBold" Foreground="#6B7C91" FontFamily="Inter, Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <!-- Rows -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                                <StackPanel x:Name="itemsPanel"/>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- RIGHT: Total + Note -->
+                <StackPanel Grid.Column="2">
+                    <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,18">
+                        <StackPanel>
+                            <TextBlock Text="Total Item 0" FontSize="15" FontWeight="Bold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,18" x:Name="txtTotalItem"/>
+
+                            <TextBlock Text="Total Loss" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1" Margin="0,0,0,18">
+                                <TextBlock x:Name="txtTotalLoss" Text="0.00" FontSize="14" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI"/>
+                            </Border>
+
+                            <TextBlock Text="Note" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                <TextBox x:Name="txtNote" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="120" Height="80" VerticalAlignment="Top"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2" Background="#F8F9FB" BorderBrush="#E3E8EF" BorderThickness="0,1,0,0" Padding="24,14">
+            <StackPanel Orientation="Horizontal">
+                <Button FontSize="14" FontWeight="SemiBold" Foreground="White" BorderThickness="0" Padding="20,10" Cursor="Hand" Click="BtnBack_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#696cff"/>
+                    </Button.Background>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Back" FontFamily="Inter, Segoe UI" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnSave" FontSize="14" FontWeight="SemiBold" Foreground="White" BorderThickness="0" Padding="20,10" Cursor="Hand" Margin="12,0,0,0" Click="BtnSave_Click">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#696cff" Offset="0"/>
+                            <GradientStop Color="#5a6be8" Offset="0.65"/>
+                            <GradientStop Color="#3f51b5" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Submit" FontFamily="Inter, Segoe UI" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

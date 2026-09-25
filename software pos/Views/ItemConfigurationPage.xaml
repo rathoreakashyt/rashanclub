@@ -1,0 +1,178 @@
+<UserControl x:Class="RashanKiDukan.Views.ItemConfigurationPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F5F6FA">
+    <UserControl.Resources>
+        <Style x:Key="TileBtn" TargetType="Button">
+            <Setter Property="Width" Value="260"/>
+            <Setter Property="Height" Value="110"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Margin" Value="0,0,16,16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="18,14">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#EEF2FF"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#C7D2FE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18"
+                        Background="Transparent" Foreground="#6B7280" BorderThickness="0"
+                        Cursor="Hand" VerticalAlignment="Center" Click="BtnBack_Click" Padding="6,4"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <TextBlock Text="Item Configuration" FontSize="17" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                    <Border Background="#EEF2FF" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Categories · Brands · Units · Racks · Variations · Expense Categories" FontSize="11" FontWeight="SemiBold" Foreground="#6366F1" FontFamily="Segoe UI"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#F5F6FA">
+            <StackPanel Margin="28,24,28,8">
+                <TextBlock Text="Configure the building blocks of your items. Data is stored locally and synced to the server." FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" Margin="2,0,0,18"/>
+
+                <!-- ITEM CATEGORY -->
+                <TextBlock Text="Item Category" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,0,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddCategory_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Category" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create a new item category" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListCategory_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Categories" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all categories" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+
+                <!-- BRAND -->
+                <TextBlock Text="Brand" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,10,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddBrand_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Brand" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create a new brand" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListBrand_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Brands" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all brands" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+
+                <!-- UNIT -->
+                <TextBlock Text="Unit" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,10,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddUnit_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Unit" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create a new unit (Kg, Piece...)" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListUnit_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Units" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all units" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+
+                <!-- RACK -->
+                <TextBlock Text="Rack" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,10,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddRack_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Rack" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create a new rack / location" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListRack_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Racks" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all racks" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+
+                <!-- VARIATION ATTRIBUTE -->
+                <TextBlock Text="Variation Attribute" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,10,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddVariation_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Variation" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create variation attribute + values" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListVariation_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Variations" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all variations" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+
+                <!-- EXPENSE CATEGORY -->
+                <TextBlock Text="Expense Category" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Segoe UI" Margin="2,10,0,10"/>
+                <WrapPanel>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenAddExpenseCategory_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#6366F1"/>
+                            <TextBlock Text="Add Expense Category" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="Create an expense category" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource TileBtn}" Click="OpenListExpenseCategory_Click">
+                        <StackPanel>
+                            <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="#0EA5E9"/>
+                            <TextBlock Text="List Expense Categories" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,8,0,0"/>
+                            <TextBlock Text="View all expense categories" FontSize="12" Foreground="#64748B" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

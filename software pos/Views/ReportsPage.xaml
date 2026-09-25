@@ -1,0 +1,145 @@
+<UserControl x:Class="RashanKiDukan.Views.ReportsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers"
+             d:DesignHeight="800" d:DesignWidth="1100"
+             Background="{StaticResource BgLightBrush}">
+    <UserControl.Resources>
+        <!-- Modern report card button (Laravel index-style tile) -->
+        <Style x:Key="ReportCardButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12" SnapsToDevicePixels="True">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentBorderBrush}"/>
+                                <Setter TargetName="bd" Property="Background" Value="#FBFBFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                <Setter TargetName="bd" Property="Effect" Value="{x:Null}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════ HEADER ═══════════ -->
+        <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,0,1">
+            <Grid Margin="20,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="{StaticResource Mdl2}" FontSize="17"
+                        Background="Transparent" Foreground="{StaticResource TextMutedBrush}" BorderThickness="0"
+                        Cursor="Hand" VerticalAlignment="Center" Padding="8,6" Click="BtnBack_Click"
+                        ToolTip="Back to dashboard"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="Reports" FontSize="19" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}" FontFamily="Segoe UI"/>
+                    <TextBlock x:Name="lblSubtitle" Text="All business reports in one place" FontSize="12"
+                               Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <DockPanel Grid.Column="2" VerticalAlignment="Center">
+                    <Border x:Name="searchBox" Width="280" Height="38" CornerRadius="10"
+                            Background="{StaticResource BgGrayBrush}" BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1" Margin="0,0,10,0">
+                        <Grid>
+                            <TextBlock Text="&#xE721;" FontFamily="{StaticResource Mdl2}" FontSize="14"
+                                       Foreground="{StaticResource TextFaintBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            <TextBox x:Name="txtSearch" TextChanged="TxtSearch_TextChanged"
+                                     Background="Transparent" BorderThickness="0"
+                                     FontSize="13" FontFamily="Segoe UI" Foreground="{StaticResource TextPrimaryBrush}"
+                                     VerticalContentAlignment="Center" Margin="34,0,10,0"
+                                     Padding="0,0,0,0" CaretBrush="{StaticResource AccentBrush}"/>
+                            <TextBlock x:Name="txtPlaceholder" Text="Search reports…" FontSize="13"
+                                       Foreground="{StaticResource TextFaintBrush}" FontFamily="Segoe UI"
+                                       VerticalAlignment="Center" Margin="34,0,0,0" IsHitTestVisible="False"/>
+                        </Grid>
+                    </Border>
+                    <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="14" Padding="12,6" VerticalAlignment="Center">
+                        <TextBlock x:Name="lblCount" Text="0 reports" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBrush}" FontFamily="Segoe UI"/>
+                    </Border>
+                </DockPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ CATEGORY FILTER CHIPS ═══════════ -->
+        <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,0,1">
+            <WrapPanel x:Name="chipPanel" Margin="20,12"/>
+        </Border>
+
+        <!-- ═══════════ REPORT GRID ═══════════ -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Background="{StaticResource BgLightBrush}">
+            <ItemsControl x:Name="reportItems" Margin="20,16,6,20">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource ReportCardButton}" Width="256" Height="132"
+                                Margin="0,0,14,14" Tag="{Binding Key}" Click="Card_Click">
+                            <Grid Margin="16,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="40" Height="40" CornerRadius="11" Background="{Binding IconBg}">
+                                    <TextBlock Text="{Binding Icon}" FontSize="19"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Title}" FontSize="13.5" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" FontFamily="Segoe UI"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Category}" FontSize="11" Margin="0,5,0,0"
+                                               Foreground="{StaticResource TextMutedBrush}" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                                <Border Grid.Column="2" Background="{Binding IconBg}" CornerRadius="8"
+                                        Width="26" Height="26" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE76C;" FontFamily="{StaticResource Mdl2}" FontSize="11"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

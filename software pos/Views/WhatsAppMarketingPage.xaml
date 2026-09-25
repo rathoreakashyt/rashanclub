@@ -1,0 +1,207 @@
+<UserControl x:Class="RashanKiDukan.Views.WhatsAppMarketingPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:helpers="clr-namespace:RashanKiDukan.Helpers" d:DesignHeight="800" d:DesignWidth="1100">
+    <Grid Background="#F3F4F6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="16,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="18" Background="Transparent" Foreground="#6B7280" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center" Padding="6,4" Click="BtnBack_Click"/>
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <TextBlock Text="WhatsApp Marketing" FontSize="17" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                    <TextBlock FontSize="11" Foreground="#9CA3AF" FontFamily="Segoe UI">
+                        <Run Text="🏠 Home"/>
+                        <Run Text=" > "/>
+                        <Run Text="Marketing"/>
+                        <Run Text=" > "/>
+                        <Run Text="WhatsApp Marketing" FontWeight="SemiBold" Foreground="#6B7280"/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16">
+            <StackPanel>
+                <!-- Stats Cards -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Birthday Today -->
+                    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#DCFCE7" VerticalAlignment="Center">
+                                <TextBlock Text="💚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Customers with Birthday Today" FontSize="12" Foreground="#6B7280" FontFamily="Segoe UI"/>
+                                <TextBlock x:Name="txtBirthdayCount" Text="0" FontSize="22" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Anniversary Today -->
+                    <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#EEF2FF" VerticalAlignment="Center">
+                                <TextBlock Text="💚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Customers with Anniversary Today" FontSize="12" Foreground="#6B7280" FontFamily="Segoe UI"/>
+                                <TextBlock x:Name="txtAnniversaryCount" Text="0" FontSize="22" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- WhatsApp Customers -->
+                    <Border Grid.Column="4" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#E0F2FE" VerticalAlignment="Center">
+                                <TextBlock Text="📱" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Customers with WhatsApp numbers" FontSize="12" Foreground="#6B7280" FontFamily="Segoe UI"/>
+                                <TextBlock x:Name="txtEligibleCount" Text="0" FontSize="22" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Forms Row -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Birthday WhatsApp -->
+                    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="💚 Birthday WhatsApp Message" FontSize="15" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI" Margin="0,0,0,12"/>
+
+                            <TextBlock Text="WhatsApp Message *" FontSize="12" Foreground="#374151" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                            <TextBox x:Name="txtBirthdayMessage" FontSize="12" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Margin="0,0,0,4"/>
+                            <TextBlock FontSize="11" Foreground="#9CA3AF" FontFamily="Segoe UI" Margin="0,0,0,10">
+                                <Run Text="Character count: "/>
+                                <Run x:Name="runBirthdayCharCount" Text="0"/>
+                            </TextBlock>
+
+                            <!-- Info Alert -->
+                            <Border Background="#DCFCE7" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="This WhatsApp message will be sent to customers celebrating their birthday today" FontSize="12" Foreground="#166534" FontFamily="Segoe UI" TextWrapping="Wrap"/>
+                                    <TextBlock FontSize="12" Foreground="#166534" FontFamily="Segoe UI" Margin="0,4,0,0">
+                                        <Run Text="Total Recipients: " FontWeight="SemiBold"/>
+                                        <Run x:Name="runBirthdayRecipients" Text="0"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <Button Content="📱 Send Birthday WhatsApp Message" FontSize="12" FontWeight="SemiBold" Background="#25D366" Foreground="White" BorderThickness="0" Cursor="Hand" Padding="14,8" HorizontalAlignment="Left" Click="BtnSendBirthday_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Anniversary WhatsApp -->
+                    <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="💚 Anniversary WhatsApp Message" FontSize="15" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI" Margin="0,0,0,12"/>
+
+                            <TextBlock Text="WhatsApp Message *" FontSize="12" Foreground="#374151" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                            <TextBox x:Name="txtAnniversaryMessage" FontSize="12" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Margin="0,0,0,4"/>
+                            <TextBlock FontSize="11" Foreground="#9CA3AF" FontFamily="Segoe UI" Margin="0,0,0,10">
+                                <Run Text="Character count: "/>
+                                <Run x:Name="runAnniversaryCharCount" Text="0"/>
+                            </TextBlock>
+
+                            <!-- Info Alert -->
+                            <Border Background="#DCFCE7" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="This WhatsApp message will be sent to customers celebrating their anniversary today" FontSize="12" Foreground="#166534" FontFamily="Segoe UI" TextWrapping="Wrap"/>
+                                    <TextBlock FontSize="12" Foreground="#166534" FontFamily="Segoe UI" Margin="0,4,0,0">
+                                        <Run Text="Total Recipients: " FontWeight="SemiBold"/>
+                                        <Run x:Name="runAnniversaryRecipients" Text="0"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <Button Content="📱 Send Anniversary WhatsApp Message" FontSize="12" FontWeight="SemiBold" Background="#25D366" Foreground="White" BorderThickness="0" Cursor="Hand" Padding="14,8" HorizontalAlignment="Left" Click="BtnSendAnniversary_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Custom WhatsApp (Full Width) -->
+                <Border Background="White" CornerRadius="10" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="📱 Custom WhatsApp Message" FontSize="15" FontWeight="SemiBold" Foreground="#111827" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                        <TextBlock Text="Send a custom WhatsApp message to selected customers or everyone" FontSize="11" Foreground="#9CA3AF" FontFamily="Segoe UI" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Recipients *" FontSize="12" Foreground="#374151" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                        <Border BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4" Margin="0,0,0,10" MaxHeight="150">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <CheckBox x:Name="chkAllCustomers" Content="All Customers" FontSize="12" Foreground="#374151" Margin="4,4" Checked="ChkAll_Changed" Unchecked="ChkAll_Changed"/>
+                                    <Separator Margin="4,2"/>
+                                    <ItemsControl x:Name="lstCustomers"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+
+                        <TextBlock Text="WhatsApp Message *" FontSize="12" Foreground="#374151" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCustomMessage" FontSize="12" Padding="8,6" BorderBrush="#D1D5DB" BorderThickness="1" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Margin="0,0,0,4"/>
+                        <TextBlock FontSize="11" Foreground="#9CA3AF" FontFamily="Segoe UI" Margin="0,0,0,10">
+                            <Run Text="Character count: "/>
+                            <Run x:Name="runCustomCharCount" Text="0"/>
+                        </TextBlock>
+
+                        <!-- Info Alert -->
+                        <Border Background="#DCFCE7" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock x:Name="txtCustomAlertMsg" Text="This WhatsApp message will be sent only to the customers you selected above." FontSize="12" Foreground="#166534" FontFamily="Segoe UI" TextWrapping="Wrap"/>
+                                <TextBlock FontSize="12" Foreground="#166534" FontFamily="Segoe UI" Margin="0,4,0,0">
+                                    <Run Text="Recipients Selected: " FontWeight="SemiBold"/>
+                                    <Run x:Name="runCustomRecipients" Text="0"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Content="📱 Send Custom WhatsApp Message" FontSize="12" FontWeight="SemiBold" Background="#25D366" Foreground="White" BorderThickness="0" Cursor="Hand" Padding="14,8" HorizontalAlignment="Left" Click="BtnSendCustom_Click"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,396 @@
+<UserControl x:Class="RashanKiDukan.Views.CreateInstallmentCustomerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F3F4F6">
+    <UserControl.Resources>
+        <Style x:Key="InputLabel" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style x:Key="RequiredDot" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#EF4444"/>
+            <Setter Property="Margin" Value="2,0,0,0"/>
+        </Style>
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="36"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="White" CornerRadius="10" Margin="18,14"
+            BorderBrush="#E5E7EB" BorderThickness="1">
+        <DockPanel LastChildFill="False">
+            <!-- Header -->
+            <Border DockPanel.Dock="Top" Background="White" BorderBrush="#E5E7EB"
+                    BorderThickness="0,0,0,1" Padding="20,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="&#xE72B;" FontFamily="Segoe MDL2 Assets"
+                            FontSize="18" Background="Transparent" Foreground="#6B7280"
+                            BorderThickness="0" Cursor="Hand" VerticalAlignment="Center"
+                            Click="BtnBack_Click" Padding="4,2"/>
+                    <TextBlock Grid.Column="1" x:Name="lblTitle" Text="Add Installment Customer"
+                               FontSize="17" FontWeight="SemiBold" Foreground="#111827"
+                               FontFamily="Segoe UI" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Form -->
+            <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto" MaxHeight="520">
+                <StackPanel Margin="28,20,28,10">
+
+                    <!-- ════ CUSTOMER INFO ════ -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="16"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="16"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="16"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 1: Name | Phone | Email -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Name" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtName" Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Phone" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtPhone" Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Email" Style="{StaticResource InputLabel}"/>
+                                <TextBox x:Name="txtEmail" Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row 2: Opening Balance | Customer NID | Customer Photo -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Opening Balance -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Opening Balance" Style="{StaticResource InputLabel}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="txtOpeningBalance"
+                                             Style="{StaticResource InputStyle}" HorizontalContentAlignment="Right"/>
+                                    <ComboBox Grid.Column="2" x:Name="cmbDrCr" Height="36"
+                                              FontFamily="Segoe UI" FontSize="13" BorderBrush="#D1D5DB"
+                                              BorderThickness="1" Padding="10,5" VerticalContentAlignment="Center">
+                                        <ComboBoxItem Content="Debit" IsSelected="True"/>
+                                        <ComboBoxItem Content="Credit"/>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                            <!-- Customer NID -->
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Customer NID" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <Grid Height="36">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Choose file"
+                                            FontFamily="Segoe UI" FontSize="12"
+                                            Background="#F3F4F6" Foreground="#374151"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Padding="10,0" Cursor="Hand"
+                                            Click="BtnBrowseNID_Click"/>
+                                    <TextBlock Grid.Column="1" x:Name="lblNID" Text="No file chosen"
+                                               FontSize="12" Foreground="#9CA3AF" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center" Margin="10,0,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </StackPanel>
+                            <!-- Customer Photo -->
+                            <StackPanel Grid.Column="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Customer Photo" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <Grid Height="36">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Choose file"
+                                            FontFamily="Segoe UI" FontSize="12"
+                                            Background="#F3F4F6" Foreground="#374151"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Padding="10,0" Cursor="Hand"
+                                            Click="BtnBrowsePhoto_Click"/>
+                                    <TextBlock Grid.Column="1" x:Name="lblPhoto" Text="No file chosen"
+                                               FontSize="12" Foreground="#9CA3AF" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center" Margin="10,0,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row 3: Address | Permanent Address | Work Address (textareas) -->
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Address" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtAddress" Style="{StaticResource InputStyle}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="60"
+                                         VerticalContentAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Permanent Address" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtPermAddress" Style="{StaticResource InputStyle}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="60"
+                                         VerticalContentAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Work Address" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtWorkAddress" Style="{StaticResource InputStyle}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="60"
+                                         VerticalContentAlignment="Top"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row 4: Date of Birth | Date of Anniversary -->
+                        <Grid Grid.Row="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Date of Birth" Style="{StaticResource InputLabel}"/>
+                                <DatePicker x:Name="dtpDOB" FontFamily="Segoe UI" FontSize="13"
+                                            Background="White" Foreground="#111827"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Height="36" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Date of Anniversary" Style="{StaticResource InputLabel}"/>
+                                <DatePicker x:Name="dtpAnniversary" FontFamily="Segoe UI" FontSize="13"
+                                            Background="White" Foreground="#111827"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Height="36" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <!-- ════ DIVIDER ════ -->
+                    <Border Height="1" Background="#E5E7EB" Margin="0,20,0,0"/>
+
+                    <!-- ════ GUARANTOR INFORMATION ════ -->
+                    <TextBlock Text="Guarantor Information" FontSize="16" FontWeight="SemiBold"
+                               Foreground="#111827" FontFamily="Segoe UI" Margin="0,16,0,12"/>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="16"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 5: Guarantor Name | Guarantor Mobile | Guarantor Present Address -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Guarantor Name" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtGName" Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Guarantor Mobile" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtGMobile" Style="{StaticResource InputStyle}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Guarantor Present Address" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtGPermAddress" Style="{StaticResource InputStyle}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="60"
+                                         VerticalContentAlignment="Top"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Row 6: Guarantor Work Address | Guarantor NID | Guarantor Photo -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Guarantor Work Address" Style="{StaticResource InputLabel}"/>
+                                    <TextBlock Text="•" Style="{StaticResource RequiredDot}"/>
+                                </StackPanel>
+                                <TextBox x:Name="txtGWorkAddress" Style="{StaticResource InputStyle}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="60"
+                                         VerticalContentAlignment="Top"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Guarantor NID" Style="{StaticResource InputLabel}"/>
+                                <Grid Height="36">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Choose file"
+                                            FontFamily="Segoe UI" FontSize="12"
+                                            Background="#F3F4F6" Foreground="#374151"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Padding="10,0" Cursor="Hand"
+                                            Click="BtnBrowseGNID_Click"/>
+                                    <TextBlock Grid.Column="1" x:Name="lblGNID" Text="No file chosen"
+                                               FontSize="12" Foreground="#9CA3AF" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center" Margin="10,0,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Guarantor Photo" Style="{StaticResource InputLabel}"/>
+                                <Grid Height="36">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Choose file"
+                                            FontFamily="Segoe UI" FontSize="12"
+                                            Background="#F3F4F6" Foreground="#374151"
+                                            BorderBrush="#D1D5DB" BorderThickness="1"
+                                            Padding="10,0" Cursor="Hand"
+                                            Click="BtnBrowseGPhoto_Click"/>
+                                    <TextBlock Grid.Column="1" x:Name="lblGPhoto" Text="No file chosen"
+                                               FontSize="12" Foreground="#9CA3AF" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center" Margin="10,0,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Buttons -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="28,4,28,24">
+                <Button x:Name="btnSave"
+                        FontSize="14" FontWeight="SemiBold" Background="#6366F1" Foreground="White"
+                        BorderThickness="0" Cursor="Hand" Height="40" Padding="18,0"
+                        Click="BtnSave_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                    CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#4F46E5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Save" FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button FontSize="14" FontWeight="SemiBold" Background="#6B7280" Foreground="White"
+                        BorderThickness="0" Cursor="Hand" Height="40" Padding="18,0" Margin="10,0,0,0"
+                        Click="BtnBack_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                    CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#4B5563"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Back" FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+    </Border>
+</UserControl>

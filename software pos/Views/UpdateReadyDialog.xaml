@@ -1,0 +1,94 @@
+<Window x:Class="RashanKiDukan.Views.UpdateReadyDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Update Ready" Width="420" Height="260"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="White" ShowInTaskbar="False">
+    <Window.Resources>
+        <Style x:Key="BtnSuccess" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="24,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource SuccessHoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="BtnGhost2" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextFaintBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource BgGrayBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Content -->
+        <StackPanel Grid.Row="0" Margin="28,24">
+            <!-- Success icon -->
+            <Border Background="{StaticResource SuccessLightBrush}" Width="48" Height="48"
+                    CornerRadius="24" HorizontalAlignment="Center" Margin="0,0,0,12">
+                <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="22"
+                           Foreground="{StaticResource SuccessBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <TextBlock Text="UPDATE READY" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+
+            <TextBlock x:Name="txtVersion" Text="Version 1.2.0 has been downloaded successfully."
+                       FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                       TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,4"/>
+
+            <TextBlock Text="The application needs to restart to complete the update."
+                       FontSize="12" Foreground="{StaticResource TextFaintBrush}"
+                       TextAlignment="Center" Margin="0,0,0,8"/>
+        </StackPanel>
+
+        <!-- Footer buttons -->
+        <Border Grid.Row="1" Background="{StaticResource BgGrayBrush}" Padding="20,14">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="btnCancel" Content="Cancel" Style="{StaticResource BtnGhost2}"
+                        Margin="0,0,12,0" Click="BtnCancel_Click"/>
+                <Button x:Name="btnRestart" Content="Restart &amp; Update" Style="{StaticResource BtnSuccess}"
+                        Click="BtnRestart_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

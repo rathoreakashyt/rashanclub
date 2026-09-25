@@ -1,0 +1,110 @@
+<UserControl x:Class="RashanKiDukan.Views.PaymentMethodFormPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="#F8F9FB" BorderBrush="#E3E8EF" BorderThickness="0,0,0,1" Padding="24,14">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="headerTitle" Text="Add Payment Method" FontSize="18" FontWeight="Bold" Foreground="#384551" FontFamily="Inter, Segoe UI"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" Content="Back" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="18,8" Cursor="Hand" Click="BtnBack_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#696cff"/>
+                    </Button.Background>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- CONTENT -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,20">
+
+                <!-- Account Type (full width) -->
+                <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,16" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="Account Type *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                        <Border Background="#F5F7FB" CornerRadius="8" Padding="2,2" BorderBrush="#E3E8EF" BorderThickness="1">
+                            <ComboBox x:Name="cmbAccountType" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" Background="Transparent" DisplayMemberPath="Name" Padding="10,9"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Account Name + Description + Opening Balance (3 columns) -->
+                <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,16" Margin="0,0,0,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Account Name -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Account Name *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                <TextBox x:Name="txtName" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Description -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Description" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                <TextBox x:Name="txtDescription" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="80" Height="42" VerticalAlignment="Top"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Opening Balance -->
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="Opening Balance *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                            <Border Background="#F5F7FB" CornerRadius="8" Padding="12,10" BorderBrush="#E3E8EF" BorderThickness="1">
+                                <TextBox x:Name="txtBalance" BorderThickness="0" Background="Transparent" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Status (full width) -->
+                <Border Background="White" BorderBrush="#E3E8EF" BorderThickness="1" CornerRadius="8" Padding="20,16" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="Status *" FontSize="13" FontWeight="SemiBold" Foreground="#384551" FontFamily="Inter, Segoe UI" Margin="0,0,0,8"/>
+                        <Border Background="#F5F7FB" CornerRadius="8" Padding="2,2" BorderBrush="#E3E8EF" BorderThickness="1">
+                            <ComboBox x:Name="cmbStatus" FontSize="14" FontFamily="Inter, Segoe UI" Foreground="#384551" Background="Transparent" Padding="10,9"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2" Background="#F8F9FB" BorderBrush="#E3E8EF" BorderThickness="0,1,0,0" Padding="24,14">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Submit" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="22,11" Cursor="Hand" Click="BtnSave_Click">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#696cff" Offset="0"/>
+                            <GradientStop Color="#5a6be8" Offset="0.65"/>
+                            <GradientStop Color="#3f51b5" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+                <Button Content="Back" FontSize="13" FontWeight="SemiBold" FontFamily="Inter, Segoe UI" Foreground="White" BorderThickness="0" Padding="22,11" Cursor="Hand" Margin="10,0,0,0" Click="BtnBack_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#696cff"/>
+                    </Button.Background>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

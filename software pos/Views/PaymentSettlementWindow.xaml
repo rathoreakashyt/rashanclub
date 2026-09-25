@@ -1,0 +1,253 @@
+<Window x:Class="RashanKiDukan.Views.PaymentSettlementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Payment Settlement" Height="520" Width="480"
+        WindowStartupLocation="CenterOwner" Background="#0F172A"
+        ResizeMode="NoResize" Topmost="True">
+    <Window.Resources>
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource TextPrimaryBrush}" Padding="20,0">
+            <Grid>
+                <TextBlock Text="PAYMENT SETTLEMENT" FontSize="16" FontWeight="Bold" Foreground="#10B981" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                <TextBlock x:Name="lblClose" Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#64748B" VerticalAlignment="Center" HorizontalAlignment="Right" Cursor="Hand" MouseLeftButtonDown="BtnClose_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#0F172A">
+            <StackPanel Margin="20,16">
+                <!-- Bill Total -->
+                <Border Background="{StaticResource TextPrimaryBrush}" CornerRadius="10" Padding="16,12" Margin="0,0,0,14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="BILL AMOUNT" FontSize="12" Foreground="#64748B" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                        <TextBlock x:Name="lblBillTotal" Text="Rs.0.00" FontSize="28" FontWeight="Bold" Foreground="#10B981" FontFamily="Segoe UI" Grid.Row="1"/>
+                        <TextBlock x:Name="lblItemSummary" Text="0 items | 0.000 qty" FontSize="11" Foreground="#64748B" FontFamily="Segoe UI" Grid.Row="2" Margin="0,4,0,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Payment Mode Tabs -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="tabCash" Grid.Column="0" Background="#059669" CornerRadius="8,0,0,8" Padding="0,10" Cursor="Hand" MouseLeftButtonDown="TabCash_Click">
+                        <TextBlock Text="CASH" FontSize="13" FontWeight="Bold" Foreground="White" FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border x:Name="tabUPI" Grid.Column="1" Background="#334155" CornerRadius="0" Padding="0,10" Cursor="Hand" MouseLeftButtonDown="TabUPI_Click">
+                        <TextBlock Text="UPI" FontSize="13" FontWeight="Bold" Foreground="#94A3B8" FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border x:Name="tabCard" Grid.Column="2" Background="#334155" CornerRadius="0,8,8,0" Padding="0,10" Cursor="Hand" MouseLeftButtonDown="TabCard_Click">
+                        <TextBlock Text="CARD" FontSize="13" FontWeight="Bold" Foreground="#94A3B8" FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Cash Panel -->
+                <StackPanel x:Name="pnlCash">
+                    <TextBlock Text="Cash Denomination" FontSize="13" FontWeight="SemiBold" Foreground="#94A3B8" FontFamily="Segoe UI" Margin="0,0,0,8"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 2000" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt2000" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 500" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt500" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 200" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt200" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 100" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt100" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 50" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt50" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 20" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt20" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="x 10" FontSize="13" Foreground="#E2E8F0" FontFamily="Segoe UI" VerticalAlignment="Center" Width="60"/>
+                        <TextBlock Grid.Column="1" Text="=" FontSize="13" Foreground="#64748B" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBox Grid.Column="2" x:Name="txt10" Style="{StaticResource InputStyle}" Text="0" HorizontalContentAlignment="Right" TextChanged="CashChanged"/>
+                    </Grid>
+
+                    <!-- Total Cash -->
+                    <Border Background="#064E3B" CornerRadius="8" Padding="14,8" Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="TOTAL CASH" FontSize="12" FontWeight="Bold" Foreground="#6EE7B7" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="lblCashTotal" Text="Rs.0.00" FontSize="16" FontWeight="Bold" Foreground="#34D399" FontFamily="Segoe UI" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Change/Cash Back -->
+                    <Border Background="#1E3A5F" CornerRadius="8" Padding="14,8" Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="CHANGE / RETURN" FontSize="12" FontWeight="Bold" Foreground="#93C5FD" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="lblChange" Text="Rs.0.00" FontSize="16" FontWeight="Bold" Foreground="#60A5FA" FontFamily="Segoe UI" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- UPI Panel -->
+                <StackPanel x:Name="pnlUPI" Visibility="Collapsed">
+                    <Border Background="{StaticResource TextPrimaryBrush}" CornerRadius="10" Padding="20,16" Margin="0,0,0,12">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="Scan QR Code to Pay" FontSize="14" FontWeight="Bold" Foreground="#E2E8F0" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <Border Background="White" Width="160" Height="160" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="QR" FontSize="36" FontWeight="Bold" Foreground="#0F172A" FontFamily="Segoe UI" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Text="UPI-PAY-RASHAN" FontSize="10" Foreground="#6B7280" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                </Grid>
+                            </Border>
+                            <TextBlock x:Name="lblUPIAmount" Text="Amount: Rs.0.00" FontSize="16" FontWeight="Bold" Foreground="#10B981" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,12,0,4"/>
+                            <TextBlock Text="UPI ID: rashan@upi" FontSize="11" Foreground="#64748B" FontFamily="Segoe UI" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Wait for payment confirmation..." FontSize="11" Foreground="#F59E0B" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Card Panel -->
+                <StackPanel x:Name="pnlCard" Visibility="Collapsed">
+                    <Border Background="{StaticResource TextPrimaryBrush}" CornerRadius="10" Padding="20,16">
+                        <StackPanel>
+                            <TextBlock Text="CARD PAYMENT" FontSize="14" FontWeight="Bold" Foreground="#E2E8F0" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Card Type" FontSize="12" Foreground="#94A3B8" FontFamily="Segoe UI" VerticalAlignment="Center" Width="80"/>
+                                <ComboBox Grid.Column="1" x:Name="cmbCardType" Height="32" FontFamily="Segoe UI" FontSize="13" Background="#0F172A" Foreground="#E2E8F0" BorderBrush="#334155" VerticalContentAlignment="Center">
+                                    <ComboBoxItem Content="Debit Card" IsSelected="True"/>
+                                    <ComboBoxItem Content="Credit Card"/>
+                                    <ComboBoxItem Content="Master Card"/>
+                                    <ComboBoxItem Content="RuPay"/>
+                                </ComboBox>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Card No." FontSize="12" Foreground="#94A3B8" FontFamily="Segoe UI" VerticalAlignment="Center" Width="80"/>
+                                <TextBox Grid.Column="1" x:Name="txtCardNo" Style="{StaticResource InputStyle}" Text="XXXX-XXXX-XXXX-"/>
+                            </Grid>
+                            <TextBlock Text="Swipe/Insert/Tap card on terminal" FontSize="11" Foreground="#F59E0B" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="{StaticResource TextPrimaryBrush}" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="20,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="CANCEL" Background="#DC2626" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Padding="24,10" Cursor="Hand" Click="BtnClose_Click" HorizontalAlignment="Left">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Cursor="Hand">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Opacity" Value="0.85"/></Trigger></ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Grid.Column="1" Content="CONFIRM PAYMENT" Background="{StaticResource SuccessBrush}" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Padding="24,10" Cursor="Hand" Click="BtnConfirm_Click" HorizontalAlignment="Right">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Cursor="Hand">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Opacity" Value="0.85"/></Trigger></ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

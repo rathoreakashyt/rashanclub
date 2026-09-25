@@ -27,3 +27,19 @@ yarn-error.log
 
 rashankidukan.zip
 dist/Rashan Ki Dukan Setup.exe
+
+# software pos build artifacts (inner repo)
+"software pos/bin"
+"software pos/obj"
+"software pos/publish"
+"software pos/publish_output"
+"software pos/dist"
+"software pos/UpdaterOutput"
+"software pos/Updater/bin"
+"software pos/Updater/obj"
+"software pos/releases/*.zip"
+
+# large build/release artifacts
+software pos/releases/
+software pos/SetupProject/
+software pos/installer/app/
